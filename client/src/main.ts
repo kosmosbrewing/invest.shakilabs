@@ -2,12 +2,14 @@ import { createApp } from "vue";
 import { createHead } from "@vueuse/head";
 import App from "./App.vue";
 import router from "./router";
+import { initAnalytics } from "./lib/analytics";
 import "./assets/css/main.css";
 
 function bootstrap(): void {
   const app = createApp(App);
   const head = createHead();
 
+  initAnalytics();
   app.use(router);
   app.use(head);
   app.mount("#app");

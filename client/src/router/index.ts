@@ -1,4 +1,6 @@
+import { nextTick } from "vue";
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
+import { trackPageView } from "@/lib/analytics";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -44,6 +46,13 @@ router.beforeEach((to) => {
   if (typeof document !== "undefined" && to.meta.title) {
     document.title = to.meta.title as string;
   }
+});
+
+router.afterEach((to, _from, failure) => {
+  if (failure || typeof document === "undefined") return;
+  void nextTick(() => {
+    trackPageView(to.fullPath, document.title);
+  });
 });
 
 export default router;

@@ -2,6 +2,8 @@
 import { onMounted, ref } from "vue";
 import { Moon, Sun } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
+import TickerBar from "@/components/common/TickerBar.vue";
+import { tickerMessages } from "@/data/tickerMessages";
 
 const THEME_STORAGE_KEY = "invest-calc:theme:v1";
 type ThemeMode = "light" | "dark";
@@ -49,7 +51,7 @@ onMounted(() => {
               </span>
             </RouterLink>
             <div class="flex min-w-0 flex-1 items-center justify-center overflow-hidden px-1 text-center font-brand text-caption tracking-[-0.01em]">
-              <span class="text-muted-foreground">2026 투자 세금 계산기</span>
+              <TickerBar :messages="tickerMessages" />
             </div>
             <button
               type="button"
