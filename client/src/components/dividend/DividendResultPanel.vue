@@ -3,7 +3,7 @@ import type { DividendTaxResult } from "@/utils/investCalculator";
 import { formatWon, formatPercent } from "@/lib/utils";
 import { DIVIDEND_TAX } from "@/data/investTaxRates";
 
-const props = defineProps<{
+defineProps<{
   result: DividendTaxResult;
 }>();
 
