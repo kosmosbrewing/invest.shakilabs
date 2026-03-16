@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/generate-sitemap.mjs",
-    "build": "vite build",
+    "build": "node scripts/build.mjs",
     "lint": "eslint \"src/**/*.{ts,vue}\"",
     "lint:fix": "npm run lint -- --fix",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
@@ -15,12 +14,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vueuse/head": "^2.0.0",
+    "@unhead/vue": "^2.1.10",
     "autoprefixer": "^10.4.24",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.563.0",
+    "pinia": "^3.0.4",
     "postcss": "^8.5.6",
+    "radix-vue": "^1.9.17",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^3.4.19",
     "tailwindcss-animate": "^1.0.7",
@@ -32,6 +33,7 @@
     "@vitejs/plugin-vue": "^6.0.2",
     "typescript": "^5.7.3",
     "vite": "^7.3.1",
+    "vite-ssg": "^28.3.0",
     "vitest": "^4.0.18",
     "vue-tsc": "^2.2.0"
   }

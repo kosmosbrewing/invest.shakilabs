@@ -1,5 +1,15 @@
-import { useHead } from "@vueuse/head";
+import { useHead } from "@unhead/vue";
 import { toValue, type MaybeRefOrGetter } from "vue";
+import { useRoute } from "vue-router";
+import { getSiteUrl } from "@/lib/site";
+
+const TITLE_SUFFIX = " | 투자 세금 계산기";
+const DEFAULT_TITLE = "투자 세금 계산기";
+const LEGACY_TITLE_SUFFIXES = [
+  " | invest.shakilabs.com",
+  " | ShakiLabs",
+  TITLE_SUFFIX,
+] as const;
 
 type SEOOptions = {
   title: MaybeRefOrGetter<string>;
@@ -10,9 +20,29 @@ type SEOOptions = {
   >;
 };
 
+function normalizeTitle(rawTitle: string): string {
+  const trimmed = rawTitle.trim();
+  let baseTitle = trimmed;
+
+  for (const suffix of LEGACY_TITLE_SUFFIXES) {
+    if (baseTitle.endsWith(suffix)) {
+      baseTitle = baseTitle.slice(0, -suffix.length).trimEnd();
+      break;
+    }
+  }
+
+  if (!baseTitle) {
+    return DEFAULT_TITLE;
+  }
+
+  return baseTitle.includes(" | ") ? baseTitle : `${baseTitle}${TITLE_SUFFIX}`;
+}
+
 export function useSEO({ title, description, noindex = false, jsonLd }: SEOOptions): void {
+  const route = useRoute();
+
   useHead(() => {
-    const resolvedTitle = toValue(title);
+    const resolvedTitle = normalizeTitle(toValue(title));
     const resolvedDescription = toValue(description);
     const resolvedNoindex = Boolean(toValue(noindex));
     const resolvedJsonLd = toValue(jsonLd);
@@ -24,24 +54,22 @@ export function useSEO({ title, description, noindex = false, jsonLd }: SEOOptio
       : resolvedJsonLd && typeof resolvedJsonLd === "object"
         ? [resolvedJsonLd]
         : [];
-
-    const currentUrl =
-      typeof window !== "undefined"
-        ? (() => {
-            try {
-              const url = new URL(window.location.href);
-              url.search = "";
-              url.hash = "";
-              return url.toString();
-            } catch {
-              return window.location.href.split("#")[0].split("?")[0];
-            }
-          })()
-        : undefined;
+    const siteUrl = getSiteUrl().replace(/\/+$/, "");
+    const currentPath = route.path || "/";
+    const currentUrl = currentPath === "/" ? siteUrl : `${siteUrl}${currentPath}`;
 
     return {
+      htmlAttrs: {
+        lang: "ko",
+      },
       title: resolvedTitle,
-      link: currentUrl ? [{ rel: "canonical", href: currentUrl }] : [],
+      link: currentUrl
+        ? [
+            { rel: "canonical", href: currentUrl },
+            { rel: "alternate", hreflang: "ko", href: currentUrl },
+            { rel: "alternate", hreflang: "x-default", href: currentUrl },
+          ]
+        : [],
       meta: [
         { name: "description", content: resolvedDescription },
         { property: "og:title", content: resolvedTitle },
@@ -54,7 +82,7 @@ export function useSEO({ title, description, noindex = false, jsonLd }: SEOOptio
       script: resolvedJsonLdArray.map((entry, index) => ({
         key: `json-ld-${index}`,
         type: "application/ld+json",
-        children: JSON.stringify(entry),
+        textContent: JSON.stringify(entry),
       })),
     };
   });

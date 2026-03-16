@@ -1,22 +1,82 @@
-import { createApp } from "vue";
-import { createHead } from "@vueuse/head";
+import { ViteSSG } from "vite-ssg";
+import { createPinia } from "pinia";
 import App from "./App.vue";
-import router from "./router";
-import { initAnalytics } from "./lib/analytics";
+import { createScrollBehavior, routes, setupRouterGuards } from "./router";
+import { initAnalytics, trackEvent } from "./lib/analytics";
 import "./assets/css/main.css";
 
-function bootstrap(): void {
-  const app = createApp(App);
-  const head = createHead();
+let hasRegisteredGlobalErrorTracking = false;
 
-  initAnalytics();
-  app.use(router);
-  app.use(head);
-  app.mount("#app");
+function normalizeErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return String(error);
+  }
 }
 
-try {
-  bootstrap();
-} catch (error) {
-  console.error("[bootstrap] failed", error);
+function registerGlobalErrorTracking(): void {
+  if (import.meta.env.SSR || typeof window === "undefined" || hasRegisteredGlobalErrorTracking) return;
+
+  window.addEventListener("error", (event) => {
+    trackEvent("app_error", {
+      message: normalizeErrorMessage(event.error ?? event.message),
+      info: "window.error",
+    });
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    trackEvent("app_error", {
+      message: normalizeErrorMessage(event.reason),
+      info: "window.unhandledrejection",
+    });
+  });
+
+  hasRegisteredGlobalErrorTracking = true;
 }
+
+function scheduleAnalyticsInit(): void {
+  if (import.meta.env.SSR) return;
+
+  if (typeof requestIdleCallback === "function") {
+    requestIdleCallback(() => initAnalytics(), { timeout: 4000 });
+  } else {
+    setTimeout(() => initAnalytics(), 0);
+  }
+}
+
+export const createApp = ViteSSG(
+  App,
+  {
+    routes,
+    scrollBehavior: createScrollBehavior(),
+  },
+  ({ app, router, isClient, initialState }) => {
+    const pinia = createPinia();
+
+    app.config.errorHandler = (error, _instance, info) => {
+      console.error("[global-error]", error, info);
+      trackEvent("app_error", {
+        message: normalizeErrorMessage(error),
+        info,
+      });
+    };
+
+    app.use(pinia);
+    setupRouterGuards(router);
+
+    if (import.meta.env.SSR) {
+      initialState.pinia = pinia.state.value;
+    } else {
+      pinia.state.value = initialState.pinia || {};
+    }
+
+    registerGlobalErrorTracking();
+
+    if (isClient) {
+      scheduleAnalyticsInit();
+    }
+  }
+);
