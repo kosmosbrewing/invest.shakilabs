@@ -1,0 +1,201 @@
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Regular-subset.woff2") format("woff2"),
+       url("/fonts/Pretendard-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Bold-subset.woff2") format("woff2"),
+       url("/fonts/Pretendard-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GmarketSans";
+  src: url("/fonts/GmarketSansBold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --status-success: 148 61% 36%;
+    --status-warning: 43 88% 43%;
+    --status-danger: 0 70% 52%;
+    --status-info: 212 83% 45%;
+    --chart-profit: 148 61% 36%;
+    --chart-tax: 0 84% 60%;
+    --chart-net: 200 90% 42%;
+  }
+
+  .dark {
+    --status-success: 148 63% 66%;
+    --status-warning: 43 95% 70%;
+    --status-danger: 0 86% 73%;
+    --status-info: 205 90% 72%;
+    --chart-profit: 148 61% 62%;
+    --chart-tax: 0 87% 70%;
+    --chart-net: 200 85% 55%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  :where(
+      a, button, input, select, textarea, summary,
+      [role="button"], [tabindex]:not([tabindex="-1"])
+    ):focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .retro-panel {
+    @apply rounded-2xl border border-border bg-card shadow-sm;
+  }
+
+  .retro-panel-muted {
+    @apply rounded-2xl border border-border bg-muted/30 shadow-sm;
+  }
+
+  .retro-panel-content {
+    @apply px-4 py-3 sm:px-5 sm:py-4;
+  }
+
+  .retro-titlebar {
+    @apply flex items-center justify-between gap-3 border-b border-border/70 bg-muted/35 px-4 py-3 sm:px-5 sm:py-3.5 text-foreground;
+  }
+
+  .retro-title {
+    @apply text-heading font-semibold leading-tight tracking-normal font-brand;
+  }
+
+  .retro-input {
+    @apply w-full rounded-xl border border-input bg-card dark:bg-background px-3 py-2.5 text-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors;
+    box-shadow: inset 0 1px 2px hsl(var(--foreground) / 0.04);
+  }
+
+  .retro-button {
+    @apply inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-4 py-2 text-body font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary/90 hover:scale-[1.02];
+  }
+
+  .retro-button-subtle {
+    @apply inline-flex items-center justify-center rounded-lg border border-border/70 bg-card px-3 py-2 text-body font-medium text-foreground transition-all duration-200 hover:border-primary/50 hover:text-primary hover:scale-[1.02];
+  }
+
+  .retro-stat-grid {
+    @apply grid grid-cols-2 gap-2 sm:grid-cols-3;
+  }
+
+  .retro-stat {
+    @apply retro-panel-muted p-3.5;
+  }
+
+  .retro-stat-label {
+    @apply text-caption uppercase tracking-wide text-muted-foreground;
+  }
+
+  .retro-stat-value {
+    @apply mt-1 text-heading font-bold tabular-nums;
+  }
+
+  .retro-board-list {
+    @apply overflow-hidden divide-y divide-border/80 rounded-xl border border-border/70 bg-background;
+  }
+
+  .retro-board-item {
+    @apply flex items-center justify-between gap-3 px-4 py-2 sm:px-5 sm:py-2.5 text-body transition-colors hover:bg-accent/25;
+  }
+
+  .retro-radio {
+    -webkit-appearance: none;
+    appearance: none;
+    @apply inline-grid h-4 w-4 shrink-0 place-content-center rounded-full border border-input bg-background align-middle transition-colors;
+  }
+
+  .retro-radio::before {
+    content: "";
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 9999px;
+    transform: scale(0);
+    transition: transform 0.16s ease-in-out;
+    background: hsl(var(--primary-foreground));
+  }
+
+  .retro-radio:checked {
+    border-color: hsl(var(--primary));
+    background: hsl(var(--primary));
+  }
+
+  .retro-radio:checked::before {
+    transform: scale(1);
+  }
+
+  .retro-chart {
+    @apply rounded-xl border border-border/60 bg-muted/20 p-3.5 space-y-3;
+  }
+
+  .retro-chart-bar {
+    @apply flex h-5 gap-px overflow-hidden rounded-lg border border-border/40 bg-background/60;
+  }
+
+  .retro-chart-segment {
+    @apply transition-all duration-300;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  .retro-chart-legend {
+    @apply grid grid-cols-2 gap-x-4 gap-y-1.5;
+  }
+
+  .retro-chart-legend-item {
+    @apply flex items-center justify-between gap-1.5 text-caption;
+  }
+
+  .retro-chart-dot {
+    @apply inline-block h-2.5 w-2.5 shrink-0 rounded-sm;
+  }
+
+  .touch-target {
+    @apply min-h-11 min-w-11;
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
