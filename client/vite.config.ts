@@ -26,9 +26,10 @@ export default defineConfig({
   server: {
     port: 6209,
   },
-  esbuild: {
-    drop: ["console", "debugger"],
-  },
+  esbuild:
+    process.env.NODE_ENV === "production"
+      ? { drop: ["console", "debugger"] }
+      : {},
   build: {
     outDir: "dist",
     sourcemap: false,
