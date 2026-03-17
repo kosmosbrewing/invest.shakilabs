@@ -4,6 +4,7 @@ import {
   calculateDividendTax,
   calculateIsaCompare,
 } from "@/utils/investCalculator";
+import { calculateGiftTax } from "@/utils/giftTaxCalculator";
 
 describe("investCalculator", () => {
   describe("calculateCryptoTax", () => {
@@ -108,6 +109,33 @@ describe("investCalculator", () => {
       expect(result.isaNetTotal).toBe(50_000_000);
       expect(result.normalNetTotal).toBe(50_000_000);
       expect(result.savingRate).toBe(0);
+    });
+  });
+
+  describe("calculateGiftTax", () => {
+    it("성년 자녀 증여는 5천만원 공제를 반영한다", () => {
+      const result = calculateGiftTax({
+        giftAmount: 300_000_000,
+        priorDeductionUsed: 0,
+        relationship: "adult-child",
+        isGenerationSkipping: false,
+      });
+
+      expect(result.availableDeduction).toBe(50_000_000);
+      expect(result.taxableAmount).toBe(250_000_000);
+      expect(result.totalTax).toBe(40_000_000);
+    });
+
+    it("세대생략 증여는 30% 가산세를 더한다", () => {
+      const result = calculateGiftTax({
+        giftAmount: 300_000_000,
+        priorDeductionUsed: 0,
+        relationship: "adult-child",
+        isGenerationSkipping: true,
+      });
+
+      expect(result.surcharge).toBe(12_000_000);
+      expect(result.totalTax).toBe(52_000_000);
     });
   });
 });

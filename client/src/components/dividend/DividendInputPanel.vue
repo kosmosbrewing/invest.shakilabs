@@ -1,26 +1,41 @@
 <script setup lang="ts">
 import { Banknote } from "lucide-vue-next";
+import { Button } from "@/components/ui/button";
 import { DIVIDEND_TAX } from "@/data/investTaxRates";
+
+type CountryKey = "KR" | keyof typeof DIVIDEND_TAX.FOREIGN_RATES;
 
 defineProps<{
   dividendAmount: number;
-  country: string;
+  country: CountryKey;
   otherFinancialIncome: number;
 }>();
 
 const emit = defineEmits<{
   "update:dividendAmount": [value: number];
-  "update:country": [value: string];
+  "update:country": [value: CountryKey];
   "update:otherFinancialIncome": [value: number];
 }>();
 
-const countries = [
+const countries: ReadonlyArray<{ value: CountryKey; label: string }> = [
   { value: "KR", label: "국내 (한국)" },
   ...Object.entries(DIVIDEND_TAX.FOREIGN_RATES).map(([key, info]) => ({
-    value: key,
+    value: key as CountryKey,
     label: `${info.label} (${(info.localRate * 100).toFixed(1)}%)`,
   })),
 ];
+
+const dividendPresets = [
+  { label: "100만", value: 1_000_000 },
+  { label: "500만", value: 5_000_000 },
+  { label: "2,000만", value: 20_000_000 },
+] as const;
+
+const incomePresets = [
+  { label: "0원", value: 0 },
+  { label: "1,000만", value: 10_000_000 },
+  { label: "2,000만", value: 20_000_000 },
+] as const;
 
 function parseInput(value: string): number {
   const num = Number(value.replace(/[^0-9.-]/g, ""));
@@ -38,67 +53,85 @@ function parseInput(value: string): number {
     </div>
 
     <div class="retro-panel-content space-y-4">
-      <div>
-        <label class="block text-caption font-semibold text-foreground mb-1.5">
-          배당금 (세전)
-        </label>
-        <div class="relative">
-          <input
-            type="text"
-            inputmode="numeric"
-            class="retro-input pr-8"
-            :value="dividendAmount.toLocaleString('ko-KR')"
-            @input="emit('update:dividendAmount', parseInput(($event.target as HTMLInputElement).value))"
-          />
-          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-caption font-semibold text-foreground mb-1.5">
-          배당 국가
-        </label>
-        <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          <label
-            v-for="c in countries"
-            :key="c.value"
-            :class="[
-              'flex items-center gap-2 rounded-lg border px-3 py-2.5 text-caption cursor-pointer transition-colors',
-              country === c.value
-                ? 'border-primary bg-primary/8 text-foreground font-semibold'
-                : 'border-border hover:border-primary/50 text-muted-foreground',
-            ]"
-          >
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="retro-panel-muted p-3.5">
+          <label class="mb-2 block text-caption font-semibold text-foreground">배당금(세전)</label>
+          <div class="relative">
             <input
-              type="radio"
-              name="country"
-              class="retro-radio"
-              :value="c.value"
-              :checked="country === c.value"
-              @change="emit('update:country', c.value)"
+              type="text"
+              inputmode="numeric"
+              class="retro-input pr-8"
+              :value="dividendAmount.toLocaleString('ko-KR')"
+              @input="emit('update:dividendAmount', parseInput(($event.target as HTMLInputElement).value))"
             />
-            {{ c.label }}
-          </label>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <Button
+              v-for="preset in dividendPresets"
+              :key="preset.label"
+              type="button"
+              variant="outline"
+              size="chipSm"
+              @click="emit('update:dividendAmount', preset.value)"
+            >
+              {{ preset.label }}
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <label class="block text-caption font-semibold text-foreground mb-1.5">
-          기타 금융소득 (이자+배당, 연간)
-        </label>
-        <div class="relative">
-          <input
-            type="text"
-            inputmode="numeric"
-            class="retro-input pr-8"
-            :value="otherFinancialIncome.toLocaleString('ko-KR')"
-            @input="emit('update:otherFinancialIncome', parseInput(($event.target as HTMLInputElement).value))"
-          />
-          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
+        <div class="retro-panel-muted p-3.5">
+          <label class="mb-2 block text-caption font-semibold text-foreground">배당 국가</label>
+          <div class="grid grid-cols-1 gap-2">
+            <label
+              v-for="countryItem in countries"
+              :key="countryItem.value"
+              :class="[
+                'flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2.5 text-caption transition-colors',
+                country === countryItem.value
+                  ? 'border-primary bg-primary/8 font-semibold text-foreground'
+                  : 'border-border text-muted-foreground hover:border-primary/50',
+              ]"
+            >
+              <input
+                type="radio"
+                name="country"
+                class="retro-radio"
+                :value="countryItem.value"
+                :checked="country === countryItem.value"
+                @change="emit('update:country', countryItem.value)"
+              />
+              {{ countryItem.label }}
+            </label>
+          </div>
         </div>
-        <p class="mt-1 text-tiny text-muted-foreground">
-          연간 금융소득 합계가 2,000만원 초과 시 종합과세 대상
-        </p>
+
+        <div class="retro-panel-muted p-3.5">
+          <label class="mb-2 block text-caption font-semibold text-foreground">기타 금융소득</label>
+          <div class="relative">
+            <input
+              type="text"
+              inputmode="numeric"
+              class="retro-input pr-8"
+              :value="otherFinancialIncome.toLocaleString('ko-KR')"
+              @input="emit('update:otherFinancialIncome', parseInput(($event.target as HTMLInputElement).value))"
+            />
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
+          </div>
+          <p class="mt-2 text-tiny text-muted-foreground">연간 합계 2,000만원 초과 시 종합과세입니다.</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <Button
+              v-for="preset in incomePresets"
+              :key="preset.label"
+              type="button"
+              variant="outline"
+              size="chipSm"
+              @click="emit('update:otherFinancialIncome', preset.value)"
+            >
+              {{ preset.label }}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

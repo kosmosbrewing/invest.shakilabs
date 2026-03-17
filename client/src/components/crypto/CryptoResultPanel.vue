@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { CRYPTO_TAX_EFFECTIVE_DATE, CRYPTO_TAX_STATUS_NOTE } from "@/data/investTaxRates";
+import ResultMetricTable from "@/components/common/ResultMetricTable.vue";
+import { Badge } from "@/components/ui/badge";
 import type { CryptoTaxResult } from "@/utils/investCalculator";
 import { formatWon, formatPercent } from "@/lib/utils";
 
@@ -10,6 +12,43 @@ const props = defineProps<{
 
 const isProfit = computed(() => props.result.totalGain > 0);
 const isLoss = computed(() => props.result.totalGain < 0);
+const metricRows = computed(() => [
+  {
+    label: "양도차익",
+    value: formatWon(props.result.totalGain),
+    description: "매도가액에서 취득가액과 비용을 차감한 금액",
+    tone: isProfit.value ? "success" : isLoss.value ? "danger" : "default",
+  },
+  {
+    label: "기본공제",
+    value: formatWon(props.result.deduction),
+    description: "연간 가상자산 양도차익에서 250만원 공제",
+  },
+  {
+    label: "과세표준",
+    value: formatWon(props.result.taxableAmount),
+    description: "공제 후 실제 세율이 적용되는 금액",
+  },
+  {
+    label: "소득세",
+    value: formatWon(props.result.incomeTax),
+    description: "예정 세율 20%",
+    tone: "danger",
+  },
+  {
+    label: "지방소득세",
+    value: formatWon(props.result.localTax),
+    description: "소득세의 10%",
+    tone: "danger",
+  },
+  {
+    label: "세후 순수익",
+    value: formatWon(props.result.netProfit),
+    description: "세금 차감 후 남는 예상 수익",
+    badge: props.result.totalTax > 0 ? `실효세율 ${formatPercent(props.result.effectiveRate)}` : undefined,
+    tone: "primary",
+  },
+] as const);
 </script>
 
 <template>
@@ -25,54 +64,20 @@ const isLoss = computed(() => props.result.totalGain < 0);
     </div>
 
     <div class="retro-panel-content space-y-4">
-      <!-- 핵심 요약 -->
-      <div class="retro-stat-grid">
-        <div class="retro-stat">
-          <p class="retro-stat-label">양도차익</p>
-          <p
-            :class="[
-              'retro-stat-value',
-              isProfit ? 'text-status-success' : isLoss ? 'text-status-danger' : '',
-            ]"
-          >
-            {{ formatWon(result.totalGain) }}
-          </p>
-        </div>
-        <div class="retro-stat">
-          <p class="retro-stat-label">기본공제</p>
-          <p class="retro-stat-value">{{ formatWon(result.deduction) }}</p>
-        </div>
-        <div class="retro-stat">
-          <p class="retro-stat-label">과세표준</p>
-          <p class="retro-stat-value">{{ formatWon(result.taxableAmount) }}</p>
+      <div class="rounded-2xl border border-primary/20 bg-primary/8 p-4">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-caption font-semibold text-muted-foreground">예상 세후 순수익</p>
+            <p class="mt-1 text-display font-brand text-primary">{{ formatWon(result.netProfit) }}</p>
+          </div>
+          <Badge variant="outline" class="border-primary/25 bg-primary/5 text-primary">
+            {{ result.totalTax > 0 ? `예상 세금 ${formatWon(result.totalTax)}` : "과세표준 0원" }}
+          </Badge>
         </div>
       </div>
 
-      <!-- 세금 내역 -->
-      <div class="retro-board-list">
-        <div class="retro-board-item">
-          <span class="text-muted-foreground">소득세 (20%)</span>
-          <span class="font-semibold tabular-nums">{{ formatWon(result.incomeTax) }}</span>
-        </div>
-        <div class="retro-board-item">
-          <span class="text-muted-foreground">지방소득세 (2%)</span>
-          <span class="font-semibold tabular-nums">{{ formatWon(result.localTax) }}</span>
-        </div>
-        <div class="retro-board-item bg-accent/30">
-          <span class="font-semibold">예상 세금 합계</span>
-          <span class="font-bold tabular-nums text-status-danger">{{ formatWon(result.totalTax) }}</span>
-        </div>
-      </div>
+      <ResultMetricTable :rows="metricRows" />
 
-      <!-- 실수령 -->
-      <div class="rounded-xl bg-primary/8 border border-primary/20 p-4 text-center">
-        <p class="text-caption text-muted-foreground">예상 세후 순수익</p>
-        <p class="text-display font-brand text-primary">
-          {{ formatWon(result.netProfit) }}
-        </p>
-      </div>
-
-      <!-- 차트 -->
       <div v-if="result.totalGain > 0" class="retro-chart">
         <div class="flex items-center justify-between text-caption text-muted-foreground">
           <span>수익 구성</span>
@@ -105,7 +110,6 @@ const isLoss = computed(() => props.result.totalGain < 0);
         </div>
       </div>
 
-      <!-- 안내 문구 -->
       <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground space-y-1">
         <p>* {{ CRYPTO_TAX_STATUS_NOTE }}</p>
         <p>* 기본공제 250만원은 연간 가상자산 양도차익 합계에서 공제됩니다.</p>

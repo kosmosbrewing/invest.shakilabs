@@ -3,6 +3,7 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 import { createScrollBehavior, routes, setupRouterGuards } from "./router";
 import { initAnalytics, trackEvent } from "./lib/analytics";
+import { initSentry } from "./lib/sentry";
 import "./assets/css/main.css";
 
 let hasRegisteredGlobalErrorTracking = false;
@@ -76,6 +77,7 @@ export const createApp = ViteSSG(
     registerGlobalErrorTracking();
 
     if (isClient) {
+      initSentry(app);
       scheduleAnalyticsInit();
     }
   }

@@ -8,6 +8,7 @@ const tabs = [
   { key: "crypto-tax", label: "가상자산세", to: "/crypto-tax" },
   { key: "dividend-tax", label: "배당소득세", to: "/dividend-tax" },
   { key: "isa", label: "ISA 비교", to: "/isa" },
+  { key: "gift-tax", label: "증여세", to: "/gift-tax" },
 ] as const;
 
 const activePath = computed(() => route.path);

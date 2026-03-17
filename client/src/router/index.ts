@@ -26,6 +26,12 @@ export const routes: RouteRecordRaw[] = [
     meta: { title: "ISA 만기 세후 비교 | 투자 세금 계산기" },
   },
   {
+    path: "/gift-tax",
+    name: "gift-tax",
+    component: () => import("@/views/GiftTaxView.vue"),
+    meta: { title: "증여세 계산기 | 투자 세금 계산기" },
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "not-found",
     component: () => import("@/views/NotFoundView.vue"),

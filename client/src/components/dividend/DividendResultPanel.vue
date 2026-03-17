@@ -1,9 +1,20 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import ResultMetricTable from "@/components/common/ResultMetricTable.vue";
+import { Badge } from "@/components/ui/badge";
 import type { DividendTaxResult } from "@/utils/investCalculator";
 import { formatWon, formatPercent } from "@/lib/utils";
 import { DIVIDEND_TAX } from "@/data/investTaxRates";
 
-defineProps<{
+type MetricRow = {
+  label: string;
+  value: string;
+  description?: string;
+  badge?: string;
+  tone?: "default" | "primary" | "success" | "danger" | "warning";
+};
+
+const props = defineProps<{
   result: DividendTaxResult;
 }>();
 
@@ -12,6 +23,46 @@ function getCountryLabel(country: string): string {
   const info = DIVIDEND_TAX.FOREIGN_RATES[country as keyof typeof DIVIDEND_TAX.FOREIGN_RATES];
   return info?.label ?? country;
 }
+
+const metricRows = computed(() => {
+  const rows: MetricRow[] = [
+    {
+      label: "세전 배당금",
+      value: formatWon(props.result.dividendAmount),
+      description: `${getCountryLabel(props.result.country)} 기준 입력 금액`,
+    },
+    {
+      label: "해외 원천징수",
+      value: formatWon(props.result.foreignTaxAmount),
+      description: props.result.country === "KR" ? "국내 배당은 해당 없음" : `현지 세율 ${formatPercent(props.result.foreignTaxRate)}`,
+      tone: "danger",
+    },
+    {
+      label: "국내 추가세액",
+      value: formatWon(props.result.domesticIncomeTax + props.result.domesticLocalTax),
+      description: props.result.country === "KR" ? "국내 배당 원천징수 15.4%" : "외국 원천징수와 국내 세율 차액 반영",
+      tone: "danger",
+    },
+    {
+      label: "실수령액",
+      value: formatWon(props.result.netDividend),
+      description: `실효세율 ${formatPercent(props.result.effectiveRate)}`,
+      tone: "primary",
+    },
+  ];
+
+  if (props.result.isComprehensive && props.result.comprehensiveTax != null && props.result.comprehensiveNetDividend != null) {
+    rows.push({
+      label: "종합과세 시나리오",
+      value: formatWon(props.result.comprehensiveNetDividend),
+      description: `예상 총세액 ${formatWon(props.result.comprehensiveTax)}`,
+      badge: "2,000만원 초과",
+      tone: "warning",
+    });
+  }
+
+  return rows;
+});
 </script>
 
 <template>
@@ -24,45 +75,20 @@ function getCountryLabel(country: string): string {
     </div>
 
     <div class="retro-panel-content space-y-4">
-      <!-- 원천징수 세금 -->
-      <div class="retro-board-list">
-        <div v-if="result.foreignTaxAmount > 0" class="retro-board-item">
-          <span class="text-muted-foreground">해외 원천징수 ({{ formatPercent(result.foreignTaxRate) }})</span>
-          <span class="font-semibold tabular-nums">{{ formatWon(result.foreignTaxAmount) }}</span>
-        </div>
-        <div v-if="result.domesticIncomeTax > 0" class="retro-board-item">
-          <span class="text-muted-foreground">
-            {{ result.country === 'KR' ? '소득세 (14%)' : '추가 소득세' }}
-          </span>
-          <span class="font-semibold tabular-nums">{{ formatWon(result.domesticIncomeTax) }}</span>
-        </div>
-        <div v-if="result.domesticLocalTax > 0" class="retro-board-item">
-          <span class="text-muted-foreground">지방소득세</span>
-          <span class="font-semibold tabular-nums">{{ formatWon(result.domesticLocalTax) }}</span>
-        </div>
-        <div class="retro-board-item bg-accent/30">
-          <span class="font-semibold">원천징수 세금 합계</span>
-          <span class="font-bold tabular-nums text-status-danger">{{ formatWon(result.totalTax) }}</span>
+      <div class="rounded-2xl border border-primary/20 bg-primary/8 p-4">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-caption font-semibold text-muted-foreground">예상 실수령 배당금</p>
+            <p class="mt-1 text-display font-brand text-primary">{{ formatWon(result.netDividend) }}</p>
+          </div>
+          <Badge variant="outline" class="border-primary/25 bg-primary/5 text-primary">
+            총세금 {{ formatWon(result.totalTax) }}
+          </Badge>
         </div>
       </div>
 
-      <!-- 실수령 배당 -->
-      <div class="retro-stat-grid">
-        <div class="retro-stat">
-          <p class="retro-stat-label">세전 배당금</p>
-          <p class="retro-stat-value">{{ formatWon(result.dividendAmount) }}</p>
-        </div>
-        <div class="retro-stat">
-          <p class="retro-stat-label">실효세율</p>
-          <p class="retro-stat-value text-status-danger">{{ formatPercent(result.effectiveRate) }}</p>
-        </div>
-        <div class="retro-stat">
-          <p class="retro-stat-label">실수령</p>
-          <p class="retro-stat-value text-primary">{{ formatWon(result.netDividend) }}</p>
-        </div>
-      </div>
+      <ResultMetricTable :rows="metricRows" />
 
-      <!-- 종합과세 경고 -->
       <div
         v-if="result.isComprehensive"
         class="rounded-xl border border-status-warning/30 bg-status-warning/8 p-3.5 space-y-2"
@@ -85,7 +111,6 @@ function getCountryLabel(country: string): string {
         </div>
       </div>
 
-      <!-- 차트 -->
       <div v-if="result.dividendAmount > 0" class="retro-chart">
         <div class="flex items-center justify-between text-caption text-muted-foreground">
           <span>배당 구성</span>
@@ -118,7 +143,6 @@ function getCountryLabel(country: string): string {
         </div>
       </div>
 
-      <!-- 안내 -->
       <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground space-y-1">
         <p>* 국내 배당: 소득세 14% + 지방소득세 1.4% = 15.4% 원천징수</p>
         <p>* 해외 배당: 현지 원천징수 후 국내 세율과 비교하여 차액 추가 납부</p>
