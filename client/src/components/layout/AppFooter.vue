@@ -7,7 +7,7 @@ const year = new Date().getFullYear();
     <div class="container py-5">
       <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <p class="text-caption font-bold text-foreground">shakilabs.com/invest</p>
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-tiny">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.75rem]">
           <a
             href="/finance"
             class="text-muted-foreground hover:text-foreground transition-colors"

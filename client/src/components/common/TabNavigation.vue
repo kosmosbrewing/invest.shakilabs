@@ -26,8 +26,9 @@ function isActiveTab(key: (typeof tabs)[number]["key"]): boolean {
           v-for="tab in tabs"
           :key="tab.key"
           :to="tab.to"
+          :aria-current="isActiveTab(tab.key) ? 'page' : undefined"
           :class="[
-            'touch-target relative inline-flex items-center justify-center px-4 py-0 text-body font-semibold leading-tight transition-all duration-200 h-12 shrink-0',
+            'touch-target relative inline-flex h-12 shrink-0 items-center justify-center px-3 text-center text-[0.82rem] font-semibold leading-tight transition-all duration-200 sm:text-body',
             isActiveTab(tab.key)
               ? 'text-primary-foreground'
               : 'text-primary-foreground/70 hover:text-primary-foreground/90',
