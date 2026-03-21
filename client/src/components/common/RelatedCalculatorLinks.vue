@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { ArrowRight, Banknote, Bitcoin, Gift, PiggyBank } from "lucide-vue-next";
+import { ArrowRight, Banknote, Bitcoin, Gift, Globe, Landmark, PiggyBank, ScrollText, TrendingUp, Wallet } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
 import { ActionCard } from "@/components/ui/action-card";
 
@@ -32,6 +32,36 @@ const links = [
     title: "증여세 계산",
     description: "관계별 공제 한도와 누진세율을 반영해 예상 세액을 봅니다.",
     icon: Gift,
+  },
+  {
+    path: "/savings-interest",
+    title: "적금 이자 계산",
+    description: "월 적립액·이율·기간별 만기 수령액과 세후 이자를 계산합니다.",
+    icon: Wallet,
+  },
+  {
+    path: "/deposit-interest",
+    title: "예금 이자 계산",
+    description: "정기예금 만기 수령액과 월이자를 계산합니다.",
+    icon: Landmark,
+  },
+  {
+    path: "/compound-interest",
+    title: "복리 계산기",
+    description: "단리와 복리의 차이를 비교하고 72법칙을 확인합니다.",
+    icon: TrendingUp,
+  },
+  {
+    path: "/inheritance-tax",
+    title: "상속세 계산기",
+    description: "법정 상속분과 누진세율을 반영해 예상 상속세를 계산합니다.",
+    icon: ScrollText,
+  },
+  {
+    path: "/foreign-stock-tax",
+    title: "해외주식 양도소득세",
+    description: "해외주식 250만원 기본공제와 22% 세율을 적용해 세금을 계산합니다.",
+    icon: Globe,
   },
 ] as const;
 

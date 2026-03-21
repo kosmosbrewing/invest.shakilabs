@@ -5,6 +5,8 @@ import {
   calculateIsaCompare,
 } from "@/utils/investCalculator";
 import { calculateGiftTax } from "@/utils/giftTaxCalculator";
+import { calculateForeignStockTax } from "@/utils/foreignStockTaxCalculator";
+import { calculateInheritanceTax } from "@/utils/inheritanceTaxCalculator";
 
 describe("investCalculator", () => {
   describe("calculateCryptoTax", () => {
@@ -109,6 +111,123 @@ describe("investCalculator", () => {
       expect(result.isaNetTotal).toBe(50_000_000);
       expect(result.normalNetTotal).toBe(50_000_000);
       expect(result.savingRate).toBe(0);
+    });
+  });
+
+  describe("calculateForeignStockTax", () => {
+    it("기본공제 이하 수익은 비과세", () => {
+      const result = calculateForeignStockTax({
+        sellAmount: 12_000_000,
+        buyAmount: 10_000_000,
+        fees: 100_000,
+        otherGains: 0,
+        otherLosses: 0,
+      });
+      // 차익 1,900,000 < 2,500,000 → 비과세
+      expect(result.totalTax).toBe(0);
+      expect(result.netProfit).toBe(1_900_000);
+    });
+
+    it("기본공제 초과분에 22% 적용", () => {
+      const result = calculateForeignStockTax({
+        sellAmount: 50_000_000,
+        buyAmount: 30_000_000,
+        fees: 500_000,
+        otherGains: 0,
+        otherLosses: 0,
+      });
+      // 차익 19,500,000 - 공제 2,500,000 = 과세 17,000,000
+      expect(result.taxableAmount).toBe(17_000_000);
+      expect(result.incomeTax).toBe(3_400_000);
+      expect(result.localTax).toBe(340_000);
+      expect(result.totalTax).toBe(3_740_000);
+    });
+
+    it("손실 종목과 합산할 수 있다", () => {
+      const result = calculateForeignStockTax({
+        sellAmount: 50_000_000,
+        buyAmount: 30_000_000,
+        fees: 0,
+        otherGains: 0,
+        otherLosses: 15_000_000,
+      });
+      // 차익 20,000,000 - 손실 15,000,000 = 순차익 5,000,000
+      expect(result.netGain).toBe(5_000_000);
+      expect(result.taxableAmount).toBe(2_500_000);
+    });
+
+    it("손실이 이익보다 크면 세금 없음", () => {
+      const result = calculateForeignStockTax({
+        sellAmount: 30_000_000,
+        buyAmount: 35_000_000,
+        fees: 0,
+        otherGains: 0,
+        otherLosses: 0,
+      });
+      expect(result.totalTax).toBe(0);
+      expect(result.netProfit).toBe(-5_000_000);
+    });
+  });
+
+  describe("calculateInheritanceTax", () => {
+    it("배우자 있는 경우 배우자 공제를 반영한다", () => {
+      const result = calculateInheritanceTax({
+        totalEstate: 2_000_000_000,
+        debt: 0,
+        financialAssets: 500_000_000,
+        hasSpouse: true,
+        childrenCount: 2,
+      });
+      expect(result.spouseDeduction).toBeGreaterThan(0);
+      expect(result.spouseDeduction).toBeLessThanOrEqual(3_000_000_000);
+      expect(result.totalTax).toBeGreaterThan(0);
+    });
+
+    it("배우자 없으면 배우자 공제가 0이다", () => {
+      const result = calculateInheritanceTax({
+        totalEstate: 2_000_000_000,
+        debt: 0,
+        financialAssets: 500_000_000,
+        hasSpouse: false,
+        childrenCount: 2,
+      });
+      expect(result.spouseDeduction).toBe(0);
+    });
+
+    it("5억 이하 상속재산은 일괄공제로 세금이 0이 될 수 있다", () => {
+      const result = calculateInheritanceTax({
+        totalEstate: 500_000_000,
+        debt: 0,
+        financialAssets: 200_000_000,
+        hasSpouse: false,
+        childrenCount: 1,
+      });
+      // 과세가액 ≈ 5억-1500만 = 4.85억, 일괄공제 5억 → 과세표준 0
+      expect(result.taxBase).toBe(0);
+      expect(result.totalTax).toBe(0);
+    });
+
+    it("신고세액공제 3%를 반영한다", () => {
+      const result = calculateInheritanceTax({
+        totalEstate: 5_000_000_000,
+        debt: 0,
+        financialAssets: 1_000_000_000,
+        hasSpouse: false,
+        childrenCount: 0,
+      });
+      expect(result.filingDeduction).toBe(Math.round(result.calculatedTax * 0.03));
+      expect(result.totalTax).toBe(result.calculatedTax - result.filingDeduction);
+    });
+
+    it("금융재산 공제는 최대 2억까지 적용한다", () => {
+      const result = calculateInheritanceTax({
+        totalEstate: 10_000_000_000,
+        debt: 0,
+        financialAssets: 5_000_000_000,
+        hasSpouse: true,
+        childrenCount: 2,
+      });
+      expect(result.financialDeduction).toBe(200_000_000);
     });
   });
 

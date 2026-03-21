@@ -6,7 +6,7 @@ import { getSiteUrl } from "@/lib/site";
 const TITLE_SUFFIX = " | 투자 세금 계산기";
 const DEFAULT_TITLE = "투자 세금 계산기";
 const LEGACY_TITLE_SUFFIXES = [
-  " | invest.shakilabs.com",
+  " | shakilabs.com/invest",
   " | ShakiLabs",
   TITLE_SUFFIX,
 ] as const;

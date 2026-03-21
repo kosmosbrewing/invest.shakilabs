@@ -3,7 +3,7 @@ import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { resolve } from "path";
 import { SEO_ROUTES } from "./seo-routes.mjs";
 
-const SITE_URL = "https://invest.shakilabs.com";
+const SITE_URL = "https://shakilabs.com/invest";
 const DIST_DIR = resolve(import.meta.dirname, "../dist");
 const PUBLIC_DIR = resolve(import.meta.dirname, "../public");
 

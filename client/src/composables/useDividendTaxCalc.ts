@@ -11,8 +11,8 @@ export type DividendTaxCalcResult = {
   result: ComputedRef<DividendTaxResult>;
 };
 
-export function useDividendTaxCalc(): DividendTaxCalcResult {
-  const dividendAmount = ref(5_000_000);
+export function useDividendTaxCalc(initialDividend?: number): DividendTaxCalcResult {
+  const dividendAmount = ref(initialDividend ?? 5_000_000);
   const country = ref<CountryKey>("KR");
   const otherFinancialIncome = ref(0);
 

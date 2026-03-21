@@ -7,8 +7,19 @@ import GiftTaxInputPanel from "@/components/gift/GiftTaxInputPanel.vue";
 import GiftTaxResultPanel from "@/components/gift/GiftTaxResultPanel.vue";
 import { useGiftTaxCalc } from "@/composables/useGiftTaxCalc";
 import { GIFT_TAX_FAQS, GIFT_TAX_SOURCES, GIFT_TAX_UPDATED } from "@/data/giftTax";
+import { formatManWon } from "@/lib/utils";
+import { computed } from "vue";
 
-const calc = useGiftTaxCalc();
+const props = defineProps<{ initialGift?: number }>();
+const amountLabel = computed(() => props.initialGift ? formatManWon(props.initialGift) : null);
+const seoTitle = computed(() =>
+  amountLabel.value ? `${amountLabel.value} 증여세 계산기 | 2026 공제 한도 반영` : "증여세 계산기 | 2026 공제 한도 반영",
+);
+const seoDesc = computed(() =>
+  amountLabel.value ? `${amountLabel.value} 증여 시 관계별 공제 한도와 예상 증여세를 계산합니다.` : "증여금액과 관계를 입력하면 공제 한도를 반영해 예상 증여세를 계산합니다.",
+);
+
+const calc = useGiftTaxCalc(props.initialGift);
 
 const faqJsonLd = {
   "@context": "https://schema.org",
@@ -23,8 +34,8 @@ const faqJsonLd = {
 
 <template>
   <SEOHead
-    title="증여세 계산기 | 2026 공제 한도 반영"
-    description="배우자, 자녀, 직계존속, 기타 친족 관계별 공제와 증여세율을 반영해 예상 증여세를 계산합니다."
+    :title="seoTitle"
+    :description="seoDesc"
     :json-ld="faqJsonLd"
   />
 

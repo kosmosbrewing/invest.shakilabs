@@ -8,8 +8,19 @@ import CryptoInputPanel from "@/components/crypto/CryptoInputPanel.vue";
 import CryptoResultPanel from "@/components/crypto/CryptoResultPanel.vue";
 import { useCryptoTaxCalc } from "@/composables/useCryptoTaxCalc";
 import { CRYPTO_TAX_STATUS_NOTE, INVEST_DATA_UPDATED } from "@/data/investTaxRates";
+import { formatManWon } from "@/lib/utils";
+import { computed } from "vue";
 
-const calc = useCryptoTaxCalc();
+const props = defineProps<{ initialPurchase?: number }>();
+const amountLabel = computed(() => props.initialPurchase ? formatManWon(props.initialPurchase) : null);
+const seoTitle = computed(() =>
+  amountLabel.value ? `${amountLabel.value} 가상자산 세금 시뮬레이터 | 2027 예정 과세 기준` : "가상자산 세금 시뮬레이터 | 2027 예정 과세 기준",
+);
+const seoDesc = computed(() =>
+  amountLabel.value ? `${amountLabel.value} 투자 시 양도차익에 대한 예상 세금을 시뮬레이션합니다.` : "2027년 예정 과세 기준으로 양도차익에서 기본공제 250만원을 반영해 예상 세금을 계산합니다.",
+);
+
+const calc = useCryptoTaxCalc(props.initialPurchase);
 
 const faqItems = [
   {
@@ -42,8 +53,8 @@ const faqJsonLd = {
 
 <template>
   <SEOHead
-    title="가상자산 세금 시뮬레이터 | 2027 예정 과세 기준"
-    description="가상자산(비트코인, 이더리움 등) 양도차익에 대한 예정 세액을 시뮬레이션합니다. 2027년 예정 기준, 기본공제 250만원과 22% 세율을 반영합니다."
+    :title="seoTitle"
+    :description="seoDesc"
     :json-ld="faqJsonLd"
   />
 

@@ -3,12 +3,13 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import tailwind from "tailwindcss";
 import autoprefixer from "autoprefixer";
+import { SEO_ROUTES } from "./scripts/seo-routes.mjs";
 
 export default defineConfig({
   test: {
     include: ["src/**/*.test.ts"],
   },
-  base: "/",
+  base: "/invest/",
   css: {
     postcss: {
       plugins: [tailwind(), autoprefixer()],
@@ -47,5 +48,10 @@ export default defineConfig({
       },
     },
     chunkSizeWarningLimit: 500,
+  },
+  ssgOptions: {
+    includedRoutes() {
+      return SEO_ROUTES;
+    },
   },
 });

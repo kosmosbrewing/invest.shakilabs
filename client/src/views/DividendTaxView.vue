@@ -7,8 +7,19 @@ import DividendInputPanel from "@/components/dividend/DividendInputPanel.vue";
 import DividendResultPanel from "@/components/dividend/DividendResultPanel.vue";
 import { useDividendTaxCalc } from "@/composables/useDividendTaxCalc";
 import { INVEST_DATA_UPDATED } from "@/data/investTaxRates";
+import { formatManWon } from "@/lib/utils";
+import { computed } from "vue";
 
-const calc = useDividendTaxCalc();
+const props = defineProps<{ initialDividend?: number }>();
+const amountLabel = computed(() => props.initialDividend ? formatManWon(props.initialDividend) : null);
+const seoTitle = computed(() =>
+  amountLabel.value ? `배당금 ${amountLabel.value} 배당소득세 계산기 | 국내·해외` : "2026 배당소득세 계산기 | 국내·해외 배당세금 계산",
+);
+const seoDesc = computed(() =>
+  amountLabel.value ? `배당금 ${amountLabel.value} 수령 시 원천징수와 종합과세 기준 세부담을 계산합니다.` : "국내 배당은 15.4% 원천징수, 해외 배당은 현지 원천징수 후 차액 반영까지 계산합니다.",
+);
+
+const calc = useDividendTaxCalc(props.initialDividend);
 
 const faqItems = [
   {
@@ -38,8 +49,8 @@ const faqJsonLd = {
 
 <template>
   <SEOHead
-    title="2026 배당소득세 계산기 | 국내·해외 배당세금 계산"
-    description="국내외 주식 배당소득에 대한 세금을 계산합니다. 원천징수, 종합과세 비교까지 한번에."
+    :title="seoTitle"
+    :description="seoDesc"
     :json-ld="faqJsonLd"
   />
 

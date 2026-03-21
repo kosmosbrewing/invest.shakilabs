@@ -8,9 +8,9 @@ export type CryptoTaxCalcResult = {
   result: ComputedRef<CryptoTaxResult>;
 };
 
-export function useCryptoTaxCalc(): CryptoTaxCalcResult {
-  const purchaseAmount = ref(10_000_000);
-  const saleAmount = ref(15_000_000);
+export function useCryptoTaxCalc(initialPurchase?: number): CryptoTaxCalcResult {
+  const purchaseAmount = ref(initialPurchase ?? 10_000_000);
+  const saleAmount = ref(initialPurchase ? Math.round(initialPurchase * 1.5) : 15_000_000);
   const expenses = ref(0);
 
   const result = computed(() =>

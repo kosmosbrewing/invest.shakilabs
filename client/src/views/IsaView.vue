@@ -7,8 +7,19 @@ import IsaInputPanel from "@/components/isa/IsaInputPanel.vue";
 import IsaResultPanel from "@/components/isa/IsaResultPanel.vue";
 import { useIsaCalc } from "@/composables/useIsaCalc";
 import { INVEST_DATA_UPDATED } from "@/data/investTaxRates";
+import { formatManWon } from "@/lib/utils";
+import { computed } from "vue";
 
-const calc = useIsaCalc();
+const props = defineProps<{ initialAnnual?: number }>();
+const amountLabel = computed(() => props.initialAnnual ? formatManWon(props.initialAnnual) : null);
+const seoTitle = computed(() =>
+  amountLabel.value ? `연 ${amountLabel.value} ISA 만기 세후 비교 | ISA vs 일반계좌` : "2026 ISA 만기 세후 비교 | ISA vs 일반계좌 절세 효과",
+);
+const seoDesc = computed(() =>
+  amountLabel.value ? `연 ${amountLabel.value} 투자 시 ISA와 일반계좌의 세후 수령액 차이를 비교합니다.` : "ISA와 일반 계좌에서 같은 금액을 투자했을 때 세후 수령액 차이를 비교합니다.",
+);
+
+const calc = useIsaCalc(props.initialAnnual);
 
 const faqItems = [
   {
@@ -38,8 +49,8 @@ const faqJsonLd = {
 
 <template>
   <SEOHead
-    title="2026 ISA 만기 세후 비교 | ISA vs 일반계좌 절세 효과"
-    description="ISA(개인종합자산관리계좌) 만기 시 세후 수령액을 일반 계좌와 비교합니다. 비과세 200만·400만원 혜택 확인."
+    :title="seoTitle"
+    :description="seoDesc"
     :json-ld="faqJsonLd"
   />
 

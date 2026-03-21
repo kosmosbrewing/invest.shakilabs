@@ -9,8 +9,8 @@ export type IsaCalcResult = {
   result: ComputedRef<IsaCompareResult>;
 };
 
-export function useIsaCalc(): IsaCalcResult {
-  const annualInvestment = ref(12_000_000);
+export function useIsaCalc(initialAnnual?: number): IsaCalcResult {
+  const annualInvestment = ref(initialAnnual ?? 12_000_000);
   const annualReturnRate = ref(0.05);
   const holdingYears = ref(3);
   const isaType = ref<"general" | "low_income">("general");

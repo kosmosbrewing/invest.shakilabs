@@ -1,0 +1,82 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
+import FreshBadge from "@/components/common/FreshBadge.vue";
+import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.vue";
+import SEOHead from "@/components/common/SEOHead.vue";
+import InheritanceTaxInputPanel from "@/components/inheritance/InheritanceTaxInputPanel.vue";
+import InheritanceTaxResultPanel from "@/components/inheritance/InheritanceTaxResultPanel.vue";
+import { useInheritanceTaxCalc } from "@/composables/useInheritanceTaxCalc";
+import { INHERITANCE_TAX_FAQS, INHERITANCE_TAX_SOURCES, INHERITANCE_TAX_UPDATED } from "@/data/inheritanceTax";
+import { formatManWon } from "@/lib/utils";
+
+const props = defineProps<{ initialEstate?: number }>();
+const amountLabel = computed(() => props.initialEstate ? formatManWon(props.initialEstate) : null);
+const seoTitle = computed(() =>
+  amountLabel.value
+    ? `${amountLabel.value} 상속세 계산기 | 배우자·자녀 공제 반영`
+    : "상속세 계산기 | 배우자공제·일괄공제·금융재산공제 반영",
+);
+const seoDesc = computed(() =>
+  amountLabel.value
+    ? `상속재산 ${amountLabel.value} 기준 배우자공제와 일괄공제를 반영한 예상 상속세를 계산합니다.`
+    : "상속재산과 공제 조건을 입력하면 배우자·일괄·금융재산 공제를 반영한 상속세를 계산합니다.",
+);
+
+const calc = useInheritanceTaxCalc(props.initialEstate);
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: INHERITANCE_TAX_FAQS.map((faq) => ({
+    "@type": "Question",
+    name: faq.q,
+    acceptedAnswer: { "@type": "Answer", text: faq.a },
+  })),
+};
+</script>
+
+<template>
+  <SEOHead :title="seoTitle" :description="seoDesc" :json-ld="faqJsonLd" />
+
+  <div class="container space-y-5 py-5">
+    <section class="retro-panel overflow-hidden">
+      <div class="retro-titlebar rounded-t-2xl">
+        <h1 class="retro-title">상속세 계산기</h1>
+        <FreshBadge :message="`${INHERITANCE_TAX_UPDATED} 기준`" />
+      </div>
+      <div class="retro-panel-content space-y-2">
+        <p class="text-body text-muted-foreground">배우자공제, 일괄공제, 금융재산공제를 반영하여 예상 상속세를 계산합니다.</p>
+        <p class="text-tiny text-muted-foreground">기한 내 신고세액공제(3%)까지 반영한 실납부 세액을 확인할 수 있습니다.</p>
+      </div>
+    </section>
+
+    <InheritanceTaxInputPanel
+      :total-estate="calc.totalEstate.value"
+      :debt="calc.debt.value"
+      :financial-assets="calc.financialAssets.value"
+      :has-spouse="calc.hasSpouse.value"
+      :children-count="calc.childrenCount.value"
+      @update:total-estate="calc.totalEstate.value = $event"
+      @update:debt="calc.debt.value = $event"
+      @update:financial-assets="calc.financialAssets.value = $event"
+      @update:has-spouse="calc.hasSpouse.value = $event"
+      @update:children-count="calc.childrenCount.value = $event"
+    />
+
+    <InheritanceTaxResultPanel :result="calc.result.value" />
+    <RelatedCalculatorLinks current-path="/inheritance-tax" />
+    <FaqAccordionPanel title="출처 및 FAQ" :items="INHERITANCE_TAX_FAQS">
+      <template #before>
+        <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">
+          <p v-for="source in INHERITANCE_TAX_SOURCES" :key="source.url">
+            {{ source.name }} ·
+            <a :href="source.url" class="text-primary underline" target="_blank" rel="noopener noreferrer">
+              {{ source.basis }}
+            </a>
+          </p>
+        </div>
+      </template>
+    </FaqAccordionPanel>
+  </div>
+</template>

@@ -13,7 +13,7 @@ const items: RelatedServiceItem[] = [
   {
     title: "종합소득세 계산",
     description: "배당·기타 투자수익과 함께 종합과세 구간까지 미리 점검합니다.",
-    href: "https://finance.shakilabs.com/comprehensive-tax",
+    href: "/finance/comprehensive-tax",
     icon: Calculator,
   },
 ];

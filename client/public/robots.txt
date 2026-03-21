@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Host: https://invest.shakilabs.com
-Sitemap: https://invest.shakilabs.com/sitemap.xml
+Host: https://shakilabs.com
+Sitemap: https://shakilabs.com/invest/sitemap.xml

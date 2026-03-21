@@ -1,0 +1,82 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
+import FreshBadge from "@/components/common/FreshBadge.vue";
+import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.vue";
+import SEOHead from "@/components/common/SEOHead.vue";
+import ForeignStockTaxInputPanel from "@/components/foreignStock/ForeignStockTaxInputPanel.vue";
+import ForeignStockTaxResultPanel from "@/components/foreignStock/ForeignStockTaxResultPanel.vue";
+import { useForeignStockTaxCalc } from "@/composables/useForeignStockTaxCalc";
+import { FOREIGN_STOCK_TAX_FAQS, FOREIGN_STOCK_TAX_SOURCES, FOREIGN_STOCK_TAX_UPDATED } from "@/data/foreignStockTax";
+import { formatManWon } from "@/lib/utils";
+
+const props = defineProps<{ initialSellAmount?: number }>();
+const amountLabel = computed(() => props.initialSellAmount ? formatManWon(props.initialSellAmount) : null);
+const seoTitle = computed(() =>
+  amountLabel.value
+    ? `${amountLabel.value} 해외주식 양도소득세 계산기 | 250만 공제 반영`
+    : "해외주식 양도소득세 계산기 | 미국·해외주식 세금 22%",
+);
+const seoDesc = computed(() =>
+  amountLabel.value
+    ? `매도금액 ${amountLabel.value} 기준 해외주식 양도소득세와 세후 수익을 계산합니다.`
+    : "매도·매수 금액을 입력하면 해외주식 양도소득세(22%)와 기본공제를 반영한 세후 수익을 계산합니다.",
+);
+
+const calc = useForeignStockTaxCalc(props.initialSellAmount);
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FOREIGN_STOCK_TAX_FAQS.map((faq) => ({
+    "@type": "Question",
+    name: faq.q,
+    acceptedAnswer: { "@type": "Answer", text: faq.a },
+  })),
+};
+</script>
+
+<template>
+  <SEOHead :title="seoTitle" :description="seoDesc" :json-ld="faqJsonLd" />
+
+  <div class="container space-y-5 py-5">
+    <section class="retro-panel overflow-hidden">
+      <div class="retro-titlebar rounded-t-2xl">
+        <h1 class="retro-title">해외주식 양도소득세 계산기</h1>
+        <FreshBadge :message="`${FOREIGN_STOCK_TAX_UPDATED} 기준`" />
+      </div>
+      <div class="retro-panel-content space-y-2">
+        <p class="text-body text-muted-foreground">매도·매수 금액과 수수료를 입력하면 해외주식 양도소득세를 계산합니다.</p>
+        <p class="text-tiny text-muted-foreground">연간 기본공제 250만원과 다른 종목 손익 합산을 반영합니다.</p>
+      </div>
+    </section>
+
+    <ForeignStockTaxInputPanel
+      :sell-amount="calc.sellAmount.value"
+      :buy-amount="calc.buyAmount.value"
+      :fees="calc.fees.value"
+      :other-gains="calc.otherGains.value"
+      :other-losses="calc.otherLosses.value"
+      @update:sell-amount="calc.sellAmount.value = $event"
+      @update:buy-amount="calc.buyAmount.value = $event"
+      @update:fees="calc.fees.value = $event"
+      @update:other-gains="calc.otherGains.value = $event"
+      @update:other-losses="calc.otherLosses.value = $event"
+    />
+
+    <ForeignStockTaxResultPanel :result="calc.result.value" />
+    <RelatedCalculatorLinks current-path="/foreign-stock-tax" />
+    <FaqAccordionPanel title="출처 및 FAQ" :items="FOREIGN_STOCK_TAX_FAQS">
+      <template #before>
+        <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">
+          <p v-for="source in FOREIGN_STOCK_TAX_SOURCES" :key="source.url">
+            {{ source.name }} ·
+            <a :href="source.url" class="text-primary underline" target="_blank" rel="noopener noreferrer">
+              {{ source.basis }}
+            </a>
+          </p>
+        </div>
+      </template>
+    </FaqAccordionPanel>
+  </div>
+</template>

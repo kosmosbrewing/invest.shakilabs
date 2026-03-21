@@ -13,8 +13,8 @@ export type GiftTaxCalcResult = {
   result: ComputedRef<ReturnType<typeof calculateGiftTax>>;
 };
 
-export function useGiftTaxCalc(): GiftTaxCalcResult {
-  const giftAmount = ref(DEFAULT_GIFT_TAX_INPUT.giftAmount);
+export function useGiftTaxCalc(initialGift?: number): GiftTaxCalcResult {
+  const giftAmount = ref(initialGift ?? DEFAULT_GIFT_TAX_INPUT.giftAmount);
   const priorDeductionUsed = ref(DEFAULT_GIFT_TAX_INPUT.priorDeductionUsed);
   const relationship = ref<GiftTaxInput["relationship"]>(DEFAULT_GIFT_TAX_INPUT.relationship);
   const isGenerationSkipping = ref(DEFAULT_GIFT_TAX_INPUT.isGenerationSkipping);
