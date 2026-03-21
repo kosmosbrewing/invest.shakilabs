@@ -52,6 +52,7 @@ export const createApp = ViteSSG(
   App,
   {
     routes,
+    base: import.meta.env.BASE_URL,
     scrollBehavior: createScrollBehavior(),
   },
   ({ app, router, isClient, initialState }) => {
