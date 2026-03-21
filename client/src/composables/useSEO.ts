@@ -15,6 +15,7 @@ type SEOOptions = {
   title: MaybeRefOrGetter<string>;
   description: MaybeRefOrGetter<string>;
   noindex?: MaybeRefOrGetter<boolean | undefined>;
+  ogImage?: MaybeRefOrGetter<string | undefined>;
   jsonLd?: MaybeRefOrGetter<
     Record<string, unknown> | Record<string, unknown>[] | undefined
   >;
@@ -38,7 +39,7 @@ function normalizeTitle(rawTitle: string): string {
   return baseTitle.includes(" | ") ? baseTitle : `${baseTitle}${TITLE_SUFFIX}`;
 }
 
-export function useSEO({ title, description, noindex = false, jsonLd }: SEOOptions): void {
+export function useSEO({ title, description, noindex = false, ogImage, jsonLd }: SEOOptions): void {
   const route = useRoute();
 
   useHead(() => {
@@ -77,6 +78,15 @@ export function useSEO({ title, description, noindex = false, jsonLd }: SEOOptio
         { name: "twitter:title", content: resolvedTitle },
         { name: "twitter:description", content: resolvedDescription },
         ...(currentUrl ? [{ property: "og:url", content: currentUrl }] : []),
+        ...(() => {
+          const img = toValue(ogImage);
+          return img
+            ? [
+                { property: "og:image", content: img },
+                { name: "twitter:image", content: img },
+              ]
+            : [];
+        })(),
         ...(resolvedNoindex ? [{ name: "robots", content: "noindex,nofollow" }] : []),
       ],
       script: resolvedJsonLdArray.map((entry, index) => ({

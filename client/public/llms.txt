@@ -1,0 +1,32 @@
+# 투자·절세 계산기 — shakilabs.com/invest
+
+> 가상자산 세금, 배당소득세, ISA, 증여세, 상속세, 해외주식 양도세, 적금·예금 이자, 복리 계산 등 투자·절세 관련 계산기를 제공하는 무료 서비스입니다. 2026년 세법 기준.
+
+## 사이트 정보
+
+- URL: https://shakilabs.com/invest
+- 언어: 한국어
+- 데이터 기준: 2026년 세법·금융 정책
+
+## 주요 계산기
+
+- [가상자산 세금 계산기](https://shakilabs.com/invest/crypto-tax): 비트코인·이더리움 등 가상자산 양도소득세 계산
+- [배당소득세 계산기](https://shakilabs.com/invest/dividend-tax): 배당소득 원천징수세·종합과세 계산
+- [ISA 절세 계산기](https://shakilabs.com/invest/isa): 개인종합자산관리계좌 비과세·분리과세 효과 계산
+- [증여세 계산기](https://shakilabs.com/invest/gift-tax): 증여 금액별 증여세 계산 (공제 반영)
+- [상속세 계산기](https://shakilabs.com/invest/inheritance-tax): 상속재산 규모별 상속세 계산
+- [해외주식 양도세 계산기](https://shakilabs.com/invest/foreign-stock-tax): 해외주식 매도 시 양도소득세 계산
+- [적금 이자 계산기](https://shakilabs.com/invest/savings-interest): 월 적립액 기준 만기 수령액·세후이자 계산
+- [예금 이자 계산기](https://shakilabs.com/invest/deposit-interest): 예치금 기준 만기 수령액·세후이자 계산
+- [복리 계산기](https://shakilabs.com/invest/compound-interest): 원금·이율·기간별 복리 수익 시뮬레이션
+
+## 데이터 출처
+
+- 가상자산 과세: 소득세법 제37조, 제94조 (2026년 시행)
+- 증여세·상속세: 상속세 및 증여세법
+- ISA: 조세특례제한법 제91조의18
+- 이자소득세: 소득세법 제129조 (15.4%)
+
+## 연락처
+
+- 이메일: skdba1313@gmail.com
