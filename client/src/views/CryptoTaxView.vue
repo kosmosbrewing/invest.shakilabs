@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ShSurface, ShText } from "@shakilabs/ui";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.vue";
@@ -59,9 +60,9 @@ const faqJsonLd = {
   />
 
   <div class="container space-y-5 py-5">
-    <section class="retro-panel overflow-hidden">
+    <ShSurface as="section" padding="none" class="overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
-        <h1 class="retro-title">가상자산 세금 시뮬레이터</h1>
+        <ShText as="h1" variant="heading">가상자산 세금 시뮬레이터</ShText>
         <FreshBadge :message="`${INVEST_DATA_UPDATED} 기준`" />
       </div>
       <div class="retro-panel-content space-y-2">
@@ -70,7 +71,7 @@ const faqJsonLd = {
           매수금액, 매도금액, 필요경비를 넣어 2027년 예정 기준 세후 수익을 빠르게 시뮬레이션합니다.
         </p>
       </div>
-    </section>
+    </ShSurface>
 
     <CryptoInputPanel
       :purchase-amount="calc.purchaseAmount.value"
