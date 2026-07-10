@@ -1,15 +1,18 @@
-// 이자 계산기 공통 상수 (2026-03-20 기준)
+// 이자 계산기 공통 상수 (2026-07-10 기준)
 
-export const INTEREST_DATA_UPDATED = "2026-03-20";
+export const INTEREST_DATA_UPDATED = "2026-07-10";
+export const COOPERATIVE_DEPOSIT_SOURCE_URL =
+  "https://www.law.go.kr/lsLinkCommonInfo.do?lsJoLnkSeq=1018487531";
+export const DEPOSIT_PROTECTION_SOURCE_URL = "https://www.fsc.go.kr/no010101/85200";
 
 // 이자소득세율
 export const INTEREST_TAX = {
   // 일반과세: 소득세 14% + 지방소득세 1.4% = 15.4%
   NORMAL_RATE: 0.154,
   NORMAL_LABEL: "일반과세 (15.4%)",
-  // 세금우대: 소득세 9% + 지방소득세 0.5% = 9.5%
-  PREFERENTIAL_RATE: 0.095,
-  PREFERENTIAL_LABEL: "세금우대 (9.5%)",
+  // 2026년 신규 조합등예탁금 일반 대상: 소득세 5% + 농어촌특별세 0.9% 가정
+  PREFERENTIAL_RATE: 0.059,
+  PREFERENTIAL_LABEL: "2026 조합 예탁금 일반 가정 (5.9%)",
   // 비과세: 0%
   TAX_FREE_RATE: 0,
   TAX_FREE_LABEL: "비과세",
