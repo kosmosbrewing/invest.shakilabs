@@ -6,7 +6,7 @@ import SEOHead from "@/components/common/SEOHead.vue";
 import SavingsInputPanel from "@/components/savings/SavingsInputPanel.vue";
 import SavingsResultPanel from "@/components/savings/SavingsResultPanel.vue";
 import { useSavingsInterestCalc } from "@/composables/useSavingsInterestCalc";
-import { INTEREST_DATA_UPDATED } from "@/data/interestData";
+import { COOPERATIVE_DEPOSIT_SOURCE_URL, INTEREST_DATA_UPDATED } from "@/data/interestData";
 import { formatManWon } from "@/lib/utils";
 import { computed } from "vue";
 
@@ -34,11 +34,11 @@ const faqItems = [
   },
   {
     q: "이자소득세는 얼마나 부과되나요?",
-    a: "일반과세는 15.4%(소득세 14% + 지방소득세 1.4%), 세금우대는 9.5%, 비과세 상품은 0%입니다.",
+    a: "일반과세는 15.4%입니다. 2026년 신규 조합등예탁금 일반 대상은 5.9%를 비교값으로 사용하며, 비과세 대상은 개인 요건과 가입 시점을 확인해야 합니다.",
   },
   {
     q: "세금우대 적금은 누가 가입할 수 있나요?",
-    a: "조합원(농·수·신협, 새마을금고 등)으로 가입 시 1인당 3,000만원 한도로 9.5% 세금우대를 받을 수 있습니다.",
+    a: "조합등예탁금은 1인당 3,000만원 한도입니다. 2026년 신규 가입 일반 대상은 소득세 5% 저율분리과세가 적용되며, 농어민·소득요건 충족자는 별도 비과세 요건을 확인해야 합니다.",
   },
   {
     q: "중도해지하면 이자는 어떻게 되나요?",
@@ -68,7 +68,11 @@ const faqJsonLd = {
       </div>
       <div class="retro-panel-content space-y-2">
         <p class="text-body text-muted-foreground">월 적립액, 연이율, 기간을 입력하면 만기 수령액과 세후 이자를 바로 계산합니다.</p>
-        <p class="text-tiny text-muted-foreground">일반과세(15.4%), 세금우대(9.5%), 비과세 중 선택하여 세후 수령액을 비교할 수 있습니다.</p>
+        <p class="text-tiny text-muted-foreground">일반과세(15.4%), 2026 조합 예탁금 일반 가정(5.9%), 비과세 중 선택해 세후 수령액을 비교합니다.</p>
+        <p class="text-tiny text-muted-foreground">
+          공식 근거:
+          <a :href="COOPERATIVE_DEPOSIT_SOURCE_URL" target="_blank" rel="noopener noreferrer" class="retro-link">조세특례제한법 제89조의3</a>
+        </p>
       </div>
     </section>
 

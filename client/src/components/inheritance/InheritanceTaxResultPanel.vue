@@ -44,7 +44,7 @@ const metricRows = computed(() => [
   {
     label: "금융재산 공제",
     value: formatWon(props.result.financialDeduction),
-    description: "순금융재산의 20% (최대 2억)",
+    description: "2천만원 이하는 전액, 초과 시 구간별 공제 (최대 2억)",
   },
   {
     label: "과세표준",

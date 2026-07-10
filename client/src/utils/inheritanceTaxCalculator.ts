@@ -21,7 +21,7 @@ function findBracket(amount: number) {
 }
 
 function calcFinancialDeduction(financialAssets: number): number {
-  if (financialAssets < FINANCIAL_ASSET_MIN) return 0;
+  if (financialAssets <= FINANCIAL_ASSET_MIN) return Math.max(0, financialAssets);
   const raw = financialAssets * FINANCIAL_ASSET_RATE;
   return Math.min(FINANCIAL_ASSET_MAX, Math.max(FINANCIAL_ASSET_MIN, roundWon(raw)));
 }

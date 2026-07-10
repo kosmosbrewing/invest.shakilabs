@@ -1,4 +1,4 @@
-export const INHERITANCE_TAX_UPDATED = "2026-03-19";
+export const INHERITANCE_TAX_UPDATED = "2026-07-10";
 
 // 상속세 누진세율 (증여세와 동일)
 export const INHERITANCE_TAX_BRACKETS = [
@@ -14,7 +14,7 @@ export const BASIC_DEDUCTION = 200_000_000;
 export const LUMP_SUM_DEDUCTION = 500_000_000;
 export const SPOUSE_MIN_DEDUCTION = 500_000_000;
 export const SPOUSE_MAX_DEDUCTION = 3_000_000_000;
-export const FUNERAL_EXPENSE = 15_000_000;
+export const FUNERAL_EXPENSE = 5_000_000;
 export const FINANCIAL_ASSET_RATE = 0.2;
 export const FINANCIAL_ASSET_MIN = 20_000_000;
 export const FINANCIAL_ASSET_MAX = 200_000_000;
@@ -24,8 +24,8 @@ export const ESTATE_PRESETS = [
 ] as const;
 
 export const INHERITANCE_TAX_SOURCES = [
-  { name: "국세법령정보시스템", url: "https://txsi.hometax.go.kr/", basis: "상속세 및 증여세법" },
-  { name: "국세청", url: "https://www.nts.go.kr/", basis: "상속세 신고 안내" },
+  { name: "국세법령정보시스템", url: "https://taxlaw.nts.go.kr/", basis: "상속세 및 증여세 집행기준" },
+  { name: "국세청", url: "https://i.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7956&mi=6528", basis: "상속공제·장례비용 안내" },
 ];
 
 export const INHERITANCE_TAX_FAQS = [
@@ -43,6 +43,10 @@ export const INHERITANCE_TAX_FAQS = [
   },
   {
     q: "금융재산 상속공제는 어떻게 계산하나요?",
-    a: "순금융재산(금융자산 - 금융부채)의 20%를 공제하며, 최소 2천만원에서 최대 2억원입니다. 순금융재산이 2천만원 미만이면 공제가 없습니다.",
+    a: "순금융재산 2천만원 이하는 전액, 2천만원 초과~1억원은 2천만원, 1억원 초과~10억원은 20%, 10억원 초과는 2억원을 공제합니다.",
+  },
+  {
+    q: "장례비용은 얼마를 반영하나요?",
+    a: "실제 지출액 입력 기능이 없어 법정 최소 공제액 500만원을 기본 반영합니다. 실제 장례비는 500만~1,000만원 범위이며 봉안시설·자연장지 비용은 별도 한도 내 추가될 수 있습니다.",
   },
 ];

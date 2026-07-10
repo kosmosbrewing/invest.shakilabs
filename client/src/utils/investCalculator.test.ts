@@ -202,7 +202,7 @@ describe("investCalculator", () => {
         hasSpouse: false,
         childrenCount: 1,
       });
-      // 과세가액 ≈ 5억-1500만 = 4.85억, 일괄공제 5억 → 과세표준 0
+      // 과세가액 5억-500만, 일괄공제 5억 → 과세표준 0
       expect(result.taxBase).toBe(0);
       expect(result.totalTax).toBe(0);
     });
@@ -228,6 +228,17 @@ describe("investCalculator", () => {
         childrenCount: 2,
       });
       expect(result.financialDeduction).toBe(200_000_000);
+    });
+
+    it("순금융재산 2천만원 이하는 전액 공제한다", () => {
+      const result = calculateInheritanceTax({
+        totalEstate: 1_000_000_000,
+        debt: 0,
+        financialAssets: 10_000_000,
+        hasSpouse: false,
+        childrenCount: 0,
+      });
+      expect(result.financialDeduction).toBe(10_000_000);
     });
   });
 
