@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/build.mjs",
+    "verify:static": "node scripts/validate-static-output.mjs",
     "lint": "eslint \"src/**/*.{ts,vue}\"",
     "lint:fix": "npm run lint -- --fix",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",

@@ -34,3 +34,7 @@ coverage/
 
 # Vite
 *.local
+
+# Vercel local project metadata
+.vercel/
+client/.vercel/
