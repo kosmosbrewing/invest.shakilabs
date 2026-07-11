@@ -6,7 +6,6 @@ import { initAnalytics, trackEvent } from "./lib/analytics";
 import { initSentry } from "./lib/sentry";
 import "./assets/css/main.css";
 import "@shakilabs/ui/styles.css";
-import "./assets/css/design-system.css";
 
 let hasRegisteredGlobalErrorTracking = false;
 
