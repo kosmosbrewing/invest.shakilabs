@@ -35,7 +35,7 @@ describe("calculateSavingsInterest", () => {
     expect(result.maturityAmount).toBe(result.totalPrincipal + result.grossInterest);
   });
 
-  it("세금우대 9.5% 적용", () => {
+  it("2026 조합 예탁금 일반 가정 5.9% 적용", () => {
     const result = calculateSavingsInterest({
       monthlyDeposit: 300_000,
       months: 12,
@@ -44,8 +44,8 @@ describe("calculateSavingsInterest", () => {
     });
     // 이자 = 300,000 × (0.035/12) × 78 = 300,000 × 0.002917 × 78 ≈ 68,250
     expect(result.grossInterest).toBe(68_250);
-    // 세금 = 68,250 × 0.095 = 6,484 (반올림)
-    expect(result.tax).toBe(6_484);
+    // 세금 = 68,250 × 0.059 = 4,027 (반올림)
+    expect(result.tax).toBe(4_027);
   });
 
   it("월별 누적 데이터의 길이가 기간과 같다", () => {

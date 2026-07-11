@@ -182,14 +182,12 @@ export function calculateIsaCompare(
 
   // 복리 수익 계산
   let isaTotal = 0;
-  let normalTotal = 0;
 
   for (let y = 0; y < holdingYears; y++) {
     // 해당 연도 투자금은 남은 기간만큼 복리 적용
     const years = holdingYears - y;
     const futureValue = annualInvestment * Math.pow(1 + annualReturnRate, years);
     isaTotal += futureValue;
-    normalTotal += futureValue;
   }
 
   const totalProfit = Math.round(isaTotal - totalInvestment);
