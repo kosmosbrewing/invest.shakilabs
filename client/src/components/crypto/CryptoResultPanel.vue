@@ -52,7 +52,7 @@ const metricRows = computed(() => [
 </script>
 
 <template>
-  <div class="retro-panel overflow-hidden">
+  <div class="crypto-result-panel retro-panel overflow-hidden">
     <div class="retro-titlebar rounded-t-2xl">
       <h2 class="retro-title">시뮬레이션 결과</h2>
       <span
@@ -64,7 +64,7 @@ const metricRows = computed(() => [
     </div>
 
     <div class="retro-panel-content space-y-4">
-      <div class="rounded-2xl border border-primary/20 bg-primary/8 p-4">
+      <div class="crypto-result-hero rounded-2xl border border-primary/20 bg-primary/8 p-4">
         <div class="flex items-center justify-between gap-3">
           <div>
             <p class="text-caption font-semibold text-muted-foreground">예상 세후 순수익</p>
@@ -76,7 +76,9 @@ const metricRows = computed(() => [
         </div>
       </div>
 
-      <ResultMetricTable :rows="metricRows" />
+      <div class="crypto-metric-list">
+        <ResultMetricTable :rows="metricRows" />
+      </div>
 
       <div v-if="result.totalGain > 0" class="retro-chart">
         <div class="flex items-center justify-between text-caption text-muted-foreground">

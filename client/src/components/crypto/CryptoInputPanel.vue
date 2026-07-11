@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { TrendingUp } from "lucide-vue-next";
+import { useId } from "vue";
 import { Button } from "@/components/ui/button";
 
 defineProps<{
@@ -36,6 +37,10 @@ const expensePresets = [
   { label: "5만", value: 50_000 },
   { label: "20만", value: 200_000 },
 ] as const;
+
+const purchaseAmountId = useId();
+const saleAmountId = useId();
+const expensesId = useId();
 </script>
 
 <template>
@@ -49,11 +54,13 @@ const expensePresets = [
 
     <div class="retro-panel-content space-y-4">
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">취득가액</label>
+        <div class="crypto-input-card retro-panel-muted p-3.5">
+          <label :for="purchaseAmountId" class="mb-2 block text-caption font-semibold text-foreground">
+            취득가액
+          </label>
           <div class="relative">
             <input
-              aria-label="취득가액"
+              :id="purchaseAmountId"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -77,11 +84,13 @@ const expensePresets = [
           </div>
         </div>
 
-        <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">양도가액</label>
+        <div class="crypto-input-card retro-panel-muted p-3.5">
+          <label :for="saleAmountId" class="mb-2 block text-caption font-semibold text-foreground">
+            양도가액
+          </label>
           <div class="relative">
             <input
-              aria-label="양도가액"
+              :id="saleAmountId"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -105,11 +114,13 @@ const expensePresets = [
           </div>
         </div>
 
-        <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">필요경비</label>
+        <div class="crypto-input-card retro-panel-muted p-3.5">
+          <label :for="expensesId" class="mb-2 block text-caption font-semibold text-foreground">
+            필요경비
+          </label>
           <div class="relative">
             <input
-              aria-label="필요경비"
+              :id="expensesId"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"

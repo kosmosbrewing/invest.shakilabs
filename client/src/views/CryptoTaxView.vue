@@ -59,7 +59,7 @@ const faqJsonLd = {
     :json-ld="faqJsonLd"
   />
 
-  <div class="container space-y-5 py-5">
+  <div class="text-resize-layout container space-y-5 py-5">
     <ShSurface as="section" padding="none" class="overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
         <ShText as="h1" variant="heading">가상자산 세금 시뮬레이터</ShText>

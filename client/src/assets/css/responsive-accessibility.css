@@ -1,0 +1,138 @@
+.text-tiny,
+.text-\[10px\],
+.text-\[11px\] {
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+:root:not(.dark) {
+  --status-success: 148 61% 27%;
+  --status-warning: 43 88% 28%;
+}
+
+:root:not(.dark) nav[aria-label="주요 메뉴"] a {
+  color: white;
+}
+
+@media (max-width: 400px) {
+  .text-caption,
+  .text-tiny,
+  .text-xs,
+  [class*="text-[0.6"],
+  [class*="text-[0.7"],
+  [class*="text-[10px]"],
+  [class*="text-[11px]"],
+  [class~="!text-xs"] {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+
+  .retro-details-chevron {
+    font-size: 12px !important;
+  }
+
+  main input[type="range"] {
+    min-height: 24px;
+  }
+
+  main input[type="checkbox"] {
+    min-width: 24px;
+    min-height: 24px;
+  }
+
+  main button,
+  main a[target="_blank"],
+  main a.underline,
+  main summary,
+  footer a {
+    min-height: 24px;
+  }
+
+  main a[target="_blank"],
+  main a.underline,
+  main summary,
+  footer a {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  main button,
+  footer a {
+    min-width: 24px;
+  }
+
+  nav[aria-label="주요 메뉴"] .container {
+    overflow-x: auto;
+    padding-inline: 0;
+  }
+
+  nav[aria-label="주요 메뉴"] .container > div {
+    width: max-content;
+    min-width: 100%;
+    gap: 4px;
+  }
+
+  .text-resize-layout.container {
+    padding-inline: 12px;
+  }
+
+  .text-resize-layout .retro-panel-content,
+  .text-resize-layout .retro-titlebar {
+    padding-inline: 12px;
+  }
+
+  .text-resize-layout :is(h1, h2, h3, p, a, button, span, strong, label, li) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .text-resize-layout .crypto-input-card,
+  .text-resize-layout .crypto-result-hero,
+  .text-resize-layout .retro-chart,
+  .text-resize-layout section > .retro-panel-content .grid > a {
+    padding: 12px;
+  }
+
+  .text-resize-layout .crypto-input-card .retro-input {
+    padding-right: 40px;
+  }
+
+  .text-resize-layout .crypto-result-hero,
+  .text-resize-layout .crypto-result-hero > div {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .text-resize-layout .crypto-metric-list > div:first-child > div {
+    padding: 12px;
+  }
+
+  .text-resize-layout .crypto-metric-list > div:first-child > div > div {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .text-resize-layout .crypto-metric-list > div:first-child > div > div > p:last-child {
+    flex-basis: 100%;
+    text-align: left;
+  }
+
+  .text-resize-layout .retro-chart-legend {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .text-resize-layout .retro-chart-legend-item {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .text-resize-layout section > .retro-panel-content .grid > a > div {
+    gap: 8px;
+  }
+
+  .text-resize-layout section > .retro-panel-content .grid > a > div > span {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+}
