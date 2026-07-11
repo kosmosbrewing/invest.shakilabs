@@ -58,6 +58,7 @@ function parseInput(value: string): number {
           <label class="mb-2 block text-caption font-semibold text-foreground">배당금(세전)</label>
           <div class="relative">
             <input
+              aria-label="세전 배당금"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -110,6 +111,7 @@ function parseInput(value: string): number {
           <label class="mb-2 block text-caption font-semibold text-foreground">기타 금융소득</label>
           <div class="relative">
             <input
+              aria-label="기타 금융소득"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { CRYPTO_TAX_EFFECTIVE_DATE, CRYPTO_TAX_STATUS_NOTE } from "@/data/investTaxRates";
-import ResultMetricTable from "@/components/common/ResultMetricTable.vue";
+import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
 import { Badge } from "@/components/ui/badge";
 import type { CryptoTaxResult } from "@/utils/investCalculator";
 import { formatWon, formatPercent } from "@/lib/utils";

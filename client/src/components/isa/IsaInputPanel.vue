@@ -93,6 +93,7 @@ const holdingYearPresets = [3, 5, 10] as const;
           <label class="mb-2 block text-caption font-semibold text-foreground">연간 투자금액</label>
           <div class="relative">
             <input
+              aria-label="연간 투자금액"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -120,6 +121,7 @@ const holdingYearPresets = [3, 5, 10] as const;
           <label class="mb-2 block text-caption font-semibold text-foreground">예상 연 수익률</label>
           <div class="flex items-center gap-3">
             <input
+              aria-label="예상 연 수익률 범위"
               type="range"
               min="0.01"
               max="0.20"
@@ -155,6 +157,7 @@ const holdingYearPresets = [3, 5, 10] as const;
         <div class="space-y-3 px-3 py-3 sm:px-4">
           <div class="flex items-center gap-3">
             <input
+              aria-label="ISA 보유 기간 범위"
               type="range"
               min="3"
               max="10"

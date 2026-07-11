@@ -40,6 +40,7 @@ function parseInput(value: string): number {
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">매도금액 (원화)</label>
           <input
+            aria-label="매도금액 원화"
             type="text"
             inputmode="numeric"
             class="retro-input"
@@ -63,6 +64,7 @@ function parseInput(value: string): number {
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">매수금액 (원화)</label>
           <input
+            aria-label="매수금액 원화"
             type="text"
             inputmode="numeric"
             class="retro-input"
@@ -75,6 +77,7 @@ function parseInput(value: string): number {
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">필요경비 (수수료 등)</label>
           <input
+            aria-label="필요경비"
             type="text"
             inputmode="numeric"
             class="retro-input"
@@ -94,6 +97,7 @@ function parseInput(value: string): number {
           <div class="retro-panel-muted p-3.5">
             <label class="mb-2 block text-caption font-semibold text-foreground">다른 종목 양도차익</label>
             <input
+              aria-label="다른 종목 양도차익"
               type="text"
               inputmode="numeric"
               class="retro-input"
@@ -104,6 +108,7 @@ function parseInput(value: string): number {
           <div class="retro-panel-muted p-3.5">
             <label class="mb-2 block text-caption font-semibold text-foreground">다른 종목 양도차손</label>
             <input
+              aria-label="다른 종목 양도차손"
               type="text"
               inputmode="numeric"
               class="retro-input"

@@ -48,6 +48,7 @@ const principalPresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">예금 원금</label>
           <div class="relative">
             <input
+              aria-label="예금 원금"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -74,6 +75,7 @@ const principalPresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">연이율 (%)</label>
           <div class="flex items-center gap-3">
             <input
+              aria-label="예금 연이율 범위"
               type="range"
               min="0.5"
               max="10"
@@ -106,6 +108,7 @@ const principalPresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">예금 기간</label>
           <div class="flex items-center gap-3">
             <input
+              aria-label="예금 기간 범위"
               type="range"
               min="1"
               max="60"

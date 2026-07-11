@@ -9,7 +9,7 @@ import {
   ShTableHeader,
   ShTableRow,
 } from "@shakilabs/ui";
-import ResultMetricTable from "@/components/common/ResultMetricTable.vue";
+import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
 import type { CompoundInterestResult } from "@/utils/interestCalculator";
 import { formatWon } from "@/lib/utils";
 

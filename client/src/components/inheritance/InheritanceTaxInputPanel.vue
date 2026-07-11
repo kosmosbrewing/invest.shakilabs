@@ -41,6 +41,7 @@ function parseInput(value: string): number {
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">상속재산 총액</label>
           <input
+            aria-label="상속재산 총액"
             type="text"
             inputmode="numeric"
             class="retro-input"
@@ -65,6 +66,7 @@ function parseInput(value: string): number {
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">채무 (공과금 포함)</label>
           <input
+            aria-label="채무와 공과금"
             type="text"
             inputmode="numeric"
             class="retro-input"
@@ -78,6 +80,7 @@ function parseInput(value: string): number {
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">순금융재산</label>
           <input
+            aria-label="순금융재산"
             type="text"
             inputmode="numeric"
             class="retro-input"
@@ -116,6 +119,7 @@ function parseInput(value: string): number {
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">자녀 수</label>
           <select
+            aria-label="자녀 수"
             class="retro-input"
             :value="childrenCount"
             @change="emit('update:childrenCount', Number(($event.target as HTMLSelectElement).value))"

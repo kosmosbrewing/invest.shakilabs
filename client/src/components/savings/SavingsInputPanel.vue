@@ -46,6 +46,7 @@ const depositPresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">월 적립액</label>
           <div class="relative">
             <input
+              aria-label="월 적립액"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -72,6 +73,7 @@ const depositPresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">연이율 (%)</label>
           <div class="flex items-center gap-3">
             <input
+              aria-label="적금 연이율 범위"
               type="range"
               min="0.5"
               max="10"
@@ -104,6 +106,7 @@ const depositPresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">적금 기간</label>
           <div class="flex items-center gap-3">
             <input
+              aria-label="적금 기간 범위"
               type="range"
               min="1"
               max="60"
