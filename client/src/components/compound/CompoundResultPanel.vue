@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import {
+  ShBadge,
+  ShTable,
+  ShTableBody,
+  ShTableCell,
+  ShTableHead,
+  ShTableHeader,
+  ShTableRow,
+} from "@shakilabs/ui";
 import ResultMetricTable from "@/components/common/ResultMetricTable.vue";
-import { Badge } from "@/components/ui/badge";
 import type { CompoundInterestResult } from "@/utils/interestCalculator";
 import { formatWon } from "@/lib/utils";
 
@@ -63,9 +71,9 @@ const displayYears = computed(() => {
             <p class="text-caption font-semibold text-muted-foreground">복리 최종 금액</p>
             <p class="mt-1 text-display font-brand text-primary">{{ formatWon(result.compoundTotal) }}</p>
           </div>
-          <Badge v-if="result.compoundAdvantage > 0" variant="outline" class="border-status-success/25 bg-status-success/5 text-status-success">
+          <ShBadge v-if="result.compoundAdvantage > 0" tone="success">
             복리 효과 +{{ formatWon(result.compoundAdvantage) }}
-          </Badge>
+          </ShBadge>
         </div>
       </div>
 
@@ -106,26 +114,24 @@ const displayYears = computed(() => {
           <span class="retro-details-chevron">+</span>
         </summary>
         <div class="px-3 py-3 sm:px-4">
-          <div class="overflow-x-auto">
-            <table class="w-full text-caption">
-              <thead>
-                <tr class="border-b border-border text-left text-muted-foreground">
-                  <th class="pb-2 pr-4 font-semibold">연차</th>
-                  <th class="pb-2 pr-4 text-right font-semibold">투자 원금</th>
-                  <th class="pb-2 pr-4 text-right font-semibold">단리</th>
-                  <th class="pb-2 text-right font-semibold">복리</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="row in displayYears" :key="row.year" class="border-b border-border/50">
-                  <td class="py-2 pr-4 tabular-nums">{{ row.year }}년</td>
-                  <td class="py-2 pr-4 text-right tabular-nums">{{ formatWon(row.invested) }}</td>
-                  <td class="py-2 pr-4 text-right tabular-nums">{{ formatWon(row.simpleTotal) }}</td>
-                  <td class="py-2 text-right tabular-nums font-semibold text-primary">{{ formatWon(row.compoundTotal) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <ShTable aria-label="연도별 단리와 복리 성장 비교" density="compact" min-width="30rem" scroll-hint="표를 좌우로 스크롤해 연도별 금액을 확인하세요.">
+            <ShTableHeader>
+              <ShTableRow>
+                <ShTableHead>연차</ShTableHead>
+                <ShTableHead numeric>투자 원금</ShTableHead>
+                <ShTableHead numeric>단리</ShTableHead>
+                <ShTableHead numeric>복리</ShTableHead>
+              </ShTableRow>
+            </ShTableHeader>
+            <ShTableBody>
+              <ShTableRow v-for="row in displayYears" :key="row.year">
+                <ShTableCell>{{ row.year }}년</ShTableCell>
+                <ShTableCell numeric>{{ formatWon(row.invested) }}</ShTableCell>
+                <ShTableCell numeric>{{ formatWon(row.simpleTotal) }}</ShTableCell>
+                <ShTableCell numeric emphasis class="text-primary">{{ formatWon(row.compoundTotal) }}</ShTableCell>
+              </ShTableRow>
+            </ShTableBody>
+          </ShTable>
         </div>
       </details>
 
