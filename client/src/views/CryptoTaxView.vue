@@ -2,7 +2,7 @@
 import { ShSurface, ShText } from "@shakilabs/ui";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
-import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.vue";
+import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import RelatedServices from "@/components/common/RelatedServices.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import CryptoInputPanel from "@/components/crypto/CryptoInputPanel.vue";
@@ -83,7 +83,7 @@ const faqJsonLd = {
     />
 
     <CryptoResultPanel :result="calc.result.value" />
-    <RelatedCalculatorLinks current-path="/crypto-tax" />
+    <IntentRelatedLinks current-path="/crypto-tax" />
     <FaqAccordionPanel :items="faqItems" />
     <RelatedServices />
   </div>

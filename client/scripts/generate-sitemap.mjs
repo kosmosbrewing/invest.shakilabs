@@ -11,6 +11,7 @@ const today = new Date().toISOString().split("T")[0];
 
 function resolvePriority(route) {
   if (route === "/crypto-tax") return "1.0";
+  if (route === "/all") return "0.9";
   if (route === "/dividend-tax") return "0.9";
   if (route === "/isa") return "0.9";
   return "0.5";

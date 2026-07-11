@@ -38,6 +38,7 @@ const paramPaths = new Set([
 ]);
 
 const basePriority = {
+  "/all": "0.9",
   "/crypto-tax": "1.0",
   "/dividend-tax": "0.9",
   "/isa": "0.9",

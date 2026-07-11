@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
-import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.vue";
+import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import ForeignStockTaxInputPanel from "@/components/foreignStock/ForeignStockTaxInputPanel.vue";
 import ForeignStockTaxResultPanel from "@/components/foreignStock/ForeignStockTaxResultPanel.vue";
@@ -65,7 +65,7 @@ const faqJsonLd = {
     />
 
     <ForeignStockTaxResultPanel :result="calc.result.value" />
-    <RelatedCalculatorLinks current-path="/foreign-stock-tax" />
+    <IntentRelatedLinks current-path="/foreign-stock-tax" />
     <FaqAccordionPanel title="출처 및 FAQ" :items="FOREIGN_STOCK_TAX_FAQS">
       <template #before>
         <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">

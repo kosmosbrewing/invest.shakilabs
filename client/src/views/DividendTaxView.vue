@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
-import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.vue";
+import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import DividendInputPanel from "@/components/dividend/DividendInputPanel.vue";
 import DividendResultPanel from "@/components/dividend/DividendResultPanel.vue";
@@ -76,7 +76,7 @@ const faqJsonLd = {
     />
 
     <DividendResultPanel :result="calc.result.value" />
-    <RelatedCalculatorLinks current-path="/dividend-tax" />
+    <IntentRelatedLinks current-path="/dividend-tax" />
     <FaqAccordionPanel :items="faqItems" />
   </div>
 </template>

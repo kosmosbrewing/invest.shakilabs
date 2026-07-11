@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
-import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.vue";
+import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SavingsInputPanel from "@/components/savings/SavingsInputPanel.vue";
 import SavingsResultPanel from "@/components/savings/SavingsResultPanel.vue";
@@ -88,7 +88,7 @@ const faqJsonLd = {
     />
 
     <SavingsResultPanel :result="calc.result.value" />
-    <RelatedCalculatorLinks current-path="/savings-interest" />
+    <IntentRelatedLinks current-path="/savings-interest" />
     <FaqAccordionPanel :items="faqItems" />
   </div>
 </template>

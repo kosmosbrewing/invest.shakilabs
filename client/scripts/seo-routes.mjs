@@ -14,6 +14,7 @@ export const DEPOSIT_AMOUNTS = [1000, 3000, 5000, 10000];
 export const COMPOUND_AMOUNTS = [1000, 3000, 5000, 10000];
 
 export const SEO_ROUTES = [
+  "/all",
   "/crypto-tax",
   "/dividend-tax",
   "/isa",

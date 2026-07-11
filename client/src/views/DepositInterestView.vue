@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
-import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.vue";
+import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import DepositInputPanel from "@/components/deposit/DepositInputPanel.vue";
 import DepositResultPanel from "@/components/deposit/DepositResultPanel.vue";
@@ -95,7 +95,7 @@ const faqJsonLd = {
     />
 
     <DepositResultPanel :result="calc.result.value" :payment-type="calc.paymentType.value" />
-    <RelatedCalculatorLinks current-path="/deposit-interest" />
+    <IntentRelatedLinks current-path="/deposit-interest" />
     <FaqAccordionPanel :items="faqItems" />
   </div>
 </template>

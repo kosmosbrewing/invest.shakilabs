@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
-import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.vue";
+import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import IsaInputPanel from "@/components/isa/IsaInputPanel.vue";
 import IsaResultPanel from "@/components/isa/IsaResultPanel.vue";
@@ -78,7 +78,7 @@ const faqJsonLd = {
     />
 
     <IsaResultPanel :result="calc.result.value" />
-    <RelatedCalculatorLinks current-path="/isa" />
+    <IntentRelatedLinks current-path="/isa" />
     <FaqAccordionPanel :items="faqItems" />
   </div>
 </template>
