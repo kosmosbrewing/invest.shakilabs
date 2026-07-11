@@ -52,6 +52,7 @@ const monthlyPresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">초기 투자금</label>
           <div class="relative">
             <input
+              aria-label="초기 투자금"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -78,6 +79,7 @@ const monthlyPresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">월 추가 적립금</label>
           <div class="relative">
             <input
+              aria-label="월 추가 적립금"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -106,6 +108,7 @@ const monthlyPresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">연 수익률 (%)</label>
           <div class="flex items-center gap-3">
             <input
+              aria-label="연 수익률 범위"
               type="range"
               min="1"
               max="20"
@@ -136,6 +139,7 @@ const monthlyPresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">투자 기간</label>
           <div class="flex items-center gap-3">
             <input
+              aria-label="투자 기간 범위"
               type="range"
               min="1"
               max="40"

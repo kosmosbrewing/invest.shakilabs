@@ -53,6 +53,7 @@ const expensePresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">취득가액</label>
           <div class="relative">
             <input
+              aria-label="취득가액"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -80,6 +81,7 @@ const expensePresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">양도가액</label>
           <div class="relative">
             <input
+              aria-label="양도가액"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -107,6 +109,7 @@ const expensePresets = [
           <label class="mb-2 block text-caption font-semibold text-foreground">필요경비</label>
           <div class="relative">
             <input
+              aria-label="필요경비"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"

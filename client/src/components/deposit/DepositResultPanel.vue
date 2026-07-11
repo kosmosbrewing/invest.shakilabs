@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import ResultMetricTable from "@/components/common/ResultMetricTable.vue";
+import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
 import { Badge } from "@/components/ui/badge";
 import type { DepositInterestResult } from "@/utils/interestCalculator";
 import { formatWon, formatPercent } from "@/lib/utils";

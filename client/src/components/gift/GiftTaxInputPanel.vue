@@ -50,6 +50,7 @@ const deductionPresets = [
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">증여금액</label>
           <input
+            aria-label="증여금액"
             type="text"
             inputmode="numeric"
             class="retro-input"
@@ -73,6 +74,7 @@ const deductionPresets = [
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">기존 사용 공제액</label>
           <input
+            aria-label="기존 사용 공제액"
             type="text"
             inputmode="numeric"
             class="retro-input"
