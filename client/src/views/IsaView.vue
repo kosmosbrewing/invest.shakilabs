@@ -5,6 +5,7 @@ import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.v
 import SEOHead from "@/components/common/SEOHead.vue";
 import IsaInputPanel from "@/components/isa/IsaInputPanel.vue";
 import IsaResultPanel from "@/components/isa/IsaResultPanel.vue";
+import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
 import { useIsaCalc } from "@/composables/useIsaCalc";
 import { INVEST_DATA_UPDATED } from "@/data/investTaxRates";
 import { formatManWon } from "@/lib/utils";
@@ -55,9 +56,11 @@ const faqJsonLd = {
   />
 
   <div class="container space-y-5 py-5">
+    <CalculatorPageHeader title="ISA 만기 세후 비교" />
+
     <section class="retro-panel overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
-        <h1 class="retro-title">ISA 만기 세후 비교</h1>
+        <h2 class="retro-title">비교 기준 안내</h2>
         <FreshBadge :message="`${INVEST_DATA_UPDATED} 기준`" />
       </div>
       <div class="retro-panel-content space-y-2">

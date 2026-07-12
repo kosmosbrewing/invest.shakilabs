@@ -7,6 +7,7 @@ import RelatedServices from "@/components/common/RelatedServices.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import CryptoInputPanel from "@/components/crypto/CryptoInputPanel.vue";
 import CryptoResultPanel from "@/components/crypto/CryptoResultPanel.vue";
+import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
 import { useCryptoTaxCalc } from "@/composables/useCryptoTaxCalc";
 import { CRYPTO_TAX_STATUS_NOTE, INVEST_DATA_UPDATED } from "@/data/investTaxRates";
 import { formatManWon } from "@/lib/utils";
@@ -60,9 +61,11 @@ const faqJsonLd = {
   />
 
   <div class="text-resize-layout container space-y-5 py-5">
+    <CalculatorPageHeader title="가상자산 세금 시뮬레이터" />
+
     <ShSurface as="section" padding="none" class="overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
-        <ShText as="h1" variant="heading">가상자산 세금 시뮬레이터</ShText>
+        <ShText as="h2" variant="heading">과세 기준 안내</ShText>
         <FreshBadge :message="`${INVEST_DATA_UPDATED} 기준`" />
       </div>
       <div class="retro-panel-content space-y-2">

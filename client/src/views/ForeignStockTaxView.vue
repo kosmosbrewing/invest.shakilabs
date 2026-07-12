@@ -6,6 +6,7 @@ import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.v
 import SEOHead from "@/components/common/SEOHead.vue";
 import ForeignStockTaxInputPanel from "@/components/foreignStock/ForeignStockTaxInputPanel.vue";
 import ForeignStockTaxResultPanel from "@/components/foreignStock/ForeignStockTaxResultPanel.vue";
+import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
 import { useForeignStockTaxCalc } from "@/composables/useForeignStockTaxCalc";
 import { FOREIGN_STOCK_TAX_FAQS, FOREIGN_STOCK_TAX_SOURCES, FOREIGN_STOCK_TAX_UPDATED } from "@/data/foreignStockTax";
 import { formatManWon } from "@/lib/utils";
@@ -40,9 +41,11 @@ const faqJsonLd = {
   <SEOHead :title="seoTitle" :description="seoDesc" :json-ld="faqJsonLd" />
 
   <div class="container space-y-5 py-5">
+    <CalculatorPageHeader title="해외주식 양도소득세 계산기" />
+
     <section class="retro-panel overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
-        <h1 class="retro-title">해외주식 양도소득세 계산기</h1>
+        <h2 class="retro-title">과세 기준 안내</h2>
         <FreshBadge :message="`${FOREIGN_STOCK_TAX_UPDATED} 기준`" />
       </div>
       <div class="retro-panel-content space-y-2">
