@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
+import BreakdownStackedBar from "@/components/result-visualization/BreakdownStackedBar.vue";
 import { Badge } from "@/components/ui/badge";
 import { formatPercent, formatWon } from "@/lib/utils";
 
@@ -65,6 +66,10 @@ const metricRows = computed(() => [
     tone: "primary",
   },
 ] as const);
+const segments = computed(() => [
+  { key: "after", label: "세후 상속재산", value: props.result.afterTaxEstate, tone: "gain" as const },
+  { key: "tax", label: "예상 상속세", value: props.result.totalTax, tone: "tax" as const },
+]);
 </script>
 
 <template>
@@ -87,6 +92,8 @@ const metricRows = computed(() => [
       </div>
 
       <ResultMetricTable :rows="metricRows" />
+
+      <BreakdownStackedBar label="채무 차감 후 재산 구성" :segments="segments" :format-value="formatWon" />
 
       <p class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">
         기한 내 신고세액공제(3%)를 반영했습니다. 세대생략 가산세, 영농·영업 상속공제, 동거주택 상속공제 등 특수 공제는 반영하지 않았습니다.

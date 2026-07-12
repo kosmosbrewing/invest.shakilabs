@@ -10,6 +10,7 @@ import {
   ShTableRow,
 } from "@shakilabs/ui";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
+import CompoundGrowthChart from "@/components/compound/CompoundGrowthChart.vue";
 import type { CompoundInterestResult } from "@/utils/interestCalculator";
 import { formatWon } from "@/lib/utils";
 
@@ -79,33 +80,7 @@ const displayYears = computed(() => {
 
       <ResultMetricTable :rows="metricRows" />
 
-      <!-- 단리 vs 복리 비교 바 -->
-      <div v-if="result.compoundTotal > result.totalInvested" class="retro-chart">
-        <div class="text-caption text-muted-foreground">단리 vs 복리 비교</div>
-        <div class="space-y-2">
-          <div>
-            <div class="flex items-center justify-between text-caption mb-1">
-              <span class="font-semibold text-primary">복리</span>
-              <span class="font-semibold tabular-nums">{{ formatWon(result.compoundTotal) }}</span>
-            </div>
-            <div class="h-4 w-full rounded-lg bg-muted overflow-hidden">
-              <div class="h-full rounded-lg bg-primary transition-all duration-300" style="width: 100%" />
-            </div>
-          </div>
-          <div>
-            <div class="flex items-center justify-between text-caption mb-1">
-              <span class="font-semibold text-muted-foreground">단리</span>
-              <span class="font-semibold tabular-nums">{{ formatWon(result.simpleTotal) }}</span>
-            </div>
-            <div class="h-4 w-full rounded-lg bg-muted overflow-hidden">
-              <div
-                class="h-full rounded-lg bg-muted-foreground/40 transition-all duration-300"
-                :style="{ width: `${(result.simpleTotal / result.compoundTotal) * 100}%` }"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <CompoundGrowthChart :rows="result.yearlyData" />
 
       <!-- 연도별 성장 테이블 -->
       <details v-if="displayYears.length > 1" class="retro-details">

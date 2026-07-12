@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
+import BreakdownStackedBar from "@/components/result-visualization/BreakdownStackedBar.vue";
 import { Badge } from "@/components/ui/badge";
 import type { SavingsInterestResult } from "@/utils/interestCalculator";
 import { formatWon, formatPercent } from "@/lib/utils";
@@ -34,6 +35,10 @@ const metricRows = computed(() => [
     tone: "primary" as const,
   },
 ]);
+const segments = computed(() => [
+  { key: "principal", label: "원금", value: props.result.totalPrincipal, tone: "primary" as const },
+  { key: "interest", label: "세후 이자", value: props.result.netInterest, tone: "gain" as const },
+]);
 </script>
 
 <template>
@@ -57,30 +62,7 @@ const metricRows = computed(() => [
 
       <ResultMetricTable :rows="metricRows" />
 
-      <!-- 원금 vs 이자 비율 바 -->
-      <div v-if="result.grossInterest > 0" class="retro-chart">
-        <div class="text-caption text-muted-foreground">만기 수령액 구성</div>
-        <div class="retro-chart-bar">
-          <div
-            class="retro-chart-segment bg-primary"
-            :style="{ width: `${(result.totalPrincipal / result.maturityAmount) * 100}%` }"
-          />
-          <div
-            class="retro-chart-segment bg-status-success"
-            :style="{ width: `${(result.netInterest / result.maturityAmount) * 100}%` }"
-          />
-        </div>
-        <div class="retro-chart-legend">
-          <div class="flex items-center gap-1.5 text-tiny">
-            <span class="retro-chart-dot bg-primary" />
-            <span class="text-muted-foreground">원금 {{ formatWon(result.totalPrincipal) }}</span>
-          </div>
-          <div class="flex items-center gap-1.5 text-tiny">
-            <span class="retro-chart-dot bg-status-success" />
-            <span class="text-muted-foreground">세후 이자 {{ formatWon(result.netInterest) }}</span>
-          </div>
-        </div>
-      </div>
+      <BreakdownStackedBar label="만기 수령액 구성" :segments="segments" :format-value="formatWon" />
 
       <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground space-y-1">
         <p>* 단리 기준 계산이며, 실제 적금 상품에 따라 이자 계산 방식이 다를 수 있습니다.</p>
