@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { PiggyBank } from "lucide-vue-next";
+import { ShPresetGroup, ShSlider } from "@shakilabs/ui";
 import { Button } from "@/components/ui/button";
 
 defineProps<{
@@ -33,7 +34,10 @@ const returnRatePresets = [
   { label: "8%", value: 0.08 },
 ] as const;
 
-const holdingYearPresets = [3, 5, 10] as const;
+const holdingYearPresets = [3, 5, 10].map((value) => ({
+  label: `${value}년`,
+  value,
+}));
 </script>
 
 <template>
@@ -120,32 +124,27 @@ const holdingYearPresets = [3, 5, 10] as const;
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">예상 연 수익률</label>
           <div class="flex items-center gap-3">
-            <input
-              aria-label="예상 연 수익률 범위"
-              type="range"
-              min="0.01"
-              max="0.20"
-              step="0.005"
-              class="h-2 flex-1 accent-primary"
-              :value="annualReturnRate"
-              @input="emit('update:annualReturnRate', Number(($event.target as HTMLInputElement).value))"
+            <ShSlider
+              :model-value="annualReturnRate"
+              :min="0.01"
+              :max="0.2"
+              :step="0.005"
+              :value-text="`예상 연 수익률 ${(annualReturnRate * 100).toFixed(1)}%`"
+              class="flex-1"
+              aria-label="예상 연 수익률 슬라이더"
+              @update:model-value="emit('update:annualReturnRate', $event)"
             />
             <span class="shrink-0 whitespace-nowrap text-right text-body font-semibold tabular-nums">
               {{ (annualReturnRate * 100).toFixed(1) }}%
             </span>
           </div>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in returnRatePresets"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:annualReturnRate', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="annualReturnRate"
+            :options="returnRatePresets"
+            label="예상 연 수익률 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:annualReturnRate', $event)"
+          />
         </div>
       </div>
 
@@ -156,30 +155,24 @@ const holdingYearPresets = [3, 5, 10] as const;
         </summary>
         <div class="space-y-3 px-3 py-3 sm:px-4">
           <div class="flex items-center gap-3">
-            <input
-              aria-label="ISA 보유 기간 범위"
-              type="range"
-              min="3"
-              max="10"
-              step="1"
-              class="h-2 flex-1 accent-primary"
-              :value="holdingYears"
-              @input="emit('update:holdingYears', Number(($event.target as HTMLInputElement).value))"
+            <ShSlider
+              :model-value="holdingYears"
+              :min="3"
+              :max="10"
+              :step="1"
+              :value-text="`ISA 보유 기간 ${holdingYears}년`"
+              class="flex-1"
+              aria-label="ISA 보유 기간 슬라이더"
+              @update:model-value="emit('update:holdingYears', $event)"
             />
             <span class="shrink-0 whitespace-nowrap text-right text-body font-semibold tabular-nums">{{ holdingYears }}년</span>
           </div>
-          <div class="flex flex-wrap gap-2">
-            <Button
-              v-for="year in holdingYearPresets"
-              :key="year"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:holdingYears', year)"
-            >
-              {{ year }}년
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="holdingYears"
+            :options="holdingYearPresets"
+            label="ISA 보유 기간 빠른 선택"
+            @update:model-value="emit('update:holdingYears', $event)"
+          />
           <p class="text-tiny text-muted-foreground">의무 가입기간은 최소 3년이며, 길수록 복리 효과가 커집니다.</p>
         </div>
       </details>

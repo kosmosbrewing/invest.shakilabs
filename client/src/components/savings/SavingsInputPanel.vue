@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { PiggyBank } from "lucide-vue-next";
+import { ShPresetGroup, ShSlider } from "@shakilabs/ui";
 import { Button } from "@/components/ui/button";
 import type { TaxType } from "@/data/interestData";
 import { TAX_TYPE_OPTIONS, SAVINGS_PERIOD_PRESETS, RATE_PRESETS } from "@/data/interestData";
@@ -29,6 +30,10 @@ const depositPresets = [
   { label: "50만", value: 500_000 },
   { label: "100만", value: 1_000_000 },
 ] as const;
+const periodPresets = SAVINGS_PERIOD_PRESETS.map((value) => ({
+  label: `${value}개월`,
+  value,
+}));
 </script>
 
 <template>
@@ -72,32 +77,27 @@ const depositPresets = [
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">연이율 (%)</label>
           <div class="flex items-center gap-3">
-            <input
-              aria-label="적금 연이율 범위"
-              type="range"
-              min="0.5"
-              max="10"
-              step="0.1"
-              class="h-2 flex-1 accent-primary"
-              :value="annualRate"
-              @input="emit('update:annualRate', Number(($event.target as HTMLInputElement).value))"
+            <ShSlider
+              :model-value="annualRate"
+              :min="0.5"
+              :max="10"
+              :step="0.1"
+              :value-text="`적금 연이율 ${annualRate.toFixed(1)}%`"
+              class="flex-1"
+              aria-label="적금 연이율 슬라이더"
+              @update:model-value="emit('update:annualRate', $event)"
             />
             <span class="shrink-0 whitespace-nowrap text-right text-body font-semibold tabular-nums">
               {{ annualRate.toFixed(1) }}%
             </span>
           </div>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in RATE_PRESETS"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:annualRate', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="annualRate"
+            :options="RATE_PRESETS"
+            label="적금 연이율 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:annualRate', $event)"
+          />
         </div>
       </div>
 
@@ -105,30 +105,25 @@ const depositPresets = [
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">적금 기간</label>
           <div class="flex items-center gap-3">
-            <input
-              aria-label="적금 기간 범위"
-              type="range"
-              min="1"
-              max="60"
-              step="1"
-              class="h-2 flex-1 accent-primary"
-              :value="months"
-              @input="emit('update:months', Number(($event.target as HTMLInputElement).value))"
+            <ShSlider
+              :model-value="months"
+              :min="1"
+              :max="60"
+              :step="1"
+              :value-text="`적금 기간 ${months}개월`"
+              class="flex-1"
+              aria-label="적금 기간 슬라이더"
+              @update:model-value="emit('update:months', $event)"
             />
             <span class="shrink-0 whitespace-nowrap text-right text-body font-semibold tabular-nums">{{ months }}개월</span>
           </div>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="period in SAVINGS_PERIOD_PRESETS"
-              :key="period"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:months', period)"
-            >
-              {{ period }}개월
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="months"
+            :options="periodPresets"
+            label="적금 기간 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:months', $event)"
+          />
         </div>
 
         <div class="retro-panel-muted p-3.5">
