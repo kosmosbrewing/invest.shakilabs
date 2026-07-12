@@ -5,6 +5,7 @@ import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.v
 import SEOHead from "@/components/common/SEOHead.vue";
 import SavingsInputPanel from "@/components/savings/SavingsInputPanel.vue";
 import SavingsResultPanel from "@/components/savings/SavingsResultPanel.vue";
+import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
 import { useSavingsInterestCalc } from "@/composables/useSavingsInterestCalc";
 import { COOPERATIVE_DEPOSIT_SOURCE_URL, INTEREST_DATA_UPDATED } from "@/data/interestData";
 import { formatManWon } from "@/lib/utils";
@@ -61,9 +62,11 @@ const faqJsonLd = {
   <SEOHead :title="seoTitle" :description="seoDesc" :json-ld="faqJsonLd" />
 
   <div class="container space-y-5 py-5">
+    <CalculatorPageHeader title="적금 이자 계산기" />
+
     <section class="retro-panel overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
-        <h1 class="retro-title">적금 이자 계산기</h1>
+        <h2 class="retro-title">계산 기준 안내</h2>
         <FreshBadge :message="`${INTEREST_DATA_UPDATED} 기준`" />
       </div>
       <div class="retro-panel-content space-y-2">
