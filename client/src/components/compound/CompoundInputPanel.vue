@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { TrendingUp } from "lucide-vue-next";
+import { ShPresetGroup, ShSlider } from "@shakilabs/ui";
 import { Button } from "@/components/ui/button";
 import { COMPOUND_YEAR_PRESETS, COMPOUND_RATE_PRESETS } from "@/data/interestData";
 
@@ -35,6 +36,10 @@ const monthlyPresets = [
   { label: "50만", value: 500_000 },
   { label: "100만", value: 1_000_000 },
 ] as const;
+const compoundYearPresets = COMPOUND_YEAR_PRESETS.map((value) => ({
+  label: `${value}년`,
+  value,
+}));
 </script>
 
 <template>
@@ -107,61 +112,51 @@ const monthlyPresets = [
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">연 수익률 (%)</label>
           <div class="flex items-center gap-3">
-            <input
-              aria-label="연 수익률 범위"
-              type="range"
-              min="1"
-              max="20"
-              step="0.5"
-              class="h-2 flex-1 accent-primary"
-              :value="annualRate"
-              @input="emit('update:annualRate', Number(($event.target as HTMLInputElement).value))"
+            <ShSlider
+              :model-value="annualRate"
+              :min="1"
+              :max="20"
+              :step="0.5"
+              :value-text="`연 수익률 ${annualRate.toFixed(1)}%`"
+              class="flex-1"
+              aria-label="연 수익률 슬라이더"
+              @update:model-value="emit('update:annualRate', $event)"
             />
             <span class="shrink-0 whitespace-nowrap text-right text-body font-semibold tabular-nums">
               {{ annualRate.toFixed(1) }}%
             </span>
           </div>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in COMPOUND_RATE_PRESETS"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:annualRate', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="annualRate"
+            :options="COMPOUND_RATE_PRESETS"
+            label="연 수익률 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:annualRate', $event)"
+          />
         </div>
 
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">투자 기간</label>
           <div class="flex items-center gap-3">
-            <input
-              aria-label="투자 기간 범위"
-              type="range"
-              min="1"
-              max="40"
-              step="1"
-              class="h-2 flex-1 accent-primary"
-              :value="years"
-              @input="emit('update:years', Number(($event.target as HTMLInputElement).value))"
+            <ShSlider
+              :model-value="years"
+              :min="1"
+              :max="40"
+              :step="1"
+              :value-text="`투자 기간 ${years}년`"
+              class="flex-1"
+              aria-label="투자 기간 슬라이더"
+              @update:model-value="emit('update:years', $event)"
             />
             <span class="shrink-0 whitespace-nowrap text-right text-body font-semibold tabular-nums">{{ years }}년</span>
           </div>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="y in COMPOUND_YEAR_PRESETS"
-              :key="y"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:years', y)"
-            >
-              {{ y }}년
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="years"
+            :options="compoundYearPresets"
+            label="투자 기간 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:years', $event)"
+          />
         </div>
       </div>
     </div>
