@@ -8,6 +8,12 @@ export const routes: RouteRecordRaw[] = [
     redirect: "/crypto-tax",
   },
   {
+    path: "/all",
+    name: "all-tools",
+    component: () => import("@/views/InvestHubView.vue"),
+    meta: { title: "투자 계산기 전체 보기 | 목적별 금융·세금 도구" },
+  },
+  {
     path: "/crypto-tax",
     name: "crypto-tax",
     component: () => import("@/views/CryptoTaxView.vue"),
