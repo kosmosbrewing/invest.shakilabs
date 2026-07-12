@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
+import RankedBars from "@/components/result-visualization/RankedBars.vue";
 import { Badge } from "@/components/ui/badge";
 import type { IsaCompareResult } from "@/utils/investCalculator";
 import { formatPercent, formatWon } from "@/lib/utils";
@@ -40,6 +41,10 @@ const metricRows = computed(() => [
     tone: "success",
   },
 ] as const);
+const comparisonItems = computed(() => [
+  { key: "isa", label: "ISA", value: props.result.isaNetTotal, highlight: true },
+  { key: "normal", label: "일반 계좌", value: props.result.normalNetTotal },
+]);
 </script>
 
 <template>
@@ -63,35 +68,12 @@ const metricRows = computed(() => [
 
       <ResultMetricTable :rows="metricRows" />
 
-      <div class="retro-chart">
-        <div class="text-caption text-muted-foreground">세후 수령액 비교</div>
-        <div class="space-y-2">
-          <div>
-            <div class="flex items-center justify-between text-caption mb-1">
-              <span class="font-semibold text-primary">ISA</span>
-              <span class="font-semibold tabular-nums">{{ formatWon(result.isaNetTotal) }}</span>
-            </div>
-            <div class="h-4 w-full rounded-lg bg-muted overflow-hidden">
-              <div
-                class="h-full rounded-lg bg-primary transition-all duration-300"
-                :style="{ width: `${Math.min(100, (result.isaNetTotal / Math.max(result.isaNetTotal, result.normalNetTotal)) * 100)}%` }"
-              />
-            </div>
-          </div>
-          <div>
-            <div class="flex items-center justify-between text-caption mb-1">
-              <span class="font-semibold text-muted-foreground">일반</span>
-              <span class="font-semibold tabular-nums">{{ formatWon(result.normalNetTotal) }}</span>
-            </div>
-            <div class="h-4 w-full rounded-lg bg-muted overflow-hidden">
-              <div
-                class="h-full rounded-lg bg-muted-foreground/40 transition-all duration-300"
-                :style="{ width: `${Math.min(100, (result.normalNetTotal / Math.max(result.isaNetTotal, result.normalNetTotal)) * 100)}%` }"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <RankedBars
+        label="세후 수령액 비교"
+        note="동일한 투자금과 수익률 기준이며 막대 길이는 세후 수령액에 직접 비례합니다."
+        :items="comparisonItems"
+        :format-value="formatWon"
+      />
 
       <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground space-y-1">
         <p>* ISA 일반형: 비과세 200만원, 초과분 9.9% 분리과세</p>

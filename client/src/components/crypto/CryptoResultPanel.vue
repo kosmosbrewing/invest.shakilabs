@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { CRYPTO_TAX_EFFECTIVE_DATE, CRYPTO_TAX_STATUS_NOTE } from "@/data/investTaxRates";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
+import BreakdownStackedBar from "@/components/result-visualization/BreakdownStackedBar.vue";
 import { Badge } from "@/components/ui/badge";
 import type { CryptoTaxResult } from "@/utils/investCalculator";
 import { formatWon, formatPercent } from "@/lib/utils";
@@ -49,6 +50,10 @@ const metricRows = computed(() => [
     tone: "primary",
   },
 ] as const);
+const segments = computed(() => [
+  { key: "net", label: "순수익", value: Math.max(0, props.result.netProfit), tone: "gain" as const },
+  { key: "tax", label: "세금", value: props.result.totalTax, tone: "tax" as const },
+]);
 </script>
 
 <template>
@@ -80,37 +85,7 @@ const metricRows = computed(() => [
         <ResultMetricTable :rows="metricRows" />
       </div>
 
-      <div v-if="result.totalGain > 0" class="retro-chart">
-        <div class="flex items-center justify-between text-caption text-muted-foreground">
-          <span>수익 구성</span>
-        </div>
-        <div class="retro-chart-bar">
-          <div
-            class="retro-chart-segment bg-chart-net"
-            :style="{ width: `${(result.netProfit / result.totalGain) * 100}%` }"
-          />
-          <div
-            class="retro-chart-segment bg-chart-tax"
-            :style="{ width: `${(result.totalTax / result.totalGain) * 100}%` }"
-          />
-        </div>
-        <div class="retro-chart-legend">
-          <div class="retro-chart-legend-item">
-            <span class="flex items-center gap-1.5">
-              <span class="retro-chart-dot bg-chart-net" />
-              <span>순수익</span>
-            </span>
-            <span class="font-semibold tabular-nums">{{ formatWon(result.netProfit) }}</span>
-          </div>
-          <div class="retro-chart-legend-item">
-            <span class="flex items-center gap-1.5">
-              <span class="retro-chart-dot bg-chart-tax" />
-              <span>세금</span>
-            </span>
-            <span class="font-semibold tabular-nums">{{ formatWon(result.totalTax) }}</span>
-          </div>
-        </div>
-      </div>
+      <BreakdownStackedBar v-if="result.totalGain > 0" label="수익 구성" :segments="segments" :format-value="formatWon" />
 
       <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground space-y-1">
         <p>* {{ CRYPTO_TAX_STATUS_NOTE }}</p>

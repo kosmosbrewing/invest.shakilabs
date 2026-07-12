@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
+import BreakdownStackedBar from "@/components/result-visualization/BreakdownStackedBar.vue";
 import { Badge } from "@/components/ui/badge";
 import type { DividendTaxResult } from "@/utils/investCalculator";
 import { formatWon, formatPercent } from "@/lib/utils";
@@ -63,6 +64,10 @@ const metricRows = computed(() => {
 
   return rows;
 });
+const segments = computed(() => [
+  { key: "net", label: "실수령", value: props.result.netDividend, tone: "gain" as const },
+  { key: "tax", label: "세금", value: props.result.totalTax, tone: "tax" as const },
+]);
 </script>
 
 <template>
@@ -111,37 +116,7 @@ const metricRows = computed(() => {
         </div>
       </div>
 
-      <div v-if="result.dividendAmount > 0" class="retro-chart">
-        <div class="flex items-center justify-between text-caption text-muted-foreground">
-          <span>배당 구성</span>
-        </div>
-        <div class="retro-chart-bar">
-          <div
-            class="retro-chart-segment bg-chart-net"
-            :style="{ width: `${(result.netDividend / result.dividendAmount) * 100}%` }"
-          />
-          <div
-            class="retro-chart-segment bg-chart-tax"
-            :style="{ width: `${(result.totalTax / result.dividendAmount) * 100}%` }"
-          />
-        </div>
-        <div class="retro-chart-legend">
-          <div class="retro-chart-legend-item">
-            <span class="flex items-center gap-1.5">
-              <span class="retro-chart-dot bg-chart-net" />
-              <span>실수령</span>
-            </span>
-            <span class="font-semibold tabular-nums">{{ formatWon(result.netDividend) }}</span>
-          </div>
-          <div class="retro-chart-legend-item">
-            <span class="flex items-center gap-1.5">
-              <span class="retro-chart-dot bg-chart-tax" />
-              <span>세금</span>
-            </span>
-            <span class="font-semibold tabular-nums">{{ formatWon(result.totalTax) }}</span>
-          </div>
-        </div>
-      </div>
+      <BreakdownStackedBar v-if="result.dividendAmount > 0" label="배당 구성" :segments="segments" :format-value="formatWon" />
 
       <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground space-y-1">
         <p>* 국내 배당: 소득세 14% + 지방소득세 1.4% = 15.4% 원천징수</p>
