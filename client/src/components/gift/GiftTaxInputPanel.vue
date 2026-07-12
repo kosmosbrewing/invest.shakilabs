@@ -98,7 +98,7 @@ const deductionPresets = [
 
         <div class="retro-panel-muted p-3.5">
           <span class="mb-2 block text-caption font-semibold text-foreground">관계</span>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="profile-option-grid grid grid-cols-2 gap-2">
             <button
               v-for="option in GIFT_TAX_RELATIONSHIP_OPTIONS"
               :key="option.value"

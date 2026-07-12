@@ -66,10 +66,10 @@ const displayYears = computed(() => {
 
     <div class="retro-panel-content space-y-4">
       <div class="rounded-2xl border border-primary/20 bg-primary/8 p-4">
-        <div class="flex items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p class="text-caption font-semibold text-muted-foreground">복리 최종 금액</p>
-            <p class="mt-1 text-display font-brand text-primary">{{ formatWon(result.compoundTotal) }}</p>
+            <p class="result-amount mt-1 font-brand text-primary tabular-nums">{{ formatWon(result.compoundTotal) }}</p>
           </div>
           <ShBadge v-if="result.compoundAdvantage > 0" tone="success">
             복리 효과 +{{ formatWon(result.compoundAdvantage) }}

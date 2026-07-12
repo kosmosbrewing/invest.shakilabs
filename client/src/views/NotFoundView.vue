@@ -14,9 +14,9 @@ import { RouterLink } from "vue-router";
     <h1 class="text-display font-brand text-muted-foreground">404</h1>
     <p class="text-body text-muted-foreground">페이지를 찾을 수 없습니다.</p>
 
-    <div class="flex justify-center gap-3 pt-4">
-      <RouterLink to="/crypto-tax" class="retro-button">가상자산세 계산기</RouterLink>
-      <RouterLink to="/dividend-tax" class="retro-button-subtle">배당세 계산기</RouterLink>
+    <div class="not-found-actions flex flex-wrap justify-center gap-3 pt-4">
+      <RouterLink to="/crypto-tax" class="retro-button">가상자산세 계산</RouterLink>
+      <RouterLink to="/dividend-tax" class="retro-button-subtle">배당세 계산</RouterLink>
     </div>
   </div>
 </template>

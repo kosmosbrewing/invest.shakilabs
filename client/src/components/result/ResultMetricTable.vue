@@ -43,7 +43,7 @@ function toneClass(tone?: MetricTone): string {
       class="space-y-2"
       padding="sm"
     >
-      <div class="flex items-start justify-between gap-3">
+      <div class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
         <div class="space-y-1">
           <div class="flex items-center gap-2">
             <p class="text-caption font-semibold text-muted-foreground">{{ row.label }}</p>
@@ -53,7 +53,7 @@ function toneClass(tone?: MetricTone): string {
             {{ row.description }}
           </p>
         </div>
-        <p :class="['text-body font-bold tabular-nums', toneClass(row.tone)]">
+        <p :class="['text-body font-bold tabular-nums sm:text-right', toneClass(row.tone)]">
           {{ row.value }}
         </p>
       </div>

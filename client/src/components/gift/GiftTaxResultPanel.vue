@@ -58,10 +58,10 @@ const metricRows = computed(() => [
 
     <div class="retro-panel-content space-y-4">
       <div class="rounded-2xl border border-primary/20 bg-primary/8 p-4">
-        <div class="flex items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p class="text-caption font-semibold text-muted-foreground">예상 증여세</p>
-            <p class="mt-1 text-display font-brand text-primary">{{ formatWon(result.totalTax) }}</p>
+            <p class="result-amount mt-1 font-brand text-primary tabular-nums">{{ formatWon(result.totalTax) }}</p>
           </div>
           <Badge variant="outline" class="border-primary/25 bg-primary/5 text-primary">
             세후 {{ formatWon(result.afterTaxGift) }}

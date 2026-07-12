@@ -95,7 +95,7 @@ function parseInput(value: string): number {
         <!-- 배우자 유무 -->
         <div class="retro-panel-muted p-3.5">
           <span class="mb-2 block text-caption font-semibold text-foreground">배우자 상속공제</span>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="profile-option-grid grid grid-cols-2 gap-2">
             <button
               type="button"
               class="rounded-lg border px-3 py-2.5 text-caption transition-colors"
