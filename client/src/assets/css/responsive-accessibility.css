@@ -14,6 +14,16 @@
   color: white;
 }
 
+.tabular-nums {
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
+.result-amount {
+  font-size: clamp(1rem, 9vw, 2.5rem);
+  line-height: 1.15;
+}
+
 @media (max-width: 400px) {
   .text-caption,
   .text-tiny,
@@ -62,6 +72,8 @@
   }
 
   nav[aria-label="주요 메뉴"] .container {
+    width: 100%;
+    max-width: 100vw;
     overflow-x: auto;
     padding-inline: 0;
   }
@@ -72,7 +84,8 @@
     gap: 4px;
   }
 
-  .text-resize-layout.container {
+  .text-resize-layout.container,
+  .text-resize-layout .container {
     padding-inline: 12px;
   }
 
@@ -81,8 +94,33 @@
     padding-inline: 12px;
   }
 
-  .text-resize-layout :is(h1, h2, h3, p, a, button, span, strong, label, li) {
+  .text-resize-layout :is(h1, h2, h3, h4) {
     min-width: 0;
+    overflow-wrap: break-word;
+    text-wrap-style: balance;
+    word-break: keep-all;
+  }
+
+  .text-resize-layout :is(p, li, dt, dd) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-wrap-style: pretty;
+  }
+
+  .text-resize-layout .about-feature-list > li {
+    text-wrap-style: balance;
+  }
+
+  header p.truncate {
+    width: 100%;
+    min-width: 0;
+    overflow: visible;
+    overflow-wrap: break-word;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .retro-link[href^="mailto:"] {
     overflow-wrap: anywhere;
   }
 
@@ -119,6 +157,16 @@
 
   .text-resize-layout .retro-chart-legend {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .text-resize-layout .profile-option-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .text-resize-layout .profile-option-grid > button,
+  .text-resize-layout .not-found-actions > a {
+    overflow-wrap: normal;
+    white-space: nowrap;
   }
 
   .text-resize-layout .retro-chart-legend-item {

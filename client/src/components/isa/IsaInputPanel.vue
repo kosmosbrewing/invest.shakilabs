@@ -130,7 +130,7 @@ const holdingYearPresets = [3, 5, 10] as const;
               :value="annualReturnRate"
               @input="emit('update:annualReturnRate', Number(($event.target as HTMLInputElement).value))"
             />
-            <span class="w-14 text-right text-body font-semibold tabular-nums">
+            <span class="shrink-0 whitespace-nowrap text-right text-body font-semibold tabular-nums">
               {{ (annualReturnRate * 100).toFixed(1) }}%
             </span>
           </div>
@@ -166,7 +166,7 @@ const holdingYearPresets = [3, 5, 10] as const;
               :value="holdingYears"
               @input="emit('update:holdingYears', Number(($event.target as HTMLInputElement).value))"
             />
-            <span class="w-14 text-right text-body font-semibold tabular-nums">{{ holdingYears }}년</span>
+            <span class="shrink-0 whitespace-nowrap text-right text-body font-semibold tabular-nums">{{ holdingYears }}년</span>
           </div>
           <div class="flex flex-wrap gap-2">
             <Button

@@ -28,7 +28,7 @@ const constantsStore = useConstantsStore();
         </p>
 
         <h2 class="text-heading font-bold">주요 기능</h2>
-        <ul class="text-body text-muted-foreground space-y-1 list-disc list-inside">
+        <ul class="about-feature-list text-body text-muted-foreground space-y-1 list-disc list-inside">
           <li>배당소득세 계산 — 금융소득 종합과세 기준 포함</li>
           <li>가상자산 세금 시뮬레이터 — 2027년 예정 과세 기준</li>
           <li>ISA 만기 세후 비교 — 일반계좌 대비 절세 효과 확인</li>

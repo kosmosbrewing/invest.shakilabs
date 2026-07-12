@@ -84,7 +84,7 @@ const principalPresets = [
               :value="annualRate"
               @input="emit('update:annualRate', Number(($event.target as HTMLInputElement).value))"
             />
-            <span class="w-14 text-right text-body font-semibold tabular-nums">
+            <span class="shrink-0 whitespace-nowrap text-right text-body font-semibold tabular-nums">
               {{ annualRate.toFixed(1) }}%
             </span>
           </div>
@@ -117,7 +117,7 @@ const principalPresets = [
               :value="months"
               @input="emit('update:months', Number(($event.target as HTMLInputElement).value))"
             />
-            <span class="w-14 text-right text-body font-semibold tabular-nums">{{ months }}개월</span>
+            <span class="shrink-0 whitespace-nowrap text-right text-body font-semibold tabular-nums">{{ months }}개월</span>
           </div>
           <div class="mt-3 flex flex-wrap gap-2">
             <Button
