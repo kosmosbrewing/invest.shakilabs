@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { ShBreakdownBar } from "@shakilabs/ui";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
-import BreakdownStackedBar from "@/components/result-visualization/BreakdownStackedBar.vue";
 import { Badge } from "@/components/ui/badge";
 import type { SavingsInterestResult } from "@/utils/interestCalculator";
 import { formatWon, formatPercent } from "@/lib/utils";
@@ -37,7 +37,7 @@ const metricRows = computed(() => [
 ]);
 const segments = computed(() => [
   { key: "principal", label: "원금", value: props.result.totalPrincipal, tone: "primary" as const },
-  { key: "interest", label: "세후 이자", value: props.result.netInterest, tone: "gain" as const },
+  { key: "interest", label: "세후 이자", value: props.result.netInterest, tone: "success" as const },
 ]);
 </script>
 
@@ -62,7 +62,7 @@ const segments = computed(() => [
 
       <ResultMetricTable :rows="metricRows" />
 
-      <BreakdownStackedBar label="만기 수령액 구성" :segments="segments" :format-value="formatWon" />
+      <ShBreakdownBar label="만기 수령액 구성" :segments="segments" :format-value="formatWon" surface="outlined" />
 
       <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground space-y-1">
         <p>* 단리 기준 계산이며, 실제 적금 상품에 따라 이자 계산 방식이 다를 수 있습니다.</p>

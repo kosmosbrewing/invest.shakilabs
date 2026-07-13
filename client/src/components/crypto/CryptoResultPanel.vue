@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { ShBreakdownBar } from "@shakilabs/ui";
 import { CRYPTO_TAX_EFFECTIVE_DATE, CRYPTO_TAX_STATUS_NOTE } from "@/data/investTaxRates";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
-import BreakdownStackedBar from "@/components/result-visualization/BreakdownStackedBar.vue";
 import { Badge } from "@/components/ui/badge";
 import type { CryptoTaxResult } from "@/utils/investCalculator";
 import { formatWon, formatPercent } from "@/lib/utils";
@@ -51,8 +51,8 @@ const metricRows = computed(() => [
   },
 ] as const);
 const segments = computed(() => [
-  { key: "net", label: "순수익", value: Math.max(0, props.result.netProfit), tone: "gain" as const },
-  { key: "tax", label: "세금", value: props.result.totalTax, tone: "tax" as const },
+  { key: "net", label: "순수익", value: Math.max(0, props.result.netProfit), tone: "success" as const },
+  { key: "tax", label: "세금", value: props.result.totalTax, tone: "danger" as const },
 ]);
 </script>
 
@@ -85,7 +85,7 @@ const segments = computed(() => [
         <ResultMetricTable :rows="metricRows" />
       </div>
 
-      <BreakdownStackedBar v-if="result.totalGain > 0" label="수익 구성" :segments="segments" :format-value="formatWon" />
+      <ShBreakdownBar v-if="result.totalGain > 0" label="수익 구성" :segments="segments" :format-value="formatWon" surface="outlined" />
 
       <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground space-y-1">
         <p>* {{ CRYPTO_TAX_STATUS_NOTE }}</p>
