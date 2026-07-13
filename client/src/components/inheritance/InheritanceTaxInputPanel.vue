@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button } from "@/components/ui/button";
+import { ShPresetGroup } from "@shakilabs/ui";
 import { Landmark } from "lucide-vue-next";
 import { ESTATE_PRESETS } from "@/data/inheritanceTax";
 import { formatWon } from "@/lib/utils";
@@ -24,6 +24,11 @@ function parseInput(value: string): number {
   const parsed = Number(value.replace(/[^0-9.-]/g, ""));
   return Number.isNaN(parsed) ? 0 : Math.max(0, parsed);
 }
+const estatePresetOptions = ESTATE_PRESETS.map((value) => ({ label: formatWon(value), value }));
+const spouseOptions = [
+  { label: "배우자 있음", value: true },
+  { label: "배우자 없음", value: false },
+] as const;
 </script>
 
 <template>
@@ -48,18 +53,13 @@ function parseInput(value: string): number {
             :value="totalEstate.toLocaleString('ko-KR')"
             @input="emit('update:totalEstate', parseInput(($event.target as HTMLInputElement).value))"
           />
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in ESTATE_PRESETS"
-              :key="preset"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:totalEstate', preset)"
-            >
-              {{ formatWon(preset) }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="totalEstate"
+            :options="estatePresetOptions"
+            label="상속재산 총액 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:totalEstate', $event)"
+          />
         </div>
 
         <!-- 채무 -->
@@ -95,24 +95,12 @@ function parseInput(value: string): number {
         <!-- 배우자 유무 -->
         <div class="retro-panel-muted p-3.5">
           <span class="mb-2 block text-caption font-semibold text-foreground">배우자 상속공제</span>
-          <div class="profile-option-grid grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              class="rounded-lg border px-3 py-2.5 text-caption transition-colors"
-              :class="hasSpouse ? 'border-primary bg-primary/8 font-semibold text-foreground' : 'border-border text-muted-foreground hover:border-primary/50'"
-              @click="emit('update:hasSpouse', true)"
-            >
-              배우자 있음
-            </button>
-            <button
-              type="button"
-              class="rounded-lg border px-3 py-2.5 text-caption transition-colors"
-              :class="!hasSpouse ? 'border-primary bg-primary/8 font-semibold text-foreground' : 'border-border text-muted-foreground hover:border-primary/50'"
-              @click="emit('update:hasSpouse', false)"
-            >
-              배우자 없음
-            </button>
-          </div>
+          <ShPresetGroup
+            :model-value="hasSpouse"
+            :options="spouseOptions"
+            label="배우자 상속공제 선택"
+            @update:model-value="emit('update:hasSpouse', $event)"
+          />
         </div>
 
         <!-- 자녀 수 -->
