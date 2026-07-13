@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { PiggyBank } from "lucide-vue-next";
 import { ShPresetGroup, ShSlider } from "@shakilabs/ui";
-import { Button } from "@/components/ui/button";
 import type { TaxType } from "@/data/interestData";
 import { TAX_TYPE_OPTIONS, SAVINGS_PERIOD_PRESETS, RATE_PRESETS } from "@/data/interestData";
 
@@ -60,18 +59,13 @@ const periodPresets = SAVINGS_PERIOD_PRESETS.map((value) => ({
             />
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
           </div>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in depositPresets"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:monthlyDeposit', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="monthlyDeposit"
+            :options="depositPresets"
+            label="월 적립액 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:monthlyDeposit', $event)"
+          />
         </div>
 
         <div class="retro-panel-muted p-3.5">

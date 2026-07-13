@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Landmark } from "lucide-vue-next";
 import { ShPresetGroup, ShSlider } from "@shakilabs/ui";
-import { Button } from "@/components/ui/button";
 import type { TaxType, PaymentType } from "@/data/interestData";
 import { TAX_TYPE_OPTIONS, PAYMENT_TYPE_OPTIONS, DEPOSIT_PERIOD_PRESETS, RATE_PRESETS } from "@/data/interestData";
 
@@ -62,18 +61,13 @@ const periodPresets = DEPOSIT_PERIOD_PRESETS.map((value) => ({
             />
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
           </div>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in principalPresets"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:principal', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="principal"
+            :options="principalPresets"
+            label="예금 원금 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:principal', $event)"
+          />
         </div>
 
         <div class="retro-panel-muted p-3.5">

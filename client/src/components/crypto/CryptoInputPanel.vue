@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { TrendingUp } from "lucide-vue-next";
 import { useId } from "vue";
-import { Button } from "@/components/ui/button";
+import { ShPresetGroup } from "@shakilabs/ui";
 
 defineProps<{
   purchaseAmount: number;
@@ -70,18 +70,13 @@ const expensesId = useId();
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
           </div>
           <p class="mt-2 text-tiny text-muted-foreground">코인을 매수한 총 금액입니다.</p>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in purchasePresets"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:purchaseAmount', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="purchaseAmount"
+            :options="purchasePresets"
+            label="취득가액 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:purchaseAmount', $event)"
+          />
         </div>
 
         <div class="crypto-input-card retro-panel-muted p-3.5">
@@ -100,18 +95,13 @@ const expensesId = useId();
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
           </div>
           <p class="mt-2 text-tiny text-muted-foreground">실제 매도 예정 금액을 넣어보세요.</p>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in salePresets"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:saleAmount', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="saleAmount"
+            :options="salePresets"
+            label="양도가액 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:saleAmount', $event)"
+          />
         </div>
 
         <div class="crypto-input-card retro-panel-muted p-3.5">
@@ -130,18 +120,13 @@ const expensesId = useId();
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
           </div>
           <p class="mt-2 text-tiny text-muted-foreground">수수료와 출금 비용을 합산합니다.</p>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in expensePresets"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:expenses', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="expenses"
+            :options="expensePresets"
+            label="필요경비 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:expenses', $event)"
+          />
         </div>
       </div>
     </div>
