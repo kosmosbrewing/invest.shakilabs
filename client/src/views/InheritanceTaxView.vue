@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
-import RelatedCalculatorLinks from "@/components/common/RelatedCalculatorLinks.vue";
+import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import InheritanceTaxInputPanel from "@/components/inheritance/InheritanceTaxInputPanel.vue";
 import InheritanceTaxResultPanel from "@/components/inheritance/InheritanceTaxResultPanel.vue";
@@ -68,7 +68,7 @@ const faqJsonLd = {
     />
 
     <InheritanceTaxResultPanel :result="calc.result.value" />
-    <RelatedCalculatorLinks current-path="/inheritance-tax" />
+    <IntentRelatedLinks current-path="/inheritance-tax" />
     <FaqAccordionPanel title="출처 및 FAQ" :items="INHERITANCE_TAX_FAQS">
       <template #before>
         <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">
