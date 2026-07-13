@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { ShBreakdownBar } from "@shakilabs/ui";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
-import BreakdownStackedBar from "@/components/result-visualization/BreakdownStackedBar.vue";
 import { Badge } from "@/components/ui/badge";
 import type { DividendTaxResult } from "@/utils/investCalculator";
 import { formatWon, formatPercent } from "@/lib/utils";
@@ -65,8 +65,8 @@ const metricRows = computed(() => {
   return rows;
 });
 const segments = computed(() => [
-  { key: "net", label: "실수령", value: props.result.netDividend, tone: "gain" as const },
-  { key: "tax", label: "세금", value: props.result.totalTax, tone: "tax" as const },
+  { key: "net", label: "실수령", value: props.result.netDividend, tone: "success" as const },
+  { key: "tax", label: "세금", value: props.result.totalTax, tone: "danger" as const },
 ]);
 </script>
 
@@ -116,7 +116,7 @@ const segments = computed(() => [
         </div>
       </div>
 
-      <BreakdownStackedBar v-if="result.dividendAmount > 0" label="배당 구성" :segments="segments" :format-value="formatWon" />
+      <ShBreakdownBar v-if="result.dividendAmount > 0" label="배당 구성" :segments="segments" :format-value="formatWon" surface="outlined" />
 
       <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground space-y-1">
         <p>* 국내 배당: 소득세 14% + 지방소득세 1.4% = 15.4% 원천징수</p>
