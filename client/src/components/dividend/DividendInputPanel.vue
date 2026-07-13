@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Banknote } from "lucide-vue-next";
-import { Button } from "@/components/ui/button";
+import { ShPresetGroup } from "@shakilabs/ui";
 import { DIVIDEND_TAX } from "@/data/investTaxRates";
 
 type CountryKey = "KR" | keyof typeof DIVIDEND_TAX.FOREIGN_RATES;
@@ -67,18 +67,13 @@ function parseInput(value: string): number {
             />
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
           </div>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in dividendPresets"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:dividendAmount', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="dividendAmount"
+            :options="dividendPresets"
+            label="배당금 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:dividendAmount', $event)"
+          />
         </div>
 
         <div class="retro-panel-muted p-3.5">
@@ -121,18 +116,13 @@ function parseInput(value: string): number {
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
           </div>
           <p class="mt-2 text-tiny text-muted-foreground">연간 합계 2,000만원 초과 시 종합과세입니다.</p>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in incomePresets"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:otherFinancialIncome', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="otherFinancialIncome"
+            :options="incomePresets"
+            label="기타 금융소득 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:otherFinancialIncome', $event)"
+          />
         </div>
       </div>
     </div>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { TrendingUp } from "lucide-vue-next";
 import { ShPresetGroup, ShSlider } from "@shakilabs/ui";
-import { Button } from "@/components/ui/button";
 import { COMPOUND_YEAR_PRESETS, COMPOUND_RATE_PRESETS } from "@/data/interestData";
 
 defineProps<{
@@ -66,18 +65,13 @@ const compoundYearPresets = COMPOUND_YEAR_PRESETS.map((value) => ({
             />
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
           </div>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in initialPresets"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:initialAmount', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="initialAmount"
+            :options="initialPresets"
+            label="초기 투자금 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:initialAmount', $event)"
+          />
         </div>
 
         <div class="retro-panel-muted p-3.5">
@@ -93,18 +87,13 @@ const compoundYearPresets = COMPOUND_YEAR_PRESETS.map((value) => ({
             />
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
           </div>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in monthlyPresets"
-              :key="preset.label"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:monthlyContribution', preset.value)"
-            >
-              {{ preset.label }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="monthlyContribution"
+            :options="monthlyPresets"
+            label="월 추가 적립금 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:monthlyContribution', $event)"
+          />
         </div>
       </div>
 

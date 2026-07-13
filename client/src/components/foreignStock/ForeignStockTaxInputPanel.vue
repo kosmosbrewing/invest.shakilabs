@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button } from "@/components/ui/button";
+import { ShPresetGroup } from "@shakilabs/ui";
 import { TrendingUp } from "lucide-vue-next";
 import { SELL_AMOUNT_PRESETS } from "@/data/foreignStockTax";
 import { formatWon } from "@/lib/utils";
@@ -24,6 +24,7 @@ function parseInput(value: string): number {
   const parsed = Number(value.replace(/[^0-9.-]/g, ""));
   return Number.isNaN(parsed) ? 0 : Math.max(0, parsed);
 }
+const sellAmountPresetOptions = SELL_AMOUNT_PRESETS.map((value) => ({ label: formatWon(value), value }));
 </script>
 
 <template>
@@ -47,18 +48,13 @@ function parseInput(value: string): number {
             :value="sellAmount.toLocaleString('ko-KR')"
             @input="emit('update:sellAmount', parseInput(($event.target as HTMLInputElement).value))"
           />
-          <div class="mt-3 flex flex-wrap gap-2">
-            <Button
-              v-for="preset in SELL_AMOUNT_PRESETS"
-              :key="preset"
-              type="button"
-              variant="outline"
-              size="chipSm"
-              @click="emit('update:sellAmount', preset)"
-            >
-              {{ formatWon(preset) }}
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="sellAmount"
+            :options="sellAmountPresetOptions"
+            label="매도금액 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:sellAmount', $event)"
+          />
         </div>
 
         <div class="retro-panel-muted p-3.5">
