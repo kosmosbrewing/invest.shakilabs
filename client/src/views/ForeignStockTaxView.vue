@@ -4,6 +4,8 @@ import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { FOREIGN_STOCK_TAX_GUIDE } from "@/data/seoGuides";
 import ForeignStockTaxInputPanel from "@/components/foreignStock/ForeignStockTaxInputPanel.vue";
 import ForeignStockTaxResultPanel from "@/components/foreignStock/ForeignStockTaxResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -81,5 +83,13 @@ const faqJsonLd = {
         </div>
       </template>
     </FaqAccordionPanel>
+
+    <SeoRichGuide
+      :title="FOREIGN_STOCK_TAX_GUIDE.title"
+      :intro="FOREIGN_STOCK_TAX_GUIDE.intro"
+      :sections="FOREIGN_STOCK_TAX_GUIDE.sections"
+      :faqs="FOREIGN_STOCK_TAX_GUIDE.faqs"
+      :disclaimer="FOREIGN_STOCK_TAX_GUIDE.disclaimer"
+    />
   </div>
 </template>

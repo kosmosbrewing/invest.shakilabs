@@ -5,6 +5,8 @@ import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import RelatedServices from "@/components/common/RelatedServices.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { CRYPTO_TAX_GUIDE } from "@/data/seoGuides";
 import CryptoInputPanel from "@/components/crypto/CryptoInputPanel.vue";
 import CryptoResultPanel from "@/components/crypto/CryptoResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -89,5 +91,13 @@ const faqJsonLd = {
     <IntentRelatedLinks current-path="/crypto-tax" />
     <FaqAccordionPanel :items="faqItems" />
     <RelatedServices />
+
+    <SeoRichGuide
+      :title="CRYPTO_TAX_GUIDE.title"
+      :intro="CRYPTO_TAX_GUIDE.intro"
+      :sections="CRYPTO_TAX_GUIDE.sections"
+      :faqs="CRYPTO_TAX_GUIDE.faqs"
+      :disclaimer="CRYPTO_TAX_GUIDE.disclaimer"
+    />
   </div>
 </template>

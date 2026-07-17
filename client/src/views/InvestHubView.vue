@@ -3,6 +3,8 @@ import { ArrowRight } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
 import { ShSurface, ShText } from "@shakilabs/ui";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { INVEST_HUB_GUIDE } from "@/data/seoGuides";
 import { INVEST_TOOL_GROUPS } from "@/data/investNavigation";
 </script>
 
@@ -37,5 +39,13 @@ import { INVEST_TOOL_GROUPS } from "@/data/investNavigation";
         </RouterLink>
       </div>
     </section>
+
+    <SeoRichGuide
+      :title="INVEST_HUB_GUIDE.title"
+      :intro="INVEST_HUB_GUIDE.intro"
+      :sections="INVEST_HUB_GUIDE.sections"
+      :faqs="INVEST_HUB_GUIDE.faqs"
+      :disclaimer="INVEST_HUB_GUIDE.disclaimer"
+    />
   </div>
 </template>

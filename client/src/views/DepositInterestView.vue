@@ -3,6 +3,8 @@ import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { DEPOSIT_INTEREST_GUIDE } from "@/data/seoGuides";
 import DepositInputPanel from "@/components/deposit/DepositInputPanel.vue";
 import DepositResultPanel from "@/components/deposit/DepositResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -100,5 +102,13 @@ const faqJsonLd = {
     <DepositResultPanel :result="calc.result.value" :payment-type="calc.paymentType.value" />
     <IntentRelatedLinks current-path="/deposit-interest" />
     <FaqAccordionPanel :items="faqItems" />
+
+    <SeoRichGuide
+      :title="DEPOSIT_INTEREST_GUIDE.title"
+      :intro="DEPOSIT_INTEREST_GUIDE.intro"
+      :sections="DEPOSIT_INTEREST_GUIDE.sections"
+      :faqs="DEPOSIT_INTEREST_GUIDE.faqs"
+      :disclaimer="DEPOSIT_INTEREST_GUIDE.disclaimer"
+    />
   </div>
 </template>

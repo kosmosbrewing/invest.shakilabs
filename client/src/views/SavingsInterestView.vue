@@ -3,6 +3,8 @@ import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { SAVINGS_INTEREST_GUIDE } from "@/data/seoGuides";
 import SavingsInputPanel from "@/components/savings/SavingsInputPanel.vue";
 import SavingsResultPanel from "@/components/savings/SavingsResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -93,5 +95,13 @@ const faqJsonLd = {
     <SavingsResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/savings-interest" />
     <FaqAccordionPanel :items="faqItems" />
+
+    <SeoRichGuide
+      :title="SAVINGS_INTEREST_GUIDE.title"
+      :intro="SAVINGS_INTEREST_GUIDE.intro"
+      :sections="SAVINGS_INTEREST_GUIDE.sections"
+      :faqs="SAVINGS_INTEREST_GUIDE.faqs"
+      :disclaimer="SAVINGS_INTEREST_GUIDE.disclaimer"
+    />
   </div>
 </template>

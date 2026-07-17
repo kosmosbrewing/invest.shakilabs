@@ -3,6 +3,8 @@ import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { COMPOUND_INTEREST_GUIDE } from "@/data/seoGuides";
 import CompoundInputPanel from "@/components/compound/CompoundInputPanel.vue";
 import CompoundResultPanel from "@/components/compound/CompoundResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -89,5 +91,13 @@ const faqJsonLd = {
     <CompoundResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/compound-interest" />
     <FaqAccordionPanel :items="faqItems" />
+
+    <SeoRichGuide
+      :title="COMPOUND_INTEREST_GUIDE.title"
+      :intro="COMPOUND_INTEREST_GUIDE.intro"
+      :sections="COMPOUND_INTEREST_GUIDE.sections"
+      :faqs="COMPOUND_INTEREST_GUIDE.faqs"
+      :disclaimer="COMPOUND_INTEREST_GUIDE.disclaimer"
+    />
   </div>
 </template>
