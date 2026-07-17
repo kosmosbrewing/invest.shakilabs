@@ -3,6 +3,8 @@ import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { DIVIDEND_TAX_GUIDE } from "@/data/seoGuides";
 import DividendInputPanel from "@/components/dividend/DividendInputPanel.vue";
 import DividendResultPanel from "@/components/dividend/DividendResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -81,5 +83,13 @@ const faqJsonLd = {
     <DividendResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/dividend-tax" />
     <FaqAccordionPanel :items="faqItems" />
+
+    <SeoRichGuide
+      :title="DIVIDEND_TAX_GUIDE.title"
+      :intro="DIVIDEND_TAX_GUIDE.intro"
+      :sections="DIVIDEND_TAX_GUIDE.sections"
+      :faqs="DIVIDEND_TAX_GUIDE.faqs"
+      :disclaimer="DIVIDEND_TAX_GUIDE.disclaimer"
+    />
   </div>
 </template>

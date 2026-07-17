@@ -4,6 +4,8 @@ import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { INHERITANCE_TAX_GUIDE } from "@/data/seoGuides";
 import InheritanceTaxInputPanel from "@/components/inheritance/InheritanceTaxInputPanel.vue";
 import InheritanceTaxResultPanel from "@/components/inheritance/InheritanceTaxResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -81,5 +83,13 @@ const faqJsonLd = {
         </div>
       </template>
     </FaqAccordionPanel>
+
+    <SeoRichGuide
+      :title="INHERITANCE_TAX_GUIDE.title"
+      :intro="INHERITANCE_TAX_GUIDE.intro"
+      :sections="INHERITANCE_TAX_GUIDE.sections"
+      :faqs="INHERITANCE_TAX_GUIDE.faqs"
+      :disclaimer="INHERITANCE_TAX_GUIDE.disclaimer"
+    />
   </div>
 </template>

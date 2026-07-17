@@ -3,6 +3,8 @@ import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { GIFT_TAX_GUIDE } from "@/data/seoGuides";
 import GiftTaxInputPanel from "@/components/gift/GiftTaxInputPanel.vue";
 import GiftTaxResultPanel from "@/components/gift/GiftTaxResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -79,5 +81,13 @@ const faqJsonLd = {
         </div>
       </template>
     </FaqAccordionPanel>
+
+    <SeoRichGuide
+      :title="GIFT_TAX_GUIDE.title"
+      :intro="GIFT_TAX_GUIDE.intro"
+      :sections="GIFT_TAX_GUIDE.sections"
+      :faqs="GIFT_TAX_GUIDE.faqs"
+      :disclaimer="GIFT_TAX_GUIDE.disclaimer"
+    />
   </div>
 </template>

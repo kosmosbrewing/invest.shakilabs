@@ -3,6 +3,8 @@ import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { ISA_GUIDE } from "@/data/seoGuides";
 import IsaInputPanel from "@/components/isa/IsaInputPanel.vue";
 import IsaResultPanel from "@/components/isa/IsaResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -83,5 +85,13 @@ const faqJsonLd = {
     <IsaResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/isa" />
     <FaqAccordionPanel :items="faqItems" />
+
+    <SeoRichGuide
+      :title="ISA_GUIDE.title"
+      :intro="ISA_GUIDE.intro"
+      :sections="ISA_GUIDE.sections"
+      :faqs="ISA_GUIDE.faqs"
+      :disclaimer="ISA_GUIDE.disclaimer"
+    />
   </div>
 </template>
