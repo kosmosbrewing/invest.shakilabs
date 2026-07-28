@@ -8,6 +8,7 @@ import { COMPOUND_INTEREST_GUIDE } from "@/data/seoGuides";
 import CompoundInputPanel from "@/components/compound/CompoundInputPanel.vue";
 import CompoundResultPanel from "@/components/compound/CompoundResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
+import CalculatorInteractionTracker from "@/components/analytics/CalculatorInteractionTracker.vue";
 import { useCompoundInterestCalc } from "@/composables/useCompoundInterestCalc";
 import { INTEREST_DATA_UPDATED } from "@/data/interestData";
 import { formatManWon } from "@/lib/utils";
@@ -77,16 +78,21 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <CompoundInputPanel
-      :initial-amount="calc.initialAmount.value"
-      :monthly-contribution="calc.monthlyContribution.value"
-      :annual-rate="calc.annualRate.value"
-      :years="calc.years.value"
-      @update:initial-amount="calc.initialAmount.value = $event"
-      @update:monthly-contribution="calc.monthlyContribution.value = $event"
-      @update:annual-rate="calc.annualRate.value = $event"
-      @update:years="calc.years.value = $event"
-    />
+    <CalculatorInteractionTracker
+      calculator-id="compound_interest"
+      page-path="/invest/compound-interest"
+    >
+      <CompoundInputPanel
+        :initial-amount="calc.initialAmount.value"
+        :monthly-contribution="calc.monthlyContribution.value"
+        :annual-rate="calc.annualRate.value"
+        :years="calc.years.value"
+        @update:initial-amount="calc.initialAmount.value = $event"
+        @update:monthly-contribution="calc.monthlyContribution.value = $event"
+        @update:annual-rate="calc.annualRate.value = $event"
+        @update:years="calc.years.value = $event"
+      />
+    </CalculatorInteractionTracker>
 
     <CompoundResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/compound-interest" />

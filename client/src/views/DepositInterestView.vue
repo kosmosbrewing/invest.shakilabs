@@ -8,6 +8,7 @@ import { DEPOSIT_INTEREST_GUIDE } from "@/data/seoGuides";
 import DepositInputPanel from "@/components/deposit/DepositInputPanel.vue";
 import DepositResultPanel from "@/components/deposit/DepositResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
+import CalculatorInteractionTracker from "@/components/analytics/CalculatorInteractionTracker.vue";
 import { useDepositInterestCalc } from "@/composables/useDepositInterestCalc";
 import {
   COOPERATIVE_DEPOSIT_SOURCE_URL,
@@ -86,18 +87,23 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <DepositInputPanel
-      :principal="calc.principal.value"
-      :months="calc.months.value"
-      :annual-rate="calc.annualRate.value"
-      :tax-type="calc.taxType.value"
-      :payment-type="calc.paymentType.value"
-      @update:principal="calc.principal.value = $event"
-      @update:months="calc.months.value = $event"
-      @update:annual-rate="calc.annualRate.value = $event"
-      @update:tax-type="calc.taxType.value = $event"
-      @update:payment-type="calc.paymentType.value = $event"
-    />
+    <CalculatorInteractionTracker
+      calculator-id="deposit_interest"
+      page-path="/invest/deposit-interest"
+    >
+      <DepositInputPanel
+        :principal="calc.principal.value"
+        :months="calc.months.value"
+        :annual-rate="calc.annualRate.value"
+        :tax-type="calc.taxType.value"
+        :payment-type="calc.paymentType.value"
+        @update:principal="calc.principal.value = $event"
+        @update:months="calc.months.value = $event"
+        @update:annual-rate="calc.annualRate.value = $event"
+        @update:tax-type="calc.taxType.value = $event"
+        @update:payment-type="calc.paymentType.value = $event"
+      />
+    </CalculatorInteractionTracker>
 
     <DepositResultPanel :result="calc.result.value" :payment-type="calc.paymentType.value" />
     <IntentRelatedLinks current-path="/deposit-interest" />

@@ -8,6 +8,7 @@ import { GIFT_TAX_GUIDE } from "@/data/seoGuides";
 import GiftTaxInputPanel from "@/components/gift/GiftTaxInputPanel.vue";
 import GiftTaxResultPanel from "@/components/gift/GiftTaxResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
+import CalculatorInteractionTracker from "@/components/analytics/CalculatorInteractionTracker.vue";
 import { useGiftTaxCalc } from "@/composables/useGiftTaxCalc";
 import { GIFT_TAX_FAQS, GIFT_TAX_SOURCES, GIFT_TAX_UPDATED } from "@/data/giftTax";
 import { formatManWon } from "@/lib/utils";
@@ -56,16 +57,21 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <GiftTaxInputPanel
-      :gift-amount="calc.giftAmount.value"
-      :prior-deduction-used="calc.priorDeductionUsed.value"
-      :relationship="calc.relationship.value"
-      :is-generation-skipping="calc.isGenerationSkipping.value"
-      @update:gift-amount="calc.giftAmount.value = $event"
-      @update:prior-deduction-used="calc.priorDeductionUsed.value = $event"
-      @update:relationship="calc.relationship.value = $event"
-      @update:is-generation-skipping="calc.isGenerationSkipping.value = $event"
-    />
+    <CalculatorInteractionTracker
+      calculator-id="gift_tax"
+      page-path="/invest/gift-tax"
+    >
+      <GiftTaxInputPanel
+        :gift-amount="calc.giftAmount.value"
+        :prior-deduction-used="calc.priorDeductionUsed.value"
+        :relationship="calc.relationship.value"
+        :is-generation-skipping="calc.isGenerationSkipping.value"
+        @update:gift-amount="calc.giftAmount.value = $event"
+        @update:prior-deduction-used="calc.priorDeductionUsed.value = $event"
+        @update:relationship="calc.relationship.value = $event"
+        @update:is-generation-skipping="calc.isGenerationSkipping.value = $event"
+      />
+    </CalculatorInteractionTracker>
 
     <GiftTaxResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/gift-tax" />

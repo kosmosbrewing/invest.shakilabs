@@ -9,6 +9,7 @@ import { INHERITANCE_TAX_GUIDE } from "@/data/seoGuides";
 import InheritanceTaxInputPanel from "@/components/inheritance/InheritanceTaxInputPanel.vue";
 import InheritanceTaxResultPanel from "@/components/inheritance/InheritanceTaxResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
+import CalculatorInteractionTracker from "@/components/analytics/CalculatorInteractionTracker.vue";
 import { useInheritanceTaxCalc } from "@/composables/useInheritanceTaxCalc";
 import { INHERITANCE_TAX_FAQS, INHERITANCE_TAX_SOURCES, INHERITANCE_TAX_UPDATED } from "@/data/inheritanceTax";
 import { formatManWon } from "@/lib/utils";
@@ -56,18 +57,23 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <InheritanceTaxInputPanel
-      :total-estate="calc.totalEstate.value"
-      :debt="calc.debt.value"
-      :financial-assets="calc.financialAssets.value"
-      :has-spouse="calc.hasSpouse.value"
-      :children-count="calc.childrenCount.value"
-      @update:total-estate="calc.totalEstate.value = $event"
-      @update:debt="calc.debt.value = $event"
-      @update:financial-assets="calc.financialAssets.value = $event"
-      @update:has-spouse="calc.hasSpouse.value = $event"
-      @update:children-count="calc.childrenCount.value = $event"
-    />
+    <CalculatorInteractionTracker
+      calculator-id="inheritance_tax"
+      page-path="/invest/inheritance-tax"
+    >
+      <InheritanceTaxInputPanel
+        :total-estate="calc.totalEstate.value"
+        :debt="calc.debt.value"
+        :financial-assets="calc.financialAssets.value"
+        :has-spouse="calc.hasSpouse.value"
+        :children-count="calc.childrenCount.value"
+        @update:total-estate="calc.totalEstate.value = $event"
+        @update:debt="calc.debt.value = $event"
+        @update:financial-assets="calc.financialAssets.value = $event"
+        @update:has-spouse="calc.hasSpouse.value = $event"
+        @update:children-count="calc.childrenCount.value = $event"
+      />
+    </CalculatorInteractionTracker>
 
     <InheritanceTaxResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/inheritance-tax" />

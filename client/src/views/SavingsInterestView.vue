@@ -8,6 +8,7 @@ import { SAVINGS_INTEREST_GUIDE } from "@/data/seoGuides";
 import SavingsInputPanel from "@/components/savings/SavingsInputPanel.vue";
 import SavingsResultPanel from "@/components/savings/SavingsResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
+import CalculatorInteractionTracker from "@/components/analytics/CalculatorInteractionTracker.vue";
 import { useSavingsInterestCalc } from "@/composables/useSavingsInterestCalc";
 import { COOPERATIVE_DEPOSIT_SOURCE_URL, INTEREST_DATA_UPDATED } from "@/data/interestData";
 import { formatManWon } from "@/lib/utils";
@@ -81,16 +82,21 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <SavingsInputPanel
-      :monthly-deposit="calc.monthlyDeposit.value"
-      :months="calc.months.value"
-      :annual-rate="calc.annualRate.value"
-      :tax-type="calc.taxType.value"
-      @update:monthly-deposit="calc.monthlyDeposit.value = $event"
-      @update:months="calc.months.value = $event"
-      @update:annual-rate="calc.annualRate.value = $event"
-      @update:tax-type="calc.taxType.value = $event"
-    />
+    <CalculatorInteractionTracker
+      calculator-id="savings_interest"
+      page-path="/invest/savings-interest"
+    >
+      <SavingsInputPanel
+        :monthly-deposit="calc.monthlyDeposit.value"
+        :months="calc.months.value"
+        :annual-rate="calc.annualRate.value"
+        :tax-type="calc.taxType.value"
+        @update:monthly-deposit="calc.monthlyDeposit.value = $event"
+        @update:months="calc.months.value = $event"
+        @update:annual-rate="calc.annualRate.value = $event"
+        @update:tax-type="calc.taxType.value = $event"
+      />
+    </CalculatorInteractionTracker>
 
     <SavingsResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/savings-interest" />

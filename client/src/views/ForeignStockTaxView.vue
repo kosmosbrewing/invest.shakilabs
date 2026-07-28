@@ -9,6 +9,7 @@ import { FOREIGN_STOCK_TAX_GUIDE } from "@/data/seoGuides";
 import ForeignStockTaxInputPanel from "@/components/foreignStock/ForeignStockTaxInputPanel.vue";
 import ForeignStockTaxResultPanel from "@/components/foreignStock/ForeignStockTaxResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
+import CalculatorInteractionTracker from "@/components/analytics/CalculatorInteractionTracker.vue";
 import { useForeignStockTaxCalc } from "@/composables/useForeignStockTaxCalc";
 import { FOREIGN_STOCK_TAX_FAQS, FOREIGN_STOCK_TAX_SOURCES, FOREIGN_STOCK_TAX_UPDATED } from "@/data/foreignStockTax";
 import { formatManWon } from "@/lib/utils";
@@ -56,18 +57,23 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <ForeignStockTaxInputPanel
-      :sell-amount="calc.sellAmount.value"
-      :buy-amount="calc.buyAmount.value"
-      :fees="calc.fees.value"
-      :other-gains="calc.otherGains.value"
-      :other-losses="calc.otherLosses.value"
-      @update:sell-amount="calc.sellAmount.value = $event"
-      @update:buy-amount="calc.buyAmount.value = $event"
-      @update:fees="calc.fees.value = $event"
-      @update:other-gains="calc.otherGains.value = $event"
-      @update:other-losses="calc.otherLosses.value = $event"
-    />
+    <CalculatorInteractionTracker
+      calculator-id="foreign_stock_tax"
+      page-path="/invest/foreign-stock-tax"
+    >
+      <ForeignStockTaxInputPanel
+        :sell-amount="calc.sellAmount.value"
+        :buy-amount="calc.buyAmount.value"
+        :fees="calc.fees.value"
+        :other-gains="calc.otherGains.value"
+        :other-losses="calc.otherLosses.value"
+        @update:sell-amount="calc.sellAmount.value = $event"
+        @update:buy-amount="calc.buyAmount.value = $event"
+        @update:fees="calc.fees.value = $event"
+        @update:other-gains="calc.otherGains.value = $event"
+        @update:other-losses="calc.otherLosses.value = $event"
+      />
+    </CalculatorInteractionTracker>
 
     <ForeignStockTaxResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/foreign-stock-tax" />
