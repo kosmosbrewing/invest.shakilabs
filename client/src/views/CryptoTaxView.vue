@@ -10,6 +10,7 @@ import { CRYPTO_TAX_GUIDE } from "@/data/seoGuides";
 import CryptoInputPanel from "@/components/crypto/CryptoInputPanel.vue";
 import CryptoResultPanel from "@/components/crypto/CryptoResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
+import CalculatorInteractionTracker from "@/components/analytics/CalculatorInteractionTracker.vue";
 import { useCryptoTaxCalc } from "@/composables/useCryptoTaxCalc";
 import { CRYPTO_TAX_STATUS_NOTE, INVEST_DATA_UPDATED } from "@/data/investTaxRates";
 import { formatManWon } from "@/lib/utils";
@@ -78,14 +79,19 @@ const faqJsonLd = {
       </div>
     </ShSurface>
 
-    <CryptoInputPanel
-      :purchase-amount="calc.purchaseAmount.value"
-      :sale-amount="calc.saleAmount.value"
-      :expenses="calc.expenses.value"
-      @update:purchase-amount="calc.purchaseAmount.value = $event"
-      @update:sale-amount="calc.saleAmount.value = $event"
-      @update:expenses="calc.expenses.value = $event"
-    />
+    <CalculatorInteractionTracker
+      calculator-id="crypto_tax"
+      page-path="/invest/crypto-tax"
+    >
+      <CryptoInputPanel
+        :purchase-amount="calc.purchaseAmount.value"
+        :sale-amount="calc.saleAmount.value"
+        :expenses="calc.expenses.value"
+        @update:purchase-amount="calc.purchaseAmount.value = $event"
+        @update:sale-amount="calc.saleAmount.value = $event"
+        @update:expenses="calc.expenses.value = $event"
+      />
+    </CalculatorInteractionTracker>
 
     <CryptoResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/crypto-tax" />

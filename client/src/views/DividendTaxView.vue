@@ -8,6 +8,7 @@ import { DIVIDEND_TAX_GUIDE } from "@/data/seoGuides";
 import DividendInputPanel from "@/components/dividend/DividendInputPanel.vue";
 import DividendResultPanel from "@/components/dividend/DividendResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
+import CalculatorInteractionTracker from "@/components/analytics/CalculatorInteractionTracker.vue";
 import { useDividendTaxCalc } from "@/composables/useDividendTaxCalc";
 import { INVEST_DATA_UPDATED } from "@/data/investTaxRates";
 import { formatManWon } from "@/lib/utils";
@@ -71,14 +72,19 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <DividendInputPanel
-      :dividend-amount="calc.dividendAmount.value"
-      :country="calc.country.value"
-      :other-financial-income="calc.otherFinancialIncome.value"
-      @update:dividend-amount="calc.dividendAmount.value = $event"
-      @update:country="calc.country.value = $event"
-      @update:other-financial-income="calc.otherFinancialIncome.value = $event"
-    />
+    <CalculatorInteractionTracker
+      calculator-id="dividend_tax"
+      page-path="/invest/dividend-tax"
+    >
+      <DividendInputPanel
+        :dividend-amount="calc.dividendAmount.value"
+        :country="calc.country.value"
+        :other-financial-income="calc.otherFinancialIncome.value"
+        @update:dividend-amount="calc.dividendAmount.value = $event"
+        @update:country="calc.country.value = $event"
+        @update:other-financial-income="calc.otherFinancialIncome.value = $event"
+      />
+    </CalculatorInteractionTracker>
 
     <DividendResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/dividend-tax" />

@@ -8,6 +8,7 @@ import { ISA_GUIDE } from "@/data/seoGuides";
 import IsaInputPanel from "@/components/isa/IsaInputPanel.vue";
 import IsaResultPanel from "@/components/isa/IsaResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
+import CalculatorInteractionTracker from "@/components/analytics/CalculatorInteractionTracker.vue";
 import { useIsaCalc } from "@/composables/useIsaCalc";
 import { INVEST_DATA_UPDATED } from "@/data/investTaxRates";
 import { formatManWon } from "@/lib/utils";
@@ -71,16 +72,21 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <IsaInputPanel
-      :annual-investment="calc.annualInvestment.value"
-      :annual-return-rate="calc.annualReturnRate.value"
-      :holding-years="calc.holdingYears.value"
-      :isa-type="calc.isaType.value"
-      @update:annual-investment="calc.annualInvestment.value = $event"
-      @update:annual-return-rate="calc.annualReturnRate.value = $event"
-      @update:holding-years="calc.holdingYears.value = $event"
-      @update:isa-type="calc.isaType.value = $event"
-    />
+    <CalculatorInteractionTracker
+      calculator-id="isa"
+      page-path="/invest/isa"
+    >
+      <IsaInputPanel
+        :annual-investment="calc.annualInvestment.value"
+        :annual-return-rate="calc.annualReturnRate.value"
+        :holding-years="calc.holdingYears.value"
+        :isa-type="calc.isaType.value"
+        @update:annual-investment="calc.annualInvestment.value = $event"
+        @update:annual-return-rate="calc.annualReturnRate.value = $event"
+        @update:holding-years="calc.holdingYears.value = $event"
+        @update:isa-type="calc.isaType.value = $event"
+      />
+    </CalculatorInteractionTracker>
 
     <IsaResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/isa" />
