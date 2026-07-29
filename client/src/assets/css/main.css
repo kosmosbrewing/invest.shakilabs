@@ -12,7 +12,7 @@
   * { @apply border-border; }
   :where(a, button, input, select, textarea, summary, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; border-radius: 3px; }
   /* 한국어 어절 단위 개행 (keep-all) + 긴 숫자·URL 예외 */
-  body { @apply bg-background text-foreground; word-break: keep-all; overflow-wrap: break-word; }
+  body { @apply bg-background text-foreground; word-break: keep-all; overflow-wrap: break-word; text-wrap: pretty; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; } }
 }
 
