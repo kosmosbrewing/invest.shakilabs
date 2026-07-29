@@ -88,14 +88,12 @@ const faqJsonLd = {
 
     <DividendResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/dividend-tax" />
-    <FaqAccordionPanel :items="faqItems" />
+    <FaqAccordionPanel :items="faqItems" :extra="DIVIDEND_TAX_GUIDE.faqs" />
 
     <SeoRichGuide
       :title="DIVIDEND_TAX_GUIDE.title"
       :intro="DIVIDEND_TAX_GUIDE.intro"
-      :sections="DIVIDEND_TAX_GUIDE.sections"
-      :faqs="DIVIDEND_TAX_GUIDE.faqs"
-      :disclaimer="DIVIDEND_TAX_GUIDE.disclaimer"
+      :sections="DIVIDEND_TAX_GUIDE.sections"      :disclaimer="DIVIDEND_TAX_GUIDE.disclaimer"
     />
   </div>
 </template>

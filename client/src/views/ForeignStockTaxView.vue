@@ -77,7 +77,7 @@ const faqJsonLd = {
 
     <ForeignStockTaxResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/foreign-stock-tax" />
-    <FaqAccordionPanel title="출처 및 FAQ" :items="FOREIGN_STOCK_TAX_FAQS">
+    <FaqAccordionPanel title="출처 및 FAQ" :items="FOREIGN_STOCK_TAX_FAQS" :extra="FOREIGN_STOCK_TAX_GUIDE.faqs">
       <template #before>
         <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">
           <p v-for="source in FOREIGN_STOCK_TAX_SOURCES" :key="source.url">
@@ -93,9 +93,7 @@ const faqJsonLd = {
     <SeoRichGuide
       :title="FOREIGN_STOCK_TAX_GUIDE.title"
       :intro="FOREIGN_STOCK_TAX_GUIDE.intro"
-      :sections="FOREIGN_STOCK_TAX_GUIDE.sections"
-      :faqs="FOREIGN_STOCK_TAX_GUIDE.faqs"
-      :disclaimer="FOREIGN_STOCK_TAX_GUIDE.disclaimer"
+      :sections="FOREIGN_STOCK_TAX_GUIDE.sections"      :disclaimer="FOREIGN_STOCK_TAX_GUIDE.disclaimer"
     />
   </div>
 </template>
