@@ -107,14 +107,12 @@ const faqJsonLd = {
 
     <DepositResultPanel :result="calc.result.value" :payment-type="calc.paymentType.value" />
     <IntentRelatedLinks current-path="/deposit-interest" />
-    <FaqAccordionPanel :items="faqItems" />
+    <FaqAccordionPanel :items="faqItems" :extra="DEPOSIT_INTEREST_GUIDE.faqs" />
 
     <SeoRichGuide
       :title="DEPOSIT_INTEREST_GUIDE.title"
       :intro="DEPOSIT_INTEREST_GUIDE.intro"
-      :sections="DEPOSIT_INTEREST_GUIDE.sections"
-      :faqs="DEPOSIT_INTEREST_GUIDE.faqs"
-      :disclaimer="DEPOSIT_INTEREST_GUIDE.disclaimer"
+      :sections="DEPOSIT_INTEREST_GUIDE.sections"      :disclaimer="DEPOSIT_INTEREST_GUIDE.disclaimer"
     />
   </div>
 </template>

@@ -96,14 +96,12 @@ const faqJsonLd = {
 
     <CompoundResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/compound-interest" />
-    <FaqAccordionPanel :items="faqItems" />
+    <FaqAccordionPanel :items="faqItems" :extra="COMPOUND_INTEREST_GUIDE.faqs" />
 
     <SeoRichGuide
       :title="COMPOUND_INTEREST_GUIDE.title"
       :intro="COMPOUND_INTEREST_GUIDE.intro"
-      :sections="COMPOUND_INTEREST_GUIDE.sections"
-      :faqs="COMPOUND_INTEREST_GUIDE.faqs"
-      :disclaimer="COMPOUND_INTEREST_GUIDE.disclaimer"
+      :sections="COMPOUND_INTEREST_GUIDE.sections"      :disclaimer="COMPOUND_INTEREST_GUIDE.disclaimer"
     />
   </div>
 </template>

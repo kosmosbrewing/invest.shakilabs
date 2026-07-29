@@ -100,14 +100,12 @@ const faqJsonLd = {
 
     <SavingsResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/savings-interest" />
-    <FaqAccordionPanel :items="faqItems" />
+    <FaqAccordionPanel :items="faqItems" :extra="SAVINGS_INTEREST_GUIDE.faqs" />
 
     <SeoRichGuide
       :title="SAVINGS_INTEREST_GUIDE.title"
       :intro="SAVINGS_INTEREST_GUIDE.intro"
-      :sections="SAVINGS_INTEREST_GUIDE.sections"
-      :faqs="SAVINGS_INTEREST_GUIDE.faqs"
-      :disclaimer="SAVINGS_INTEREST_GUIDE.disclaimer"
+      :sections="SAVINGS_INTEREST_GUIDE.sections"      :disclaimer="SAVINGS_INTEREST_GUIDE.disclaimer"
     />
   </div>
 </template>

@@ -77,7 +77,7 @@ const faqJsonLd = {
 
     <InheritanceTaxResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/inheritance-tax" />
-    <FaqAccordionPanel title="출처 및 FAQ" :items="INHERITANCE_TAX_FAQS">
+    <FaqAccordionPanel title="출처 및 FAQ" :items="INHERITANCE_TAX_FAQS" :extra="INHERITANCE_TAX_GUIDE.faqs">
       <template #before>
         <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">
           <p v-for="source in INHERITANCE_TAX_SOURCES" :key="source.url">
@@ -93,9 +93,7 @@ const faqJsonLd = {
     <SeoRichGuide
       :title="INHERITANCE_TAX_GUIDE.title"
       :intro="INHERITANCE_TAX_GUIDE.intro"
-      :sections="INHERITANCE_TAX_GUIDE.sections"
-      :faqs="INHERITANCE_TAX_GUIDE.faqs"
-      :disclaimer="INHERITANCE_TAX_GUIDE.disclaimer"
+      :sections="INHERITANCE_TAX_GUIDE.sections"      :disclaimer="INHERITANCE_TAX_GUIDE.disclaimer"
     />
   </div>
 </template>

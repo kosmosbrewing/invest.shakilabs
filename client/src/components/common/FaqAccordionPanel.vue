@@ -1,15 +1,22 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { mergeFaqs } from "@/lib/faqMerge";
 
 interface FaqItem {
   q: string;
   a: string;
 }
 
-defineProps<{
+const props = defineProps<{
   title?: string;
   items: readonly FaqItem[];
+  // SEO 가이드에 따로 있던 FAQ — 중복을 걸러 이 아코디언 하나로 합쳐 노출한다
+  // (같은 페이지에 FAQ 블록이 두 번 나오던 가독성 문제 해소)
+  extra?: readonly FaqItem[];
 }>();
+
+const visibleItems = computed(() => mergeFaqs(props.items, props.extra));
 </script>
 
 <template>
@@ -21,7 +28,7 @@ defineProps<{
       <slot name="before" />
       <Accordion type="single" collapsible>
         <AccordionItem
-          v-for="(item, index) in items"
+          v-for="(item, index) in visibleItems"
           :key="item.q"
           :value="`faq-${index}`"
         >

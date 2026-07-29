@@ -95,15 +95,13 @@ const faqJsonLd = {
 
     <CryptoResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/crypto-tax" />
-    <FaqAccordionPanel :items="faqItems" />
+    <FaqAccordionPanel :items="faqItems" :extra="CRYPTO_TAX_GUIDE.faqs" />
     <RelatedServices />
 
     <SeoRichGuide
       :title="CRYPTO_TAX_GUIDE.title"
       :intro="CRYPTO_TAX_GUIDE.intro"
-      :sections="CRYPTO_TAX_GUIDE.sections"
-      :faqs="CRYPTO_TAX_GUIDE.faqs"
-      :disclaimer="CRYPTO_TAX_GUIDE.disclaimer"
+      :sections="CRYPTO_TAX_GUIDE.sections"      :disclaimer="CRYPTO_TAX_GUIDE.disclaimer"
     />
   </div>
 </template>

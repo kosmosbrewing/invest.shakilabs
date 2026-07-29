@@ -75,7 +75,7 @@ const faqJsonLd = {
 
     <GiftTaxResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/gift-tax" />
-    <FaqAccordionPanel title="출처 및 FAQ" :items="GIFT_TAX_FAQS">
+    <FaqAccordionPanel title="출처 및 FAQ" :items="GIFT_TAX_FAQS" :extra="GIFT_TAX_GUIDE.faqs">
       <template #before>
         <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">
           <p v-for="source in GIFT_TAX_SOURCES" :key="source.url">
@@ -91,9 +91,7 @@ const faqJsonLd = {
     <SeoRichGuide
       :title="GIFT_TAX_GUIDE.title"
       :intro="GIFT_TAX_GUIDE.intro"
-      :sections="GIFT_TAX_GUIDE.sections"
-      :faqs="GIFT_TAX_GUIDE.faqs"
-      :disclaimer="GIFT_TAX_GUIDE.disclaimer"
+      :sections="GIFT_TAX_GUIDE.sections"      :disclaimer="GIFT_TAX_GUIDE.disclaimer"
     />
   </div>
 </template>

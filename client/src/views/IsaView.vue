@@ -90,14 +90,12 @@ const faqJsonLd = {
 
     <IsaResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/isa" />
-    <FaqAccordionPanel :items="faqItems" />
+    <FaqAccordionPanel :items="faqItems" :extra="ISA_GUIDE.faqs" />
 
     <SeoRichGuide
       :title="ISA_GUIDE.title"
       :intro="ISA_GUIDE.intro"
-      :sections="ISA_GUIDE.sections"
-      :faqs="ISA_GUIDE.faqs"
-      :disclaimer="ISA_GUIDE.disclaimer"
+      :sections="ISA_GUIDE.sections"      :disclaimer="ISA_GUIDE.disclaimer"
     />
   </div>
 </template>
