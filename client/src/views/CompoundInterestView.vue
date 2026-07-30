@@ -4,6 +4,7 @@ import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { mergeFaqs } from "@/lib/faqMerge";
 import { COMPOUND_INTEREST_GUIDE } from "@/data/seoGuides";
 import CompoundInputPanel from "@/components/compound/CompoundInputPanel.vue";
 import CompoundResultPanel from "@/components/compound/CompoundResultPanel.vue";
@@ -50,10 +51,12 @@ const faqItems = [
   },
 ] as const;
 
+// 화면에 실제 렌더되는 병합 FAQ와 구조화 데이터를 일치시킨다 (스키마 규칙)
+const mergedFaqs = mergeFaqs(faqItems, COMPOUND_INTEREST_GUIDE.faqs);
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: faqItems.map((faq) => ({
+  mainEntity: mergedFaqs.map((faq) => ({
     "@type": "Question",
     name: faq.q,
     acceptedAnswer: { "@type": "Answer", text: faq.a },
@@ -96,7 +99,7 @@ const faqJsonLd = {
 
     <CompoundResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/compound-interest" />
-    <FaqAccordionPanel :items="faqItems" :extra="COMPOUND_INTEREST_GUIDE.faqs" />
+    <FaqAccordionPanel :items="mergedFaqs" />
 
     <SeoRichGuide
       :title="COMPOUND_INTEREST_GUIDE.title"

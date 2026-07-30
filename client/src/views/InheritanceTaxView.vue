@@ -5,6 +5,7 @@ import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { mergeFaqs } from "@/lib/faqMerge";
 import { INHERITANCE_TAX_GUIDE } from "@/data/seoGuides";
 import InheritanceTaxInputPanel from "@/components/inheritance/InheritanceTaxInputPanel.vue";
 import InheritanceTaxResultPanel from "@/components/inheritance/InheritanceTaxResultPanel.vue";
@@ -29,10 +30,12 @@ const seoDesc = computed(() =>
 
 const calc = useInheritanceTaxCalc(props.initialEstate);
 
+// 화면에 실제 렌더되는 병합 FAQ와 구조화 데이터를 일치시킨다 (스키마 규칙)
+const mergedFaqs = mergeFaqs(INHERITANCE_TAX_FAQS, INHERITANCE_TAX_GUIDE.faqs);
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: INHERITANCE_TAX_FAQS.map((faq) => ({
+  mainEntity: mergedFaqs.map((faq) => ({
     "@type": "Question",
     name: faq.q,
     acceptedAnswer: { "@type": "Answer", text: faq.a },
@@ -77,7 +80,7 @@ const faqJsonLd = {
 
     <InheritanceTaxResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/inheritance-tax" />
-    <FaqAccordionPanel title="출처 및 FAQ" :items="INHERITANCE_TAX_FAQS" :extra="INHERITANCE_TAX_GUIDE.faqs">
+    <FaqAccordionPanel title="출처 및 FAQ" :items="mergedFaqs">
       <template #before>
         <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">
           <p v-for="source in INHERITANCE_TAX_SOURCES" :key="source.url">

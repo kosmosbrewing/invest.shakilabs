@@ -4,6 +4,7 @@ import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { mergeFaqs } from "@/lib/faqMerge";
 import { DIVIDEND_TAX_GUIDE } from "@/data/seoGuides";
 import DividendInputPanel from "@/components/dividend/DividendInputPanel.vue";
 import DividendResultPanel from "@/components/dividend/DividendResultPanel.vue";
@@ -40,10 +41,12 @@ const faqItems = [
   },
 ] as const;
 
+// 화면에 실제 렌더되는 병합 FAQ와 구조화 데이터를 일치시킨다 (스키마 규칙)
+const mergedFaqs = mergeFaqs(faqItems, DIVIDEND_TAX_GUIDE.faqs);
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: faqItems.map((faq) => ({
+  mainEntity: mergedFaqs.map((faq) => ({
     "@type": "Question",
     name: faq.q,
     acceptedAnswer: { "@type": "Answer", text: faq.a },
@@ -88,7 +91,7 @@ const faqJsonLd = {
 
     <DividendResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/dividend-tax" />
-    <FaqAccordionPanel :items="faqItems" :extra="DIVIDEND_TAX_GUIDE.faqs" />
+    <FaqAccordionPanel :items="mergedFaqs" />
 
     <SeoRichGuide
       :title="DIVIDEND_TAX_GUIDE.title"

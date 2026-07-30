@@ -5,6 +5,7 @@ import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { mergeFaqs } from "@/lib/faqMerge";
 import { FOREIGN_STOCK_TAX_GUIDE } from "@/data/seoGuides";
 import ForeignStockTaxInputPanel from "@/components/foreignStock/ForeignStockTaxInputPanel.vue";
 import ForeignStockTaxResultPanel from "@/components/foreignStock/ForeignStockTaxResultPanel.vue";
@@ -29,10 +30,12 @@ const seoDesc = computed(() =>
 
 const calc = useForeignStockTaxCalc(props.initialSellAmount);
 
+// 화면에 실제 렌더되는 병합 FAQ와 구조화 데이터를 일치시킨다 (스키마 규칙)
+const mergedFaqs = mergeFaqs(FOREIGN_STOCK_TAX_FAQS, FOREIGN_STOCK_TAX_GUIDE.faqs);
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: FOREIGN_STOCK_TAX_FAQS.map((faq) => ({
+  mainEntity: mergedFaqs.map((faq) => ({
     "@type": "Question",
     name: faq.q,
     acceptedAnswer: { "@type": "Answer", text: faq.a },
@@ -77,7 +80,7 @@ const faqJsonLd = {
 
     <ForeignStockTaxResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/foreign-stock-tax" />
-    <FaqAccordionPanel title="출처 및 FAQ" :items="FOREIGN_STOCK_TAX_FAQS" :extra="FOREIGN_STOCK_TAX_GUIDE.faqs">
+    <FaqAccordionPanel title="출처 및 FAQ" :items="mergedFaqs">
       <template #before>
         <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">
           <p v-for="source in FOREIGN_STOCK_TAX_SOURCES" :key="source.url">
