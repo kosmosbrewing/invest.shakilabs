@@ -6,6 +6,7 @@ import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
 import RelatedServices from "@/components/common/RelatedServices.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { mergeFaqs } from "@/lib/faqMerge";
 import { CRYPTO_TAX_GUIDE } from "@/data/seoGuides";
 import CryptoInputPanel from "@/components/crypto/CryptoInputPanel.vue";
 import CryptoResultPanel from "@/components/crypto/CryptoResultPanel.vue";
@@ -42,10 +43,12 @@ const faqItems = [
   },
 ] as const;
 
+// 화면에 실제 렌더되는 병합 FAQ와 구조화 데이터를 일치시킨다 (스키마 규칙)
+const mergedFaqs = mergeFaqs(faqItems, CRYPTO_TAX_GUIDE.faqs);
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: faqItems.map((faq) => ({
+  mainEntity: mergedFaqs.map((faq) => ({
     "@type": "Question",
     name: faq.q,
     acceptedAnswer: {
@@ -95,7 +98,7 @@ const faqJsonLd = {
 
     <CryptoResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/crypto-tax" />
-    <FaqAccordionPanel :items="faqItems" :extra="CRYPTO_TAX_GUIDE.faqs" />
+    <FaqAccordionPanel :items="mergedFaqs" />
     <RelatedServices />
 
     <SeoRichGuide
