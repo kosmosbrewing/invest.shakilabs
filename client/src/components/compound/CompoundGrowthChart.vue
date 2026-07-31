@@ -2,7 +2,8 @@
 import { computed, useId } from "vue";
 import type { CompoundInterestResult } from "@/utils/interestCalculator";
 import { formatWon } from "@/lib/utils";
-import { linePoint } from "@/utils/chartMath";
+// 차트 수식은 @shakilabs/ui로 승격됐다 — 로컬 chartMath는 제거.
+import { linePoint } from "@shakilabs/ui";
 
 const props = defineProps<{ rows: CompoundInterestResult["yearlyData"] }>();
 const titleId = `compound-growth-${useId()}`;

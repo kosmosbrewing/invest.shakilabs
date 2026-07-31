@@ -1,41 +1,25 @@
 <script setup lang="ts">
-import { computed, useId } from "vue";
-import { positiveBarWidth } from "@/utils/chartMath";
+// 차트 본체는 @shakilabs/ui ShRankedBars — 이 파일은 invest의 retro-chart 크롬만 입힌다.
+// 호출부(IsaResultPanel.vue)의 props 이름(label/note/items/formatValue)은 그대로 유지한다.
+import { ShRankedBars } from "@shakilabs/ui";
+import type { RankedBarItem } from "@shakilabs/ui";
 
-type BarItem = { key: string; label: string; value: number; highlight?: boolean };
-const props = defineProps<{
+defineProps<{
+  /** 패키지에서는 title이지만, 호출부를 고치지 않기 위해 label 이름을 유지한다. */
   label: string;
   note: string;
-  items: readonly BarItem[];
-  formatValue: (value: number) => string;
+  items: readonly RankedBarItem[];
+  // 패키지 계약이 null(산출 불가)까지 받으므로 여기서도 넓혀야 타입이 통과한다. formatWon은 이미 null 처리를 한다.
+  formatValue: (value: number | null) => string;
 }>();
-const titleId = `ranked-${useId()}`;
-const maximum = computed(() => Math.max(...props.items.map((item) => item.value), 0));
 </script>
 
 <template>
-  <section class="retro-chart space-y-3" :aria-labelledby="titleId">
-    <div>
-      <h3 :id="titleId" class="text-caption text-muted-foreground">{{ label }}</h3>
-      <p class="mt-1 text-tiny text-muted-foreground">{{ note }}</p>
-    </div>
-    <ol class="space-y-3">
-      <li v-for="item in items" :key="item.key" class="space-y-1.5">
-        <div class="flex items-baseline justify-between gap-3 text-caption">
-          <span class="font-semibold" :class="item.highlight ? 'text-primary' : 'text-muted-foreground'">{{ item.label }}</span>
-          <strong class="tabular-nums">{{ formatValue(item.value) }}</strong>
-        </div>
-        <div class="h-3 overflow-hidden rounded-full bg-muted">
-          <svg viewBox="0 0 100 12" preserveAspectRatio="none" class="block h-full w-full" aria-hidden="true">
-            <rect
-              :width="positiveBarWidth(item.value, maximum)"
-              height="12"
-              rx="4"
-              :class="item.highlight ? 'fill-primary' : 'fill-muted-foreground/45'"
-            />
-          </svg>
-        </div>
-      </li>
-    </ol>
+  <section class="retro-chart">
+    <ShRankedBars :items="items" :note="note" :format-value="formatValue">
+      <template #header="{ titleId }">
+        <h3 :id="titleId" class="text-caption text-muted-foreground">{{ label }}</h3>
+      </template>
+    </ShRankedBars>
   </section>
 </template>
