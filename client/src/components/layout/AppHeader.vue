@@ -49,7 +49,7 @@ onMounted(() => {
               </span>
             </a>
 
-            <div class="flex h-full flex-1 items-center justify-center overflow-hidden text-center font-brand text-caption sm:text-body">
+            <div class="flex min-w-0 flex-1 items-center justify-center text-center font-brand text-caption sm:text-body">
               <TickerBar :messages="tickerMessages" />
             </div>
 
