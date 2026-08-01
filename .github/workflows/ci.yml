@@ -36,3 +36,19 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # SBOM은 저장소에 커밋하지 않는다(timestamp·documentNamespace가 비결정적).
+      # 릴리스별 사본은 아래 upload-artifact로 90일 보관된다.
+      - name: Generate production SBOM
+        run: npm run sbom:prod
+
+      # 네트워크·재생성 없이 1초 미만. vendor tgz↔README↔package.json 3자 대조와
+      # SBOM metadata.component 신원(name·version·vcs url) 대조만 수행한다.
+      - name: Verify vendored artifacts
+        run: npm run verify:supply-chain
+
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-sbom
+          path: client/artifacts/sbom/*.json
