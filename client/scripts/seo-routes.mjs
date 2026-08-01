@@ -14,6 +14,9 @@ export const DEPOSIT_AMOUNTS = [1000, 3000, 5000, 10000];
 export const COMPOUND_AMOUNTS = [1000, 3000, 5000, 10000];
 
 export const SEO_ROUTES = [
+  // "/" must stay listed: without it vite-ssg skips the home and dist/index.html
+  // ships as the empty shell (no content, no footer cross-app links).
+  "/",
   "/all",
   "/crypto-tax",
   "/dividend-tax",
