@@ -34,7 +34,8 @@ function validateRoute(route) {
   assert(existsSync(outputPath), `Missing static output for ${route}: ${outputPath}`);
 
   const html = readFileSync(outputPath, "utf8");
-  const expectedCanonical = `${canonicalBase}${route}`;
+  // cleanUrls redirects "/invest/" to "/invest", so the home canonical carries no slash
+  const expectedCanonical = route === "/" ? canonicalBase : `${canonicalBase}${route}`;
   const actualCanonical = html.match(/<link rel="canonical" href="([^"]+)"\s*\/?>/)?.[1];
   const h1Count = html.match(/<h1\b/gi)?.length ?? 0;
 
@@ -49,9 +50,23 @@ validateVercelConfig(resolve(repositoryRoot, "vercel.json"));
 validateVercelConfig(resolve(projectRoot, "vercel.json"));
 SEO_ROUTES.forEach(validateRoute);
 
-const rootHtml = readFileSync(resolve(distRoot, "index.html"), "utf8");
-const rootCanonical = rootHtml.match(/<link rel="canonical" href="([^"]+)"\s*\/?>/)?.[1];
-assert(rootCanonical === `${canonicalBase}/`, "Invalid root shell canonical");
+// Regression guard: the home used to ship as the empty shell because "/" was
+// missing from SEO_ROUTES. Catch that here instead of noticing it in production.
+const homeHtml = readFileSync(routeOutputPath("/"), "utf8");
+assert(!/<div id="app">\s*<\/div>/.test(homeHtml),
+  "Home is an empty shell - it must be prerendered");
+const crossAppLinks = new Set(
+  homeHtml.match(/href="\/(biz|car|card|finance|house|loan|nutri|ott|seller|travel)"/g) ?? []
+);
+assert(crossAppLinks.size >= 8,
+  `Home is missing the shared footer cross-app links (found ${crossAppLinks.size})`);
+
+// The home and the /all hub are both directories; keep their titles distinct so
+// neither page competes with the other in search results.
+const hubHtml = readFileSync(routeOutputPath("/all"), "utf8");
+const titleOf = (html) => html.match(/<title>([^<]+)<\/title>/)?.[1] ?? "";
+assert(titleOf(homeHtml) !== titleOf(hubHtml),
+  "Home and /all must not share the same title");
 
 const notFoundPath = resolve(distRoot, "404.html");
 assert(existsSync(notFoundPath), "Missing custom 404.html output");
@@ -59,4 +74,4 @@ const notFoundHtml = readFileSync(notFoundPath, "utf8");
 assert(/name="robots" content="noindex,nofollow"/.test(notFoundHtml),
   "404.html must be noindex,nofollow");
 
-console.log(`Validated ${SEO_ROUTES.length} SEO routes, root shell, and custom 404 output.`);
+console.log(`Validated ${SEO_ROUTES.length} SEO routes, prerendered home, and custom 404 output.`);

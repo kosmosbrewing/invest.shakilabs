@@ -38,8 +38,9 @@ const paramPaths = new Set([
 ]);
 
 const basePriority = {
+  "/": "1.0",
   "/all": "0.9",
-  "/crypto-tax": "1.0",
+  "/crypto-tax": "0.9",
   "/dividend-tax": "0.9",
   "/isa": "0.9",
   "/gift-tax": "0.9",
@@ -80,8 +81,10 @@ function renderSitemap(buildDate) {
   const baseUrl = "https://shakilabs.com/invest";
   const urls = SEO_ROUTES.map((path) => {
     const { changefreq, priority } = getRouteConfig(path);
+    // cleanUrls redirects "/invest/" to "/invest", so the home must be listed slashless
+    const loc = path === "/" ? baseUrl : `${baseUrl}${path}`;
     return `  <url>
-    <loc>${baseUrl}${path}</loc>
+    <loc>${loc}</loc>
     <lastmod>${buildDate}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
@@ -96,7 +99,10 @@ ${urls}
 }
 
 function routeOutputPath(route) {
-  return resolve(projectRoot, "dist", `${route.slice(1)}.html`);
+  // vite-ssg emits the home as dist/index.html, not dist/.html
+  return route === "/"
+    ? resolve(projectRoot, "dist", "index.html")
+    : resolve(projectRoot, "dist", `${route.slice(1)}.html`);
 }
 
 function removeRenderedNoscriptFallbacks() {

@@ -10,7 +10,8 @@ const PUBLIC_DIR = resolve(import.meta.dirname, "../public");
 const today = new Date().toISOString().split("T")[0];
 
 function resolvePriority(route) {
-  if (route === "/crypto-tax") return "1.0";
+  if (route === "/") return "1.0";
+  if (route === "/crypto-tax") return "0.9";
   if (route === "/all") return "0.9";
   if (route === "/dividend-tax") return "0.9";
   if (route === "/isa") return "0.9";
@@ -22,8 +23,9 @@ function resolveChangeFreq(route) {
   return "weekly";
 }
 
+// cleanUrls redirects "/invest/" to "/invest", so the home must be listed slashless
 const urls = SEO_ROUTES.map((route) => `  <url>
-    <loc>${SITE_URL}${route}</loc>
+    <loc>${route === "/" ? SITE_URL : `${SITE_URL}${route}`}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>${resolveChangeFreq(route)}</changefreq>
     <priority>${resolvePriority(route)}</priority>

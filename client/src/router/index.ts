@@ -4,8 +4,11 @@ import { trackPageView } from "@/lib/analytics";
 
 export const routes: RouteRecordRaw[] = [
   {
+    // 리다이렉트였을 때는 프리렌더 대상이 될 수 없어 홈이 빈 껍데기로 나갔다
     path: "/",
-    redirect: "/crypto-tax",
+    name: "home",
+    component: () => import("@/views/HomeView.vue"),
+    meta: { title: "투자 세금 계산기 | 2026 세율·공제 한눈에" },
   },
   {
     path: "/all",

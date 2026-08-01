@@ -34,8 +34,8 @@ onMounted(() => {
         <div class="retro-titlebar h-11 border-b-0 bg-transparent px-1.5 sm:px-2">
           <div class="flex h-full w-full items-center gap-2.5 sm:gap-4">
             <a
-              href="/invest/crypto-tax"
-              aria-label="ShakiLabs 홈"
+              href="/invest"
+              aria-label="투자 계산기 홈"
               class="inline-flex h-8 w-8 shrink-0 items-center justify-center gap-1 px-0.5 text-muted-foreground transition-colors hover:text-foreground sm:w-auto sm:justify-start sm:gap-1.5"
             >
               <span
