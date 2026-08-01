@@ -35,6 +35,9 @@ coverage/
 # Vite
 *.local
 
+# Generated build/compliance artifacts (SBOM 등) — 비결정적 산출물을 저장소에 남기지 않는다
+client/artifacts/
+
 # Vercel local project metadata
 .vercel/
 client/.vercel/
