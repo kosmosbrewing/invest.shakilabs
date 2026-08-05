@@ -16,6 +16,14 @@ import { formatManWon } from "@/lib/utils";
 import { computed } from "vue";
 
 const props = defineProps<{ initialAmountMan?: number }>();
+
+// 금액 변종(/compound-interest/{금액})은 형제 간 고유 본문이 얇아(준-doorway)
+// 대표 URL로 canonical을 통합한다. 라우트·프리렌더는 유지하되
+// canonical·hreflang·og:url만 /compound-interest를 가리킨다 (noindex 아님).
+const canonicalPath = computed(() =>
+  props.initialAmountMan != null ? "/compound-interest" : undefined,
+);
+
 const amountLabel = computed(() =>
   props.initialAmountMan ? formatManWon(props.initialAmountMan * 10_000) : null,
 );
@@ -65,7 +73,12 @@ const faqJsonLd = {
 </script>
 
 <template>
-  <SEOHead :title="seoTitle" :description="seoDesc" :json-ld="faqJsonLd" />
+  <SEOHead
+    :title="seoTitle"
+    :description="seoDesc"
+    :json-ld="faqJsonLd"
+    :canonical-path="canonicalPath"
+  />
 
   <div class="container space-y-5 py-5">
     <CalculatorPageHeader title="복리 계산기" />

@@ -19,12 +19,18 @@ export interface GuideChecklist {
   items: string[];
 }
 
+export interface GuideSource {
+  label: string;
+  url: string;
+}
+
 defineProps<{
   title: string;
   intro: string;
   sections?: GuideSection[];
   faqs?: GuideFaq[];
   checklist?: GuideChecklist;
+  sources?: GuideSource[];
   disclaimer?: string;
 }>();
 </script>
@@ -66,6 +72,21 @@ defineProps<{
         <p class="text-sm font-semibold text-foreground">Q. {{ faq.q }}</p>
         <p class="text-sm leading-relaxed text-muted-foreground">A. {{ faq.a }}</p>
       </div>
+    </div>
+
+    <!-- 공식 출처: 정부·공공 원자료로 가는 링크 (신뢰 신호, nofollow 금지) -->
+    <div v-if="sources && sources.length > 0" class="space-y-2">
+      <h3 class="text-base font-semibold text-foreground">공식 출처</h3>
+      <ul class="ml-4 list-disc space-y-1 text-sm text-muted-foreground">
+        <li v-for="(src, i) in sources" :key="`src-${i}`">
+          <a
+            :href="src.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="underline underline-offset-2 hover:text-foreground"
+          >{{ src.label }}</a>
+        </li>
+      </ul>
     </div>
 
     <p

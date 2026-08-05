@@ -98,7 +98,9 @@ const faqJsonLd = {
     <SeoRichGuide
       :title="ISA_GUIDE.title"
       :intro="ISA_GUIDE.intro"
-      :sections="ISA_GUIDE.sections"      :disclaimer="ISA_GUIDE.disclaimer"
+      :sections="ISA_GUIDE.sections"
+      :sources="ISA_GUIDE.sources"
+      :disclaimer="ISA_GUIDE.disclaimer"
     />
   </div>
 </template>

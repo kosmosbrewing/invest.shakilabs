@@ -104,7 +104,9 @@ const faqJsonLd = {
     <SeoRichGuide
       :title="CRYPTO_TAX_GUIDE.title"
       :intro="CRYPTO_TAX_GUIDE.intro"
-      :sections="CRYPTO_TAX_GUIDE.sections"      :disclaimer="CRYPTO_TAX_GUIDE.disclaimer"
+      :sections="CRYPTO_TAX_GUIDE.sections"
+      :sources="CRYPTO_TAX_GUIDE.sources"
+      :disclaimer="CRYPTO_TAX_GUIDE.disclaimer"
     />
   </div>
 </template>
