@@ -13,6 +13,16 @@ export const DEPOSIT_AMOUNTS = [1000, 3000, 5000, 10000];
 // 복리: 초기 투자 만원 단위
 export const COMPOUND_AMOUNTS = [1000, 3000, 5000, 10000];
 
+// 복리 금액 변종: 형제 간 고유 본문이 약 9%뿐인 준-doorway라 대표 URL로 canonical을 통합한다.
+// 라우트·프리렌더 산출물은 유지한다 (프리렌더에서 빼면 soft-404가 되므로 금지 · noindex도 금지).
+// 변종에 고유 본문이 생기면 이 목록에서 빼고 사이트맵으로 복귀시킨다 (가역적 조치).
+export const PARAM_ROUTES = COMPOUND_AMOUNTS.map((a) => `/compound-interest/${a}`);
+
+// 변종 경로 → 대표(canonical) 경로 매핑. 빌드 검증·SSG 메타가 같은 소스를 공유한다.
+export const CANONICAL_OVERRIDES = Object.fromEntries(
+  PARAM_ROUTES.map((route) => [route, "/compound-interest"])
+);
+
 export const SEO_ROUTES = [
   // "/" must stay listed: without it vite-ssg skips the home and dist/index.html
   // ships as the empty shell (no content, no footer cross-app links).
@@ -38,5 +48,11 @@ export const SEO_ROUTES = [
   ...FOREIGN_STOCK_AMOUNTS.map((a) => `/foreign-stock-tax/${a}`),
   ...SAVINGS_AMOUNTS.map((a) => `/savings-interest/${a}`),
   ...DEPOSIT_AMOUNTS.map((a) => `/deposit-interest/${a}`),
-  ...COMPOUND_AMOUNTS.map((a) => `/compound-interest/${a}`),
+  ...PARAM_ROUTES,
 ];
+
+// 사이트맵에는 canonical 대표 URL만 노출한다 (통합 변종은 canonical이 다른 곳을
+// 가리키므로 크롤러에 광고하지 않는다). 프리렌더는 SEO_ROUTES 전체를 유지한다.
+export const SITEMAP_ROUTES = SEO_ROUTES.filter(
+  (route) => !(route in CANONICAL_OVERRIDES)
+);

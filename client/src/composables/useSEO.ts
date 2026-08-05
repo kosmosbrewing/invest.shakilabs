@@ -19,6 +19,12 @@ type SEOOptions = {
   jsonLd?: MaybeRefOrGetter<
     Record<string, unknown> | Record<string, unknown>[] | undefined
   >;
+  /**
+   * 변종 URL을 대표 URL로 canonical 통합할 때 대표 경로를 지정한다
+   * ("/compound-interest" 등). canonical·hreflang·og:url이 모두
+   * 이 경로 기준으로 계산되어 세 메타가 항상 일치한다.
+   */
+  canonicalPath?: MaybeRefOrGetter<string | undefined>;
 };
 
 function normalizeTitle(rawTitle: string): string {
@@ -39,7 +45,14 @@ function normalizeTitle(rawTitle: string): string {
   return baseTitle.includes(" | ") ? baseTitle : `${baseTitle}${TITLE_SUFFIX}`;
 }
 
-export function useSEO({ title, description, noindex = false, ogImage, jsonLd }: SEOOptions): void {
+export function useSEO({
+  title,
+  description,
+  noindex = false,
+  ogImage,
+  jsonLd,
+  canonicalPath,
+}: SEOOptions): void {
   const route = useRoute();
 
   useHead(() => {
@@ -56,7 +69,8 @@ export function useSEO({ title, description, noindex = false, ogImage, jsonLd }:
         ? [resolvedJsonLd]
         : [];
     const siteUrl = getSiteUrl().replace(/\/+$/, "");
-    const currentPath = route.path || "/";
+    // canonicalPath가 지정되면 실제 경로 대신 대표 경로로 canonical류 메타를 통일한다
+    const currentPath = toValue(canonicalPath) ?? (route.path || "/");
     const currentUrl = currentPath === "/" ? siteUrl : `${siteUrl}${currentPath}`;
 
     return {

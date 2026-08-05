@@ -4,12 +4,15 @@
 export interface GuideSection { h2: string; body: string; }
 export interface GuideFaq { q: string; a: string; }
 export interface GuideChecklist { title: string; items: string[]; }
+// 공공기관 공식 출처 링크 — 콘텐츠 신뢰도(E-E-A-T) 근거로 가이드 하단에 노출한다
+export interface GuideSource { label: string; url: string; }
 export interface GuideData {
   title: string;
   intro: string;
   sections?: GuideSection[];
   faqs?: GuideFaq[];
   checklist?: GuideChecklist;
+  sources?: GuideSource[];
   disclaimer?: string;
 }
 
@@ -217,6 +220,20 @@ export const CRYPTO_TAX_GUIDE: GuideData = {
     {
       q: "필요경비에는 무엇을 넣나요?",
       a: "거래소 매매 수수료, 출금 수수료 등 양도를 위해 직접 지출한 비용을 입력합니다. 필요경비가 커질수록 양도차익과 과세표준이 줄어들어 예상 세금이 감소합니다.",
+    },
+  ],
+  sources: [
+    {
+      label: "국세청 — 가상자산 과세 제도·세법 안내",
+      url: "https://www.nts.go.kr",
+    },
+    {
+      label: "국가법령정보센터 — 소득세법·시행령 원문",
+      url: "https://www.law.go.kr",
+    },
+    {
+      label: "홈택스 — 양도소득세 신고·납부",
+      url: "https://www.hometax.go.kr",
     },
   ],
   disclaimer: COMMON_DISCLAIMER,
@@ -523,6 +540,16 @@ export const ISA_GUIDE: GuideData = {
     {
       q: "연간 한도 2,000만원을 다 못 채우면 어떻게 되나요?",
       a: "사용하지 않은 한도는 다음 해로 이월되어 총 납입 한도 1억원 내에서 몰아서 납입할 수 있습니다. 여유 자금이 생기는 시점에 맞춰 유연하게 납입 계획을 세울 수 있습니다.",
+    },
+  ],
+  sources: [
+    {
+      label: "국세청 — ISA 비과세·분리과세 세제 혜택 안내",
+      url: "https://www.nts.go.kr",
+    },
+    {
+      label: "국가법령정보센터 — 조세특례제한법(ISA 과세특례) 원문",
+      url: "https://www.law.go.kr",
     },
   ],
   disclaimer: COMMON_DISCLAIMER,
