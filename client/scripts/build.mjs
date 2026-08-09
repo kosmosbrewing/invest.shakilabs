@@ -2,18 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import {
-  SEO_ROUTES,
-  SITEMAP_ROUTES,
-  CRYPTO_AMOUNTS,
-  DIVIDEND_AMOUNTS,
-  ISA_AMOUNTS,
-  GIFT_AMOUNTS,
-  INHERITANCE_AMOUNTS,
-  FOREIGN_STOCK_AMOUNTS,
-  SAVINGS_AMOUNTS,
-  DEPOSIT_AMOUNTS,
-} from "./seo-routes.mjs";
+import { SEO_ROUTES, SITEMAP_ROUTES } from "./seo-routes.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..");
@@ -25,19 +14,8 @@ const viteSsgBin = resolve(
   process.platform === "win32" ? "vite-ssg.cmd" : "vite-ssg"
 );
 
-// 파라미터 라우트 집합 (priority/changefreq 분기용)
-// compound-interest 변종은 canonical 통합으로 사이트맵에서 빠지므로 여기 포함하지 않는다
-const paramPaths = new Set([
-  ...CRYPTO_AMOUNTS.map((a) => `/crypto-tax/${a}`),
-  ...DIVIDEND_AMOUNTS.map((a) => `/dividend-tax/${a}`),
-  ...ISA_AMOUNTS.map((a) => `/isa/${a}`),
-  ...GIFT_AMOUNTS.map((a) => `/gift-tax/${a}`),
-  ...INHERITANCE_AMOUNTS.map((a) => `/inheritance-tax/${a}`),
-  ...FOREIGN_STOCK_AMOUNTS.map((a) => `/foreign-stock-tax/${a}`),
-  ...SAVINGS_AMOUNTS.map((a) => `/savings-interest/${a}`),
-  ...DEPOSIT_AMOUNTS.map((a) => `/deposit-interest/${a}`),
-]);
-
+// Every amount variant is now canonical-consolidated, so SITEMAP_ROUTES holds
+// base routes only and the old per-variant priority branch is unreachable.
 const basePriority = {
   "/": "1.0",
   "/all": "0.9",
@@ -63,9 +41,6 @@ function getRouteConfig(path) {
       priority: basePriority[path],
     };
   }
-  if (paramPaths.has(path)) {
-    return { changefreq: "monthly", priority: "0.7" };
-  }
   return { changefreq: "monthly", priority: "0.5" };
 }
 
@@ -80,7 +55,7 @@ function resolveBuildDate() {
 
 function renderSitemap(buildDate) {
   const baseUrl = "https://shakilabs.com/invest";
-  // 사이트맵은 canonical 대표 URL만 담는다 (compound-interest 변종 제외 —
+  // 사이트맵은 canonical 대표 URL만 담는다 (9개 패밀리의 금액 변종 전부 제외 —
   // 프리렌더는 SEO_ROUTES 전체 유지, 변종 canonical은 대표 페이지를 가리킨다)
   const urls = SITEMAP_ROUTES.map((path) => {
     const { changefreq, priority } = getRouteConfig(path);

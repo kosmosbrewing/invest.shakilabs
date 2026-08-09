@@ -16,6 +16,12 @@ import { formatManWon } from "@/lib/utils";
 import { computed } from "vue";
 
 const props = defineProps<{ initialAnnual?: number }>();
+// 금액 변종(/isa/{금액})은 대표 페이지와 프리렌더 본문이 100% 동일하므로
+// canonical·hreflang·og:url을 /isa로 통합한다 (seo-routes.mjs CANONICAL_OVERRIDES와 동일 규약).
+// 라우트·프리렌더 산출물은 유지하고 noindex는 쓰지 않는다.
+const canonicalPath = computed(() =>
+  props.initialAnnual != null ? "/isa" : undefined,
+);
 const amountLabel = computed(() => props.initialAnnual ? formatManWon(props.initialAnnual) : null);
 const seoTitle = computed(() =>
   amountLabel.value ? `연 ${amountLabel.value} ISA 만기 세후 비교 | ISA vs 일반계좌` : "2026 ISA 만기 세후 비교 | ISA vs 일반계좌 절세 효과",
@@ -59,6 +65,7 @@ const faqJsonLd = {
     :title="seoTitle"
     :description="seoDesc"
     :json-ld="faqJsonLd"
+    :canonical-path="canonicalPath"
   />
 
   <div class="container space-y-5 py-5">
