@@ -38,8 +38,8 @@ function validateRoute(route) {
   assert(existsSync(outputPath), `Missing static output for ${route}: ${outputPath}`);
 
   const html = readFileSync(outputPath, "utf8");
-  // canonical 통합 변종(compound-interest 금액)은 대표 URL을 가리켜야 한다
-  // (self-canonical이면 준-doorway로 회귀). 나머지는 self-canonical 유지.
+  // canonical 통합 변종(9개 패밀리의 금액 변종)은 대표 URL을 가리켜야 한다
+  // (self-canonical이면 doorway로 회귀). 나머지는 self-canonical 유지.
   const canonicalRoute = CANONICAL_OVERRIDES[route] ?? route;
   // cleanUrls redirects "/invest/" to "/invest", so the home canonical carries no slash
   const expectedCanonical =
@@ -77,6 +77,13 @@ function validateSitemap() {
 
 validateVercelConfig(resolve(repositoryRoot, "vercel.json"));
 validateVercelConfig(resolve(projectRoot, "vercel.json"));
+// Consolidated variants must stay in the prerender set. Dropping one here
+// would let the Vercel rewrite serve the SPA shell for that URL (soft-404),
+// which is strictly worse than the duplication we are fixing.
+for (const variant of Object.keys(CANONICAL_OVERRIDES)) {
+  assert(SEO_ROUTES.includes(variant),
+    `Canonicalized variant must stay prerendered: ${variant}`);
+}
 // validateRoute는 canonical 통합 변종에도 돌아간다: 정적 HTML은 계속 존재해야
 // 한다 (soft-404 방지) — 사이트맵에서만 빠질 뿐이다.
 SEO_ROUTES.forEach(validateRoute);

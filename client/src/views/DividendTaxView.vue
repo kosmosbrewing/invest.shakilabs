@@ -16,6 +16,12 @@ import { formatManWon } from "@/lib/utils";
 import { computed } from "vue";
 
 const props = defineProps<{ initialDividend?: number }>();
+// 금액 변종(/dividend-tax/{금액})은 대표 페이지와 프리렌더 본문이 100% 동일하므로
+// canonical·hreflang·og:url을 /dividend-tax로 통합한다
+// (seo-routes.mjs CANONICAL_OVERRIDES와 동일 규약 · noindex 아님, 프리렌더 유지).
+const canonicalPath = computed(() =>
+  props.initialDividend != null ? "/dividend-tax" : undefined,
+);
 const amountLabel = computed(() => props.initialDividend ? formatManWon(props.initialDividend) : null);
 const seoTitle = computed(() =>
   amountLabel.value ? `배당금 ${amountLabel.value} 배당소득세 계산기 | 국내·해외` : "2026 배당소득세 계산기 | 국내·해외 배당세금 계산",
@@ -59,6 +65,7 @@ const faqJsonLd = {
     :title="seoTitle"
     :description="seoDesc"
     :json-ld="faqJsonLd"
+    :canonical-path="canonicalPath"
   />
 
   <div class="container space-y-5 py-5">

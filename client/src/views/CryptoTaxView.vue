@@ -18,6 +18,12 @@ import { formatManWon } from "@/lib/utils";
 import { computed } from "vue";
 
 const props = defineProps<{ initialPurchase?: number }>();
+// 금액 변종(/crypto-tax/{금액})은 대표 페이지와 프리렌더 본문이 100% 동일하므로
+// canonical·hreflang·og:url을 /crypto-tax로 통합한다
+// (seo-routes.mjs CANONICAL_OVERRIDES와 동일 규약 · noindex 아님, 프리렌더 유지).
+const canonicalPath = computed(() =>
+  props.initialPurchase != null ? "/crypto-tax" : undefined,
+);
 const amountLabel = computed(() => props.initialPurchase ? formatManWon(props.initialPurchase) : null);
 const seoTitle = computed(() =>
   amountLabel.value ? `${amountLabel.value} 가상자산 세금 시뮬레이터 | 2027 예정 과세 기준` : "가상자산 세금 시뮬레이터 | 2027 예정 과세 기준",
@@ -64,6 +70,7 @@ const faqJsonLd = {
     :title="seoTitle"
     :description="seoDesc"
     :json-ld="faqJsonLd"
+    :canonical-path="canonicalPath"
   />
 
   <div class="text-resize-layout container space-y-5 py-5">

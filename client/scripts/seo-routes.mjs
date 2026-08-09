@@ -13,15 +13,41 @@ export const DEPOSIT_AMOUNTS = [1000, 3000, 5000, 10000];
 // 복리: 초기 투자 만원 단위
 export const COMPOUND_AMOUNTS = [1000, 3000, 5000, 10000];
 
-// 복리 금액 변종: 형제 간 고유 본문이 약 9%뿐인 준-doorway라 대표 URL로 canonical을 통합한다.
-// 라우트·프리렌더 산출물은 유지한다 (프리렌더에서 빼면 soft-404가 되므로 금지 · noindex도 금지).
-// 변종에 고유 본문이 생기면 이 목록에서 빼고 사이트맵으로 복귀시킨다 (가역적 조치).
-export const PARAM_ROUTES = COMPOUND_AMOUNTS.map((a) => `/compound-interest/${a}`);
+// Amount-variant families. The URL amount only seeds post-hydration state, so
+// every variant prerenders the byte-identical body of its base calculator —
+// a full-scale audit measured 1.0000 similarity in all 9 families (e.g. /isa
+// vs /isa/1200, /crypto-tax vs /crypto-tax/1000). That is duplication, not
+// near-duplication, so the variants are consolidated rather than enriched:
+// canonical/hreflang/og:url point at the base page and the variants leave the
+// sitemap. Every base page is already well past the 1,500-char floor, so no
+// canonical target needs padding.
+//
+// Routes and prerendered HTML stay (dropping them from PRERENDER/SEO_ROUTES
+// would make the Vercel rewrite serve the SPA shell = soft-404). noindex is
+// deliberately NOT used: it would contradict the canonical signal.
+//
+// Reversible: if a variant ever gains genuinely unique body content, remove it
+// from this map and it returns to the sitemap as a self-canonical URL.
+const VARIANT_FAMILIES = {
+  "/crypto-tax": CRYPTO_AMOUNTS,
+  "/dividend-tax": DIVIDEND_AMOUNTS,
+  "/isa": ISA_AMOUNTS,
+  "/gift-tax": GIFT_AMOUNTS,
+  "/inheritance-tax": INHERITANCE_AMOUNTS,
+  "/foreign-stock-tax": FOREIGN_STOCK_AMOUNTS,
+  "/savings-interest": SAVINGS_AMOUNTS,
+  "/deposit-interest": DEPOSIT_AMOUNTS,
+  "/compound-interest": COMPOUND_AMOUNTS,
+};
 
 // 변종 경로 → 대표(canonical) 경로 매핑. 빌드 검증·SSG 메타가 같은 소스를 공유한다.
 export const CANONICAL_OVERRIDES = Object.fromEntries(
-  PARAM_ROUTES.map((route) => [route, "/compound-interest"])
+  Object.entries(VARIANT_FAMILIES).flatMap(([base, amounts]) =>
+    amounts.map((amount) => [`${base}/${amount}`, base])
+  )
 );
+
+export const PARAM_ROUTES = Object.keys(CANONICAL_OVERRIDES);
 
 export const SEO_ROUTES = [
   // "/" must stay listed: without it vite-ssg skips the home and dist/index.html
@@ -40,14 +66,7 @@ export const SEO_ROUTES = [
   "/about",
   "/terms",
   "/privacy",
-  ...CRYPTO_AMOUNTS.map((a) => `/crypto-tax/${a}`),
-  ...DIVIDEND_AMOUNTS.map((a) => `/dividend-tax/${a}`),
-  ...ISA_AMOUNTS.map((a) => `/isa/${a}`),
-  ...GIFT_AMOUNTS.map((a) => `/gift-tax/${a}`),
-  ...INHERITANCE_AMOUNTS.map((a) => `/inheritance-tax/${a}`),
-  ...FOREIGN_STOCK_AMOUNTS.map((a) => `/foreign-stock-tax/${a}`),
-  ...SAVINGS_AMOUNTS.map((a) => `/savings-interest/${a}`),
-  ...DEPOSIT_AMOUNTS.map((a) => `/deposit-interest/${a}`),
+  // 변종은 프리렌더 대상으로 유지한다 (사이트맵에서만 빠진다 — soft-404 방지)
   ...PARAM_ROUTES,
 ];
 
