@@ -97,6 +97,30 @@ function removeRenderedNoscriptFallbacks() {
   }
 }
 
+// 404 셸에서만 AdSense 로더를 걷어낸다.
+//
+// 왜: 404 화면의 본문은 "404 / 페이지를 찾을 수 없습니다" 33자뿐인데, 셸(index.html)의
+// 로더를 그대로 물려받아 auto ads가 ins.adsbygoogle 슬롯을 만든다. 게시자 콘텐츠가 없는
+// 화면에 광고를 싣는 것이라 Google의 Valuable Inventory 정책에 저촉된다. noindex는 색인만
+// 막을 뿐이고 정책은 색인 여부가 아니라 로더의 존재를 본다.
+//
+// 왜 여기서 지우는가: 로더는 index.html <head>에 정적으로 있어야 한다(승인 심사·소유 확인이
+// 전 페이지 head를 본다). 404만 예외이므로 정상 라우트의 광고 배선은 건드리지 않고
+// 산출물 단계에서 404.html에서만 제거한다.
+function removeAdLoaderFromNotFound() {
+  const notFoundPath = resolve(projectRoot, "dist", "404.html");
+  if (!existsSync(notFoundPath)) return;
+
+  const html = readFileSync(notFoundPath, "utf8");
+  const nextHtml = html
+    // 로더 스크립트 태그 (vite-ssg가 async -> async="" 로 다시 쓰므로 속성 순서에 기대지 않는다)
+    .replace(/\n?\s*<script[^>]*googlesyndication\.com[^>]*>\s*<\/script>/gi, "")
+    // 로더를 설명하던 주석도 함께 지운다 — 남으면 "광고 없음"과 모순되는 흔적이 된다
+    .replace(/\n?\s*<!--\s*Google AdSense[\s\S]*?-->/i, "");
+
+  writeFileSync(notFoundPath, nextHtml, "utf8");
+}
+
 const buildDate = resolveBuildDate();
 
 mkdirSync(dirname(sitemapPath), { recursive: true });
@@ -116,6 +140,7 @@ if (result.status !== 0) {
 }
 
 removeRenderedNoscriptFallbacks();
+removeAdLoaderFromNotFound();
 
 const validationResult = spawnSync(
   process.execPath,

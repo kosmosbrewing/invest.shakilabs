@@ -112,6 +112,39 @@ assert(existsSync(notFoundPath), "Missing custom 404.html output");
 const notFoundHtml = readFileSync(notFoundPath, "utf8");
 assert(/name="robots" content="noindex,nofollow"/.test(notFoundHtml),
   "404.html must be noindex,nofollow");
+// 404 본문은 제목과 복구 링크뿐이다. 셸의 로더가 남으면 auto ads가 그 위에 슬롯을 만들고,
+// 이는 게시자 콘텐츠 없는 화면에 광고를 싣는 Valuable Inventory 저촉이다. noindex는 색인만
+// 막을 뿐 정책 판정은 로더의 존재를 본다. 셸이 전 라우트에 로더를 넣으므로 이 제거는
+// 검사하는 코드가 있을 때만 유지된다 (build.mjs: removeAdLoaderFromNotFound).
+assert(!/adsbygoogle|googlesyndication/i.test(notFoundHtml),
+  "404.html must not load the AdSense script (Valuable Inventory: no ads on a contentless screen)");
+// 역방향 검증: 정상 라우트의 광고 배선까지 걷어내면 안 된다 (심사·소유 확인이 head 로더를 본다)
+const homeAdLoaders = homeHtml.match(/googlesyndication\.com/gi)?.length ?? 0;
+assert(homeAdLoaders === 1,
+  `Home must keep exactly one AdSense loader, found ${homeAdLoaders}`);
+
+// 애드센스 심사는 방침이 제3자 광고 쿠키를 고지하고 옵트아웃 경로를 제공할 것을 요구한다.
+// 두 링크 모두 필수다: Google 설정은 Google만, aboutads.info는 나머지 사업자를 덮는다.
+// 운영자 표기(13자산 공통 기준)까지 함께 고정해, 방침을 다시 쓰다 실수로 떨어뜨리는 것을 막는다.
+function validatePolicyDisclosures() {
+  const privacyHtml = readFileSync(routeOutputPath("/privacy"), "utf8");
+  const termsHtml = readFileSync(routeOutputPath("/terms"), "utf8");
+
+  for (const link of ["https://adssettings.google.com", "https://www.aboutads.info/choices"]) {
+    assert(privacyHtml.includes(link), `/privacy must keep the AdSense opt-out link ${link}`);
+  }
+  assert(/제3자 광고|맞춤 광고/.test(privacyHtml),
+    "/privacy must disclose third-party ad cookies and personalized ads");
+  for (const [route, html] of [["/privacy", privacyHtml], ["/terms", termsHtml]]) {
+    assert(html.includes("운영: ShakiLabs"), `${route} must keep the operator line`);
+    assert(html.includes("skdba1313@gmail.com"), `${route} must keep the contact address`);
+  }
+  // 이 앱 약관이 이 앱의 기능을 서술하는지 — 과거 다른 저장소에서 타 앱 설명을 복붙한 사고가 있었다
+  assert(termsHtml.includes("shakilabs.com/invest"),
+    "/terms must describe this app, not another one");
+}
+
+validatePolicyDisclosures();
 
 console.log(
   `Validated ${SEO_ROUTES.length} SEO routes (${SITEMAP_ROUTES.length} sitemap URLs, ` +

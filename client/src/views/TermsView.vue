@@ -8,7 +8,7 @@ const constantsStore = useConstantsStore();
 <template>
   <SEOHead
     title="이용약관"
-    description="shakilabs.com/invest의 서비스 이용약관입니다. 서비스 성격, 정보 제공의 한계(투자·세무 자문 아님), 광고 게재, 면책 조항과 준거법을 안내합니다."
+    description="shakilabs.com/invest의 서비스 이용약관입니다. 9개 투자·이자 계산기의 성격, 투자 자문이 아니라는 한계(수익률은 이용자 가정값·ISA 비교는 가입 권유 아님), 광고 게재, 면책 조항과 준거법을 안내합니다."
   />
 
   <div class="container py-5">
@@ -34,15 +34,41 @@ const constantsStore = useConstantsStore();
           기준일이 함께 표기되므로 이용자는 계산 근거를 직접 확인하면서 결과를 해석할 수 있습니다.
         </p>
 
-        <h2 class="text-heading font-bold">3. 정보 제공의 한계 — 투자·세무 자문이 아님</h2>
+        <h2 class="text-heading font-bold">3. 정보 제공의 한계 — 투자 자문이 아님</h2>
         <p class="text-body text-muted-foreground">
           본 서비스가 제공하는 계산 결과와 가이드 콘텐츠는 일반적인 정보 제공 목적의 참고용
-          추정치입니다. 본 서비스는 자본시장법상 투자자문·투자일임, 금융소비자보호법상 금융상품
-          자문·판매·중개, 세무사법상 세무 대리 서비스가 아니며, 특정 금융상품의 매수·매도나 특정
-          절세 방안을 권유하지 않습니다. 실제 세액과 투자 손익은 개인별 소득 구간, 보유 기간,
-          법령 개정에 따라 달라지므로, 투자·증여·상속 등 실제 의사결정 전에는 반드시 세무사 등
-          자격을 갖춘 전문가 또는 국세청 등 관계기관의 확인을 거쳐야 합니다.
+          추정치입니다. 본 서비스는 자본시장법상 투자자문업·투자일임업으로 등록된 사업자가
+          아니며, 금융소비자보호법상 금융상품 자문·판매·중개, 세무사법상 세무 대리도 수행하지
+          않습니다. 특정 종목·가상자산·금융상품의 매수나 매도를 권유하지 않고, 어떤 금융회사와도
+          제휴하거나 수수료를 받지 않습니다.
         </p>
+        <p class="text-body text-muted-foreground">
+          특히 다음 사항에 유의하시기 바랍니다.
+        </p>
+        <ul class="text-body text-muted-foreground space-y-1 list-disc list-inside">
+          <li>
+            <strong>수익률은 이용자가 직접 넣는 가정값입니다.</strong> ISA 비교와 복리 성장
+            계산기에 입력하는 연 수익률은 본 서비스가 예측하거나 보장하는 값이 아닙니다.
+            연 7%를 넣으면 연 7%가 실현된다는 전제로 계산할 뿐이며, 실제 투자 원금은 손실될 수
+            있습니다.
+          </li>
+          <li>
+            <strong>세후 비교는 절세 방안 추천이 아닙니다.</strong> ISA 계좌와 일반계좌의 만기
+            세후 금액을 나란히 보여주는 것은 두 제도의 과세 방식 차이를 설명하기 위함이며,
+            어느 계좌에 가입하라는 권유가 아닙니다. 중도해지 조건, 의무 보유 기간, 가입 자격 등
+            계산에 반영되지 않은 요소가 실제 유불리를 뒤집을 수 있습니다.
+          </li>
+          <li>
+            <strong>가상자산 과세는 시행 전 예정 기준입니다.</strong> 해당 계산기는 현재
+            공표된 시행 예정 기준에 따른 시뮬레이션이며, 시행 시점과 세부 규정이 바뀌면 결과도
+            달라집니다.
+          </li>
+          <li>
+            <strong>증여·상속 세액은 신고서를 대신하지 않습니다.</strong> 증여세·상속세
+            계산기는 대표적인 공제만 반영하므로, 실제 신고 전에는 세무사 또는 국세청·홈택스의
+            확인을 거쳐야 합니다.
+          </li>
+        </ul>
 
         <h2 class="text-heading font-bold">4. 광고 게재</h2>
         <p class="text-body text-muted-foreground">
@@ -110,7 +136,7 @@ const constantsStore = useConstantsStore();
         </p>
 
         <p class="text-tiny text-muted-foreground mt-6">
-          시행일: 2026년 3월 19일 · 최종 개정일: 2026년 8월 5일
+          시행일: 2026년 3월 19일 · 최종 개정일: 2026년 8월 10일
         </p>
       </div>
     </div>

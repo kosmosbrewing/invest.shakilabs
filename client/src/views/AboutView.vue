@@ -107,6 +107,65 @@ const constantsStore = useConstantsStore();
           </li>
         </ul>
 
+        <h2 class="text-heading font-bold">상황별로 어떤 계산기를 쓰나</h2>
+        <p class="text-body text-muted-foreground">
+          계산기 이름만 봐서는 어느 것을 열어야 할지 애매한 경우가 많아, 실제로 자주 들어오는
+          질문을 기준으로 정리했습니다.
+        </p>
+        <ul class="text-body text-muted-foreground space-y-1 list-disc list-inside">
+          <li>
+            "올해 배당을 얼마까지 받아도 세금이 그대로일까" —
+            <RouterLink to="/dividend-tax" class="retro-link">배당소득세</RouterLink>에서
+            그 외 금융소득까지 함께 넣어 보세요. 이자·배당 합계가 2,000만원을 넘는 순간
+            원천징수로 끝나지 않고 종합과세로 넘어갑니다.
+          </li>
+          <li>
+            "지금 목돈을 넣을까, 매달 나눠 넣을까" —
+            <RouterLink to="/deposit-interest" class="retro-link">예금</RouterLink>과
+            <RouterLink to="/savings-interest" class="retro-link">적금</RouterLink>을 같은
+            연이율로 각각 계산해 비교하세요. 적금은 나중에 넣은 돈일수록 이자가 붙는 기간이
+            짧아, 같은 금리라도 실수령 이자가 예금보다 적습니다.
+          </li>
+          <li>
+            "ISA가 정말 이득인지" —
+            <RouterLink to="/isa" class="retro-link">ISA 만기 비교</RouterLink>는 세후 금액을
+            일반계좌와 나란히 보여줍니다. 차이가 몇만원 수준이면 의무 보유 기간을 감수할
+            이유가 크지 않을 수 있습니다.
+          </li>
+          <li>
+            "미리 증여하는 게 나은지" —
+            <RouterLink to="/gift-tax" class="retro-link">증여세</RouterLink>와
+            <RouterLink to="/inheritance-tax" class="retro-link">상속세</RouterLink>를 같은
+            재산가액으로 각각 돌려 보세요. 증여는 10년 단위로 공제가 되살아나는 반면 상속은
+            일괄공제 5억이 한 번에 적용되므로, 금액대에 따라 유불리가 갈립니다.
+          </li>
+          <li>
+            "장기 목표까지 얼마나 걸릴지" —
+            <RouterLink to="/compound-interest" class="retro-link">복리 성장</RouterLink>에서
+            월 납입액을 바꿔 가며 도달 시점을 확인하세요.
+          </li>
+        </ul>
+
+        <h2 class="text-heading font-bold">자주 혼동되는 세 가지</h2>
+        <ul class="text-body text-muted-foreground space-y-1 list-disc list-inside">
+          <li>
+            <strong>기본공제 250만원은 종목별이 아니라 연간 합산입니다.</strong> 해외주식
+            양도소득은 한 해 동안 실현한 이익과 손실을 모두 더한 뒤 250만원을 한 번 빼고,
+            남은 금액에 22%를 적용합니다. 손실 종목을 같은 해에 정리하면 과세 대상 이익이
+            줄어드는 것도 이 때문입니다.
+          </li>
+          <li>
+            <strong>가상자산과 해외주식은 세율이 같아도 공제를 공유하지 않습니다.</strong>
+            둘 다 22%에 기본공제 250만원이지만 서로 다른 소득 구분이라 각각 따로 계산합니다.
+            한쪽에서 손실이 나도 다른 쪽 이익과 상계되지 않습니다.
+          </li>
+          <li>
+            <strong>세전 이자와 세후 이자를 섞어 비교하지 마세요.</strong> 금융회사가 광고하는
+            금리는 세전 기준입니다. 일반과세라면 이자에서 15.4%가 빠지므로, 서로 다른 상품을
+            비교할 때는 본 서비스의 세후 실수령 이자끼리 맞대어 보는 편이 정확합니다.
+          </li>
+        </ul>
+
         <h2 class="text-heading font-bold">검증 방법</h2>
         <p class="text-body text-muted-foreground">
           모든 세율·공제·이자 계산 기준은 국세청, 국가법령정보센터(소득세법·상속세 및 증여세법·조세특례제한법 등),
