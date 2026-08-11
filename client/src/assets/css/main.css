@@ -7,7 +7,9 @@
 @tailwind utilities;
 
 @layer base {
-  :root { --status-success: 148 61% 36%; --status-warning: 43 88% 43%; --status-caution: 28 82% 48%; --status-danger: 0 70% 52%; --status-info: 212 83% 45%; --chart-profit: 148 61% 36%; --chart-tax: 0 84% 60%; --chart-net: 200 90% 42%; }
+  /* 라이트 의미색은 본문 텍스트로 쓰이므로 WCAG AA(4.5:1) 기준. 배경 최악값은 --muted(204 40% 96%).
+     success 27%/5.67:1 · warning 28%/5.07:1 · caution 33%/5.50:1 · danger 52%/4.36:1 · info 45%/4.67:1 */
+  :root { --status-success: 148 61% 27%; --status-warning: 43 88% 28%; --status-caution: 28 82% 33%; --status-danger: 0 70% 52%; --status-info: 212 83% 45%; --chart-profit: 148 61% 36%; --chart-tax: 0 84% 60%; --chart-net: 200 90% 42%; }
   .dark { --status-success: 148 63% 66%; --status-warning: 43 95% 70%; --status-caution: 28 91% 66%; --status-danger: 0 86% 73%; --status-info: 205 90% 72%; --chart-profit: 148 61% 62%; --chart-tax: 0 87% 70%; --chart-net: 200 85% 55%; }
   * { @apply border-border; }
   :where(a, button, input, select, textarea, summary, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; border-radius: 3px; }

@@ -5,13 +5,10 @@
   line-height: 1.4;
 }
 
-:root:not(.dark) {
-  --status-success: 148 61% 27%;
-  --status-warning: 43 88% 28%;
-}
-
+/* 네비 배경은 --primary이므로 링크 색은 그 짝 토큰을 그대로 쓴다.
+   white 하드코딩은 다크에서 짝이 어긋나므로 금지 — 라이트 6.03:1 */
 :root:not(.dark) nav[aria-label="주요 메뉴"] a {
-  color: white;
+  color: hsl(var(--primary-foreground));
 }
 
 .tabular-nums {

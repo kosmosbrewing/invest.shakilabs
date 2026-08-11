@@ -11,7 +11,8 @@ export const badgeVariants = cva(
         outline: "text-foreground",
         deduction: "border-transparent bg-deduction text-deduction-foreground",
         highlight: "border-transparent bg-highlight text-highlight-foreground",
-        neutral: "border-border/50 bg-muted-foreground/70 text-white",
+        // 70% 알파 + 흰 글자는 라이트 3.37:1 / 다크 3.46:1로 미달 → 불투명 배경 + 짝 토큰
+        neutral: "border-border/50 bg-muted-foreground text-background",
       },
     },
     defaultVariants: {
