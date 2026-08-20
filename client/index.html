@@ -91,7 +91,8 @@
         --popover: 0 0% 100%;
         --popover-foreground: 222 47% 11%;
         --destructive: 0 72% 52%;
-        --destructive-foreground: 210 40% 98%;
+        /* 210 40% 98%는 --destructive 위에서 4.49:1(미달). 순백으로 올려 4.70:1 확보 */
+        --destructive-foreground: 0 0% 100%;
         --border: 214 16% 85%;
         --input: 214 16% 85%;
         --ring: 200 85% 32%;
@@ -114,7 +115,9 @@
         --popover: 217 33% 17%;
         --popover-foreground: 210 40% 96%;
         --destructive: 0 72% 58%;
-        --destructive-foreground: 0 0% 100%;
+        /* 다크 --destructive 위 흰 글자는 4.05:1(미달). --primary-foreground와 같은 방식으로
+           hue를 유지한 채 어둡게 내려 4.74:1 확보 */
+        --destructive-foreground: 0 90% 8%;
         --border: 214 16% 26%;
         --input: 214 16% 30%;
         --ring: 200 85% 55%;
