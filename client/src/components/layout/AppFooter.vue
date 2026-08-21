@@ -13,6 +13,9 @@ const policyLinks = [
   { to: "/about", label: "사이트 안내" },
   { to: "/terms", label: "이용약관" },
   { to: "/privacy", label: "개인정보 처리방침" },
+  // 블로그는 root 소유(shakilabs.com/blog)라 앱 라우터 밖이다 — href를 주어
+  // RouterLink 대신 <a href>로 나가게 한다(RouterLink면 /invest/blog로 깨진다).
+  { to: "", href: "/blog", label: "블로그" },
   { to: "", href: `mailto:${SUPPORT_EMAIL}`, label: "문의" },
 ];
 
