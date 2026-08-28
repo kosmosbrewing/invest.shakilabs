@@ -73,7 +73,7 @@ const segments = computed(() => [
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p class="text-caption font-semibold text-muted-foreground">예상 세후 순수익</p>
-            <p class="result-amount mt-1 font-brand text-primary tabular-nums">{{ formatWon(result.netProfit) }}</p>
+            <p class="result-amount mt-1 font-bold text-primary tabular-nums">{{ formatWon(result.netProfit) }}</p>
           </div>
           <Badge variant="outline" class="border-primary/25 bg-primary/5 text-primary">
             {{ result.totalTax > 0 ? `예상 세금 ${formatWon(result.totalTax)}` : "과세표준 0원" }}

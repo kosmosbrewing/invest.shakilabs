@@ -17,8 +17,10 @@
 }
 
 .result-amount {
-  font-size: clamp(1rem, 9vw, 2.5rem);
-  line-height: 1.15;
+  /* 상한 1.625rem(26px) = 전 앱 결과 히어로 공통 text-display 스케일.
+     40px 상한은 다른 앱 대비 1.5배 커서 문법 수렴 대상이었다. */
+  font-size: clamp(1rem, 9vw, 1.625rem);
+  line-height: 1.2;
 }
 
 @media (max-width: 400px) {
