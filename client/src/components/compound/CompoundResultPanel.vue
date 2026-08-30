@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CountUpAmount from "@/components/common/CountUpAmount.vue";
 import { computed } from "vue";
 import {
   ShBadge,
@@ -70,7 +71,7 @@ const displayYears = computed(() => {
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p class="text-caption font-semibold text-muted-foreground">복리 최종 금액</p>
-            <p class="result-amount mt-1 font-bold text-primary tabular-nums">{{ formatWon(result.compoundTotal) }}</p>
+            <p class="result-amount mt-1 font-bold text-primary tabular-nums"><CountUpAmount :value="formatWon(result.compoundTotal)" /></p>
           </div>
           <ShBadge v-if="result.compoundAdvantage > 0" tone="success">
             복리 효과 +{{ formatWon(result.compoundAdvantage) }}

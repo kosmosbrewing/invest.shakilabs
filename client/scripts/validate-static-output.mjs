@@ -323,8 +323,104 @@ function validateEmittedUtilities() {
 
 validateEmittedUtilities();
 
+// 확장 축 1 — spacing: mt-13, p-4.5 처럼 spacing 스케일 밖 값도 색과 똑같이
+// 조용히 사라진다. 숫자값 spacing 유틸만 좁게 잡아 산출 CSS와 대조한다.
+// 확장 축 2 — 후행 `!`: v3의 important는 접두사(!mt-4)다. v4 접미사 문법(mt-4!)은
+// 클래스가 아예 생성되지 않고 마크업에만 남는다 (car·travel에서 실검출된 유형).
+function validateSpacingAndBangUtilities() {
+  const assetsDir = resolve(distRoot, "assets");
+  const css = readdirSync(assetsDir)
+    .filter((name) => name.endsWith(".css"))
+    .map((name) => readFileSync(join(assetsDir, name), "utf8"))
+    .join("\n");
+
+  const files = [];
+  (function walk(dir) {
+    for (const name of readdirSync(dir)) {
+      const path = join(dir, name);
+      if (statSync(path).isDirectory()) walk(path);
+      else if (/\.(vue|ts)$/.test(name)) files.push(path);
+    }
+  })(resolve(projectRoot, "src"));
+
+  const spacingUtility =
+    /(?<![\w/[-])(?:[a-z-]+:)*-?(?:m[trblxyse]?|p[trblxyse]?|gap(?:-[xy])?|space-[xy])-(?:\d+(?:\.\d+)?|px)(?![\w/%.[-])/g;
+  const trailingBang =
+    /(?:[a-z-]+:)*(?:bg|text|border|ring|shadow|rounded|opacity|flex|grid|gap|w|h|z|m[trblxyse]?|p[trblxyse]?)-[a-z0-9[\]/.%-]+!(?=[\s"'`])/g;
+  const toSelector = (cls) => "." + cls.replace(/[/[\]%.:]/g, (ch) => "\\" + ch);
+
+  const missing = [];
+  const bangs = [];
+  for (const file of files) {
+    const source = readFileSync(file, "utf8");
+    const rel = file.slice(projectRoot.length + 1);
+    for (const cls of new Set(source.match(spacingUtility) ?? [])) {
+      if (!css.includes(toSelector(cls))) missing.push(`${cls} (${rel})`);
+    }
+    if (file.endsWith(".vue")) {
+      for (const cls of new Set(source.match(trailingBang) ?? [])) {
+        bangs.push(`${cls} (${rel})`);
+      }
+    }
+  }
+  assert(missing.length === 0,
+    "이 spacing 유틸리티는 산출 CSS에 규칙이 없다 — 스케일 안 값이나 임의값(mt-[52px])을 쓰라: "
+      + missing.join(" | "));
+  assert(bangs.length === 0,
+    "후행 `!` 유틸리티는 v3에서 생성되지 않는다 — 접두사 문법(!mt-4)으로 바꾸라: "
+      + bangs.join(" | "));
+}
+
+validateSpacingAndBangUtilities();
+
+// 유령 답변 게이트: FAQPage 스키마가 신고한 답변이 클라이언트 DOM에 존재하려면
+// 아코디언이 force-mount여야 한다. radix는 접힌 항목을 언마운트하므로 force-mount가
+// 빠지면 "스키마에는 있고 DOM에는 없는" 상태가 된다(9라우트 73문항 라이브 실측 결함).
+//
+// 왜 정적 HTML 대조가 아닌가: radix의 Presence는 템플릿 ref 기반이라 vite-ssg
+// 서버 렌더에서는 force-mount여도 슬롯을 비운다(클라이언트 마운트 후에만 채워진다).
+// 그래서 이 게이트는 ①스키마 무결성(9라우트 전부 FAQPage + 문항 수)과
+// ②force-mount 배선의 소스 회귀(빠지면 유령 답변 재발)를 검사하고, 클라이언트
+// DOM 존재는 헤드리스 실측으로 별도 검증한다.
+function validateFaqSchemaAndForceMount() {
+  let faqRoutes = 0;
+  let declaredAnswers = 0;
+  for (const route of SEO_ROUTES) {
+    const html = readFileSync(routeOutputPath(route), "utf8");
+    for (const m of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {
+      let data;
+      try { data = JSON.parse(m[1]); } catch { continue; }
+      for (const node of [].concat(data?.["@graph"] ?? data ?? [])) {
+        if (node?.["@type"] !== "FAQPage") continue;
+        const answers = (node.mainEntity ?? []).filter((q) => q?.acceptedAnswer?.text);
+        assert(answers.length > 0,
+          `${route}: FAQPage 스키마가 있는데 답변이 0건이다`);
+        faqRoutes += 1;
+        declaredAnswers += answers.length;
+      }
+    }
+  }
+  assert(faqRoutes >= 9,
+    `FAQPage jsonLd 라우트가 ${faqRoutes}개뿐이다 — 9개 계산기 라우트 전부에 있어야 한다`);
+
+  const panel = readFileSync(
+    resolve(projectRoot, "src/components/common/FaqAccordionPanel.vue"), "utf8");
+  assert(/<AccordionContent\s[^>]*force-mount/.test(panel),
+    "FaqAccordionPanel이 AccordionContent에 force-mount를 넘기지 않는다 — "
+      + "접힌 답변이 DOM에서 언마운트돼 FAQPage 유령 답변이 재발한다");
+  const content = readFileSync(
+    resolve(projectRoot, "src/components/ui/accordion/AccordionContent.vue"), "utf8");
+  assert(content.includes("data-[state=closed]:hidden"),
+    "AccordionContent가 force-mount 시 닫힘 상태를 숨기지 않는다 — "
+      + "접힌 답변이 펼쳐진 채 화면에 남는다");
+  return { faqRoutes, declaredAnswers };
+}
+
+const faqStats = validateFaqSchemaAndForceMount();
+
 console.log(
   `Validated ${SEO_ROUTES.length} SEO routes (${SITEMAP_ROUTES.length} sitemap URLs, ` +
   `${Object.keys(CANONICAL_OVERRIDES).length} canonicalized variants), router<->sitemap parity, ` +
-  `emitted color utilities, prerendered home, and custom 404 output.`
+  `emitted color/spacing utilities, ${faqStats.declaredAnswers} FAQ answers declared across ` +
+  `${faqStats.faqRoutes} FAQPage routes (force-mount wiring checked), prerendered home, and custom 404 output.`
 );

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CountUpAmount from "@/components/common/CountUpAmount.vue";
 import { computed } from "vue";
 import { ShBreakdownBar } from "@shakilabs/ui";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
@@ -81,7 +82,7 @@ const segments = computed(() => [
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p class="text-caption font-semibold text-muted-foreground">예상 양도소득세</p>
-            <p class="result-amount mt-1 font-bold text-primary tabular-nums">{{ formatWon(result.totalTax) }}</p>
+            <p class="result-amount mt-1 font-bold text-primary tabular-nums"><CountUpAmount :value="formatWon(result.totalTax)" /></p>
           </div>
           <Badge variant="outline" class="border-primary/25 bg-primary/5 text-primary">
             세후 {{ formatWon(result.netProfit) }}

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CountUpAmount from "@/components/common/CountUpAmount.vue";
 import { computed } from "vue";
 import { ShBreakdownBar } from "@shakilabs/ui";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
@@ -77,7 +78,7 @@ const segments = computed(() => [
             <p class="text-caption font-semibold text-muted-foreground">
               {{ paymentType === "monthly" ? "만기 원금 + 누적 이자" : "예상 만기 수령액" }}
             </p>
-            <p class="result-amount mt-1 font-bold text-primary tabular-nums">{{ formatWon(result.maturityAmount) }}</p>
+            <p class="result-amount mt-1 font-bold text-primary tabular-nums"><CountUpAmount :value="formatWon(result.maturityAmount)" /></p>
           </div>
           <Badge variant="outline" class="border-primary/25 bg-primary/5 text-primary">
             {{ paymentType === "monthly" ? "월이자 지급" : "만기일시" }}
