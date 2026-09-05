@@ -53,11 +53,14 @@ const metricRows = computed(() => {
     },
   ];
 
-  if (props.result.isComprehensive && props.result.comprehensiveTax != null && props.result.comprehensiveNetDividend != null) {
+  if (props.result.isComprehensive && props.result.comprehensiveExtraTax != null && props.result.comprehensiveNetDividend != null) {
     rows.push({
-      label: "종합과세 시나리오",
+      label: "종합과세 시 실수령",
       value: formatWon(props.result.comprehensiveNetDividend),
-      description: `예상 총세액 ${formatWon(props.result.comprehensiveTax)}`,
+      description:
+        props.result.comprehensiveExtraTax > 0
+          ? `분리과세 대비 추가 세부담 ${formatWon(props.result.comprehensiveExtraTax)}`
+          : "추가 세부담 없음 (비교과세 하한 적용)",
       badge: "2,000만원 초과",
       tone: "warning",
     });
@@ -103,18 +106,34 @@ const segments = computed(() => [
           종합과세 대상
         </p>
         <p class="text-tiny text-muted-foreground">
-          연간 금융소득이 2,000만원을 초과하여 종합과세가 적용됩니다.
+          연간 금융소득이 2,000만원을 초과하여 초과분이 다른 종합소득과 합산 과세됩니다.
+          다른 종합소득 {{ formatWon(result.otherComprehensiveIncome) }}
+          {{ result.otherComprehensiveIncome > 0 ? "기준" : "(금융소득 외 소득 없음 가정)" }}으로 계산했습니다.
         </p>
         <div v-if="result.comprehensiveTax != null" class="retro-board-list mt-2">
           <div class="retro-board-item">
-            <span class="text-muted-foreground">종합과세 세금</span>
+            <span class="text-muted-foreground">분리과세 세금 (금융소득 전체)</span>
+            <span class="font-semibold tabular-nums">{{ formatWon(result.separateTaxTotal ?? 0) }}</span>
+          </div>
+          <div class="retro-board-item">
+            <span class="text-muted-foreground">종합과세 세금 (금융소득 전체)</span>
             <span class="font-semibold tabular-nums">{{ formatWon(result.comprehensiveTax) }}</span>
           </div>
           <div class="retro-board-item">
-            <span class="text-muted-foreground">종합과세 실수령</span>
+            <span class="text-muted-foreground">추가 세부담</span>
+            <span class="font-semibold tabular-nums">{{ formatWon(result.comprehensiveExtraTax ?? 0) }}</span>
+          </div>
+          <div class="retro-board-item">
+            <span class="text-muted-foreground">종합과세 시 배당 실수령</span>
             <span class="font-bold tabular-nums text-primary">{{ formatWon(result.comprehensiveNetDividend) }}</span>
           </div>
         </div>
+        <p class="text-tiny text-muted-foreground">
+          {{ result.isComparisonFloorApplied
+            ? "비교과세(소득세법 제62조): 종합과세 세액이 분리과세 세액보다 낮아지지 않도록 분리과세 세액을 하한으로 적용했습니다."
+            : "누진세율 산출세액이 분리과세 세액을 넘어 그 차액만큼 추가 세부담이 생깁니다." }}
+          국내 배당 초과분에는 배당가산 10%와 같은 금액의 배당세액공제를 반영했습니다.
+        </p>
       </div>
 
       <ShBreakdownBar v-if="result.dividendAmount > 0" label="배당 구성" :segments="segments" :format-value="formatWon" surface="outlined" />
@@ -122,7 +141,8 @@ const segments = computed(() => [
       <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground space-y-1">
         <p>* 국내 배당: 소득세 14% + 지방소득세 1.4% = 15.4% 원천징수</p>
         <p>* 해외 배당: 현지 원천징수 후 국내 세율과 비교하여 차액 추가 납부</p>
-        <p>* 연간 금융소득(이자+배당) 합계 2,000만원 초과 시 종합과세</p>
+        <p>* 연간 금융소득(이자+배당) 합계 2,000만원 초과 시 종합과세 — 비교과세로 분리과세 세액이 하한</p>
+        <p>* 종합과세 시뮬레이션은 소득공제·세액공제(배당·외국납부 제외)를 반영하지 않은 과세표준 기준 추정치</p>
       </div>
     </div>
   </div>

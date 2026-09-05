@@ -39,11 +39,11 @@ const faqItems = [
   },
   {
     q: "금융소득 2,000만원을 넘으면 어떻게 되나요?",
-    a: "이자와 배당 합계가 2,000만원을 넘으면 종합과세 대상이 되어 기존 원천징수 외 추가 세부담이 생길 수 있습니다.",
+    a: "이자와 배당 합계가 2,000만원을 넘으면 초과분이 근로·사업소득 등 다른 종합소득과 합산되어 누진세율로 과세됩니다. 다만 소득세법 제62조의 비교과세에 따라 종합과세 세액은 금융소득 전체를 14%로 분리과세한 세액보다 낮아지지 않으므로, 다른 소득이 없거나 적으면 추가 세부담이 0원일 수 있고 다른 소득이 많을수록 추가 세부담이 커집니다.",
   },
   {
     q: "외국납부세액공제도 고려되나요?",
-    a: "해외 배당 계산에는 현지 원천징수와 국내 추가세액을 반영하고, 종합과세 시나리오에는 외국납부세액공제를 단순화해 반영합니다.",
+    a: "해외 배당 계산에는 현지 원천징수와 국내 추가세액을 반영하고, 종합과세 시나리오에는 외국납부세액공제를 한도(산출세액 × 국외소득 비율) 안에서 반영합니다. 해외 배당은 배당가산·배당세액공제 대상이 아닙니다.",
   },
 ] as const;
 
@@ -90,9 +90,11 @@ const faqJsonLd = {
         :dividend-amount="calc.dividendAmount.value"
         :country="calc.country.value"
         :other-financial-income="calc.otherFinancialIncome.value"
+        :other-comprehensive-income="calc.otherComprehensiveIncome.value"
         @update:dividend-amount="calc.dividendAmount.value = $event"
         @update:country="calc.country.value = $event"
         @update:other-financial-income="calc.otherFinancialIncome.value = $event"
+        @update:other-comprehensive-income="calc.otherComprehensiveIncome.value = $event"
       />
     </CalculatorInteractionTracker>
 

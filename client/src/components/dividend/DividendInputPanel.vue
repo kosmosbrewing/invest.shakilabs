@@ -9,12 +9,14 @@ defineProps<{
   dividendAmount: number;
   country: CountryKey;
   otherFinancialIncome: number;
+  otherComprehensiveIncome: number;
 }>();
 
 const emit = defineEmits<{
   "update:dividendAmount": [value: number];
   "update:country": [value: CountryKey];
   "update:otherFinancialIncome": [value: number];
+  "update:otherComprehensiveIncome": [value: number];
 }>();
 
 const countries: ReadonlyArray<{ value: CountryKey; label: string }> = [
@@ -37,6 +39,15 @@ const incomePresets = [
   { label: "2,000만", value: 20_000_000 },
 ] as const;
 
+// 왜: 금융소득 종합과세는 다른 종합소득과 합산해 누진세율을 적용하므로
+// 근로·사업소득이 없으면 비교과세 하한(분리과세 세액)에 걸려 추가 세부담이 0이 된다.
+const comprehensiveIncomePresets = [
+  { label: "0원", value: 0 },
+  { label: "3,000만", value: 30_000_000 },
+  { label: "5,000만", value: 50_000_000 },
+  { label: "1억", value: 100_000_000 },
+] as const;
+
 function parseInput(value: string): number {
   const num = Number(value.replace(/[^0-9.-]/g, ""));
   return isNaN(num) ? 0 : Math.max(0, num);
@@ -53,7 +64,7 @@ function parseInput(value: string): number {
     </div>
 
     <div class="retro-panel-content space-y-4">
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div class="retro-panel-muted p-3.5">
           <label class="mb-2 block text-caption font-semibold text-foreground">배당금(세전)</label>
           <div class="relative">
@@ -122,6 +133,29 @@ function parseInput(value: string): number {
             label="기타 금융소득 빠른 선택"
             class="mt-3"
             @update:model-value="emit('update:otherFinancialIncome', $event)"
+          />
+        </div>
+
+        <div class="retro-panel-muted p-3.5">
+          <label class="mb-2 block text-caption font-semibold text-foreground">다른 종합소득 과세표준</label>
+          <div class="relative">
+            <input
+              aria-label="다른 종합소득 과세표준"
+              type="text"
+              inputmode="numeric"
+              class="retro-input pr-8"
+              :value="otherComprehensiveIncome.toLocaleString('ko-KR')"
+              @input="emit('update:otherComprehensiveIncome', parseInput(($event.target as HTMLInputElement).value))"
+            />
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">원</span>
+          </div>
+          <p class="mt-2 text-tiny text-muted-foreground">근로·사업소득 등(소득공제 후). 0이면 금융소득 외 소득이 없다고 가정합니다.</p>
+          <ShPresetGroup
+            :model-value="otherComprehensiveIncome"
+            :options="comprehensiveIncomePresets"
+            label="다른 종합소득 빠른 선택"
+            class="mt-3"
+            @update:model-value="emit('update:otherComprehensiveIncome', $event)"
           />
         </div>
       </div>

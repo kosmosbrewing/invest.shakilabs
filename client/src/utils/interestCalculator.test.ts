@@ -142,6 +142,55 @@ describe("calculateDepositInterest", () => {
   });
 });
 
+// 같은 상품(월 적립 단리)이 적금 페이지와 복리 페이지에서 다른 답을 내던 회귀를 잠근다.
+// 은행 관행: 세전 이자 = 월납입액 × 연이율 × n(n+1)/2 ÷ 12 (월초 납입, k번째 납입금은 n-k+1개월)
+describe("적금 ↔ 복리(단리 모드) 원 단위 일치", () => {
+  const cases = [
+    { monthly: 500_000, annualRate: 3.0, years: 1 },
+    { monthly: 300_000, annualRate: 3.5, years: 2 },
+    { monthly: 1_000_000, annualRate: 4.2, years: 5 },
+  ];
+
+  for (const { monthly, annualRate, years } of cases) {
+    it(`월 ${monthly.toLocaleString("ko-KR")}원 · 연 ${annualRate}% · ${years}년`, () => {
+      const savings = calculateSavingsInterest({
+        monthlyDeposit: monthly,
+        months: years * 12,
+        annualRate,
+        taxType: "tax_free",
+      });
+      const compound = calculateCompoundInterest({
+        initialAmount: 0,
+        monthlyContribution: monthly,
+        annualRate,
+        years,
+      });
+
+      expect(compound.simpleInterest).toBe(savings.grossInterest);
+      expect(compound.simpleTotal).toBe(savings.maturityAmount);
+    });
+  }
+
+  it("월 50만원 연 3% 12개월의 세전 이자는 97,500원이다", () => {
+    const savings = calculateSavingsInterest({
+      monthlyDeposit: 500_000,
+      months: 12,
+      annualRate: 3.0,
+      taxType: "normal",
+    });
+    const compound = calculateCompoundInterest({
+      initialAmount: 0,
+      monthlyContribution: 500_000,
+      annualRate: 3.0,
+      years: 1,
+    });
+
+    // 500,000 × (0.03/12) × 78 = 97,500
+    expect(savings.grossInterest).toBe(97_500);
+    expect(compound.simpleInterest).toBe(97_500);
+  });
+});
+
 describe("calculateCompoundInterest", () => {
   it("초기 1000만원 월 0원 연 7% 10년 복리", () => {
     const result = calculateCompoundInterest({
