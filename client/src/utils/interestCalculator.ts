@@ -197,28 +197,30 @@ export function calculateCompoundInterest(input: CompoundInterestInput): Compoun
   const totalMonths = years * 12;
   const totalInvested = initialAmount + monthlyContribution * totalMonths;
 
-  // 단리 계산
+  // 단리 계산 — 적립금은 적금 계산기와 같은 은행 관행(월초 납입, k번째 납입금이 n-k+1개월 이자)
   // 초기금: 초기 × (1 + 연이율 × 기간)
-  // 적립금: 월적립 × Σ(1 + 월이율 × (totalMonths - k)) for k=1..totalMonths
-  //       = 월적립 × totalMonths + 월적립 × 월이율 × totalMonths×(totalMonths-1)/2
+  // 적립금: 월적립 × Σ(1 + 월이율 × (totalMonths - k + 1)) for k=1..totalMonths
+  //       = 월적립 × totalMonths + 월적립 × 월이율 × totalMonths×(totalMonths+1)/2
+  // 왜: 예전 (n-1) 공식은 월말 납입 가정이라 같은 입력에 적금 계산기와 다른 이자를 냈다.
   const simpleInitial = Math.round(initialAmount * (1 + (annualRate / 100) * years));
   const simpleMonthly = Math.round(
     monthlyContribution * totalMonths +
-    monthlyContribution * monthlyRate * (totalMonths * (totalMonths - 1)) / 2,
+    monthlyContribution * monthlyRate * (totalMonths * (totalMonths + 1)) / 2,
   );
   const simpleTotal = simpleInitial + simpleMonthly;
   const simpleInterest = simpleTotal - totalInvested;
 
-  // 복리 계산
+  // 복리 계산 — 적립금도 단리와 같은 월초 납입(기시 연금) 가정이어야 단리·복리 비교가 공정하다
   // 초기금: 초기 × (1 + 월이율)^총개월
-  // 적립금: 월적립 × ((1 + 월이율)^총개월 - 1) / 월이율
+  // 적립금: 월적립 × ((1 + 월이율)^총개월 - 1) / 월이율 × (1 + 월이율)
   let compoundTotal: number;
   if (monthlyRate === 0) {
     compoundTotal = totalInvested;
   } else {
     const compoundFactor = Math.pow(1 + monthlyRate, totalMonths);
     const compoundInitial = initialAmount * compoundFactor;
-    const compoundMonthly = monthlyContribution * ((compoundFactor - 1) / monthlyRate);
+    const compoundMonthly =
+      monthlyContribution * ((compoundFactor - 1) / monthlyRate) * (1 + monthlyRate);
     compoundTotal = Math.round(compoundInitial + compoundMonthly);
   }
   const compoundInterest = compoundTotal - totalInvested;
@@ -237,7 +239,7 @@ export function calculateCompoundInterest(input: CompoundInterestInput): Compoun
     const sInit = Math.round(initialAmount * (1 + (annualRate / 100) * y));
     const sMonth = Math.round(
       monthlyContribution * m +
-      monthlyContribution * monthlyRate * (m * (m - 1)) / 2,
+      monthlyContribution * monthlyRate * (m * (m + 1)) / 2,
     );
 
     // 복리
@@ -246,7 +248,9 @@ export function calculateCompoundInterest(input: CompoundInterestInput): Compoun
       cTotal = invested;
     } else {
       const cf = Math.pow(1 + monthlyRate, m);
-      cTotal = Math.round(initialAmount * cf + monthlyContribution * ((cf - 1) / monthlyRate));
+      cTotal = Math.round(
+        initialAmount * cf + monthlyContribution * ((cf - 1) / monthlyRate) * (1 + monthlyRate),
+      );
     }
 
     yearlyData.push({

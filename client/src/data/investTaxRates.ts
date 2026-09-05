@@ -67,5 +67,6 @@ export const ISA_TAX = {
   TOTAL_LIMIT: 100_000_000,
 } as const;
 
-// 배당소득 Gross-up (귀속법인세 상당액) — 종합과세 시 적용
-export const DIVIDEND_GROSS_UP_RATE = 0.11;
+// 배당소득 Gross-up(배당가산, 귀속법인세 상당액) — 종합과세 시 기준금액 초과 국내 배당에 적용
+// 소득세법 제17조③ "배당소득의 100분의 10" (2023.12.31 개정, 2024.1.1 이후 지급분부터 11%→10%)
+export const DIVIDEND_GROSS_UP_RATE = 0.10;

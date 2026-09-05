@@ -72,8 +72,76 @@ describe("investCalculator", () => {
 
       expect(result.isComprehensive).toBe(true);
       expect(result.totalTax).toBe(2_310_000);
-      expect(result.comprehensiveTax).toBe(1_196_250);
-      expect(result.comprehensiveNetDividend).toBe(13_803_750);
+      // 금융소득 2,500만 = 분리과세 상당액 385만. 다른 종합소득이 없으면
+      // 비교과세 하한(제62조 제2호)이 걸려 추가 세부담이 0이다.
+      expect(result.separateTaxTotal).toBe(3_850_000);
+      expect(result.comprehensiveTax).toBe(3_850_000);
+      expect(result.comprehensiveExtraTax).toBe(0);
+      expect(result.isComparisonFloorApplied).toBe(true);
+      expect(result.comprehensiveNetDividend).toBe(12_690_000);
+    });
+
+    // 소득세법 제62조(이자소득 등에 대한 종합과세 시 세액 계산의 특례):
+    // 종합소득 산출세액 = MAX(① 기준금액 초과분+다른 종합소득 누진세액 + 기준금액×14%,
+    //                        ② 이자소득등 전체×14% + 다른 종합소득 산출세액)
+    // → 종합과세 세부담이 분리과세 세부담보다 낮아질 수 없다 (YMYL 회귀 잠금).
+    describe("비교과세 하한 (소득세법 제62조)", () => {
+      const samples = [21_000_000, 50_000_000, 100_000_000];
+
+      for (const amount of samples) {
+        it(`배당 ${amount.toLocaleString("ko-KR")}원: 종합과세 >= 분리과세`, () => {
+          for (const otherIncome of [0, 30_000_000, 100_000_000]) {
+            const result = calculateDividendTax(amount, "KR", 0, otherIncome);
+            expect(result.isComprehensive).toBe(true);
+            expect(result.comprehensiveTax).not.toBeNull();
+            expect(result.comprehensiveTax as number).toBeGreaterThanOrEqual(
+              result.separateTaxTotal as number,
+            );
+            expect(result.comprehensiveExtraTax as number).toBeGreaterThanOrEqual(0);
+            expect(result.comprehensiveNetDividend as number).toBeLessThanOrEqual(
+              result.netDividend,
+            );
+          }
+        });
+      }
+
+      it("다른 종합소득이 없으면 국내 배당 2,100만원의 추가 세부담은 0이다", () => {
+        const result = calculateDividendTax(21_000_000, "KR", 0);
+
+        // 분리과세 21,000,000 × 15.4% = 3,234,000
+        expect(result.separateTaxTotal).toBe(3_234_000);
+        expect(result.comprehensiveTax).toBe(3_234_000);
+        expect(result.comprehensiveExtraTax).toBe(0);
+        expect(result.isComparisonFloorApplied).toBe(true);
+        expect(result.grossUpAmount).toBe(100_000); // 초과분 100만 × 10%
+      });
+
+      it("다른 종합소득이 크면 누진세율이 하한을 넘어 추가 세부담이 생긴다", () => {
+        const result = calculateDividendTax(100_000_000, "KR", 0, 50_000_000);
+
+        expect(result.isComparisonFloorApplied).toBe(false);
+        expect(result.separateTaxTotal).toBe(15_400_000);
+        expect(result.comprehensiveTax).toBe(23_562_000);
+        expect(result.comprehensiveExtraTax).toBe(8_162_000);
+      });
+
+      it("해외 배당도 외국납부세액공제 후 분리과세 하한을 지킨다", () => {
+        for (const country of ["US", "CN", "HK"] as const) {
+          const result = calculateDividendTax(50_000_000, country, 0, 0);
+          expect(result.comprehensiveTax as number).toBeGreaterThanOrEqual(
+            result.separateTaxTotal as number,
+          );
+        }
+      });
+
+      it("기준금액 이하면 종합과세 필드가 모두 null이다", () => {
+        const result = calculateDividendTax(20_000_000, "KR", 0);
+
+        expect(result.isComprehensive).toBe(false);
+        expect(result.comprehensiveTax).toBeNull();
+        expect(result.comprehensiveExtraTax).toBeNull();
+        expect(result.separateTaxTotal).toBeNull();
+      });
     });
   });
 

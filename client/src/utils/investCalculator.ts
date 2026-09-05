@@ -58,18 +58,45 @@ export type DividendTaxResult = {
   foreignTaxAmount: number;
   domesticIncomeTax: number;
   domesticLocalTax: number;
+  /** 입력 배당금만의 분리과세(원천징수) 세부담 — 해외 원천징수 포함 */
   totalTax: number;
   netDividend: number;
   effectiveRate: number;
   isComprehensive: boolean;
+  /** 계산에 사용한 다른 종합소득 과세표준(근로·사업 등). 0이면 "타 소득 없음" 가정 */
+  otherComprehensiveIncome: number;
+  /** 배당가산(gross-up) 금액 — 기준금액 초과분 중 국내 배당에만 적용 */
+  grossUpAmount: number | null;
+  /** 종합소득 과세표준(다른 종합소득 + 금융소득 + 배당가산) */
+  comprehensiveTaxBase: number | null;
+  /** 금융소득(배당 + 기타 금융소득) 전체를 분리과세로 끝냈을 때의 세부담 */
+  separateTaxTotal: number | null;
+  /** 금융소득 전체를 종합과세했을 때의 세부담(해외 원천징수 포함, 지방소득세 포함) */
   comprehensiveTax: number | null;
+  /** 종합과세 − 분리과세 추가 세부담. 비교과세 하한 때문에 음수가 될 수 없다 */
+  comprehensiveExtraTax: number | null;
+  /** 종합과세 시 배당 실수령액 = 배당금 − 분리과세 세금 − 추가 세부담 */
   comprehensiveNetDividend: number | null;
+  /** 비교과세 하한(제62조 제2호)이 적용되어 추가 세부담이 없는 경우 true */
+  isComparisonFloorApplied: boolean;
 };
+
+/** 종합소득세 기본세율(6~45%) 산출세액 — 소득공제는 반영하지 않는 과세표준 기준 */
+function calculateProgressiveTax(taxBase: number): number {
+  let tax = 0;
+  for (const bracket of INCOME_TAX_BRACKETS) {
+    if (taxBase <= bracket.min) break;
+    const taxable = Math.min(taxBase, bracket.max) - bracket.min;
+    tax += taxable * bracket.rate;
+  }
+  return tax;
+}
 
 export function calculateDividendTax(
   dividendAmount: number,
   country: "KR" | keyof typeof DIVIDEND_TAX.FOREIGN_RATES = "KR",
-  otherFinancialIncome: number = 0
+  otherFinancialIncome: number = 0,
+  otherComprehensiveIncome: number = 0
 ): DividendTaxResult {
   const totalFinancialIncome = dividendAmount + otherFinancialIncome;
   const isComprehensive = totalFinancialIncome > DIVIDEND_TAX.FINANCIAL_INCOME_THRESHOLD;
@@ -104,32 +131,66 @@ export function calculateDividendTax(
   const netDividend = dividendAmount - totalTax;
   const effectiveRate = dividendAmount > 0 ? totalTax / dividendAmount : 0;
 
-  // 종합과세 시뮬레이션 (2000만원 초과 시)
+  // 종합과세 시뮬레이션 (금융소득 2,000만원 초과 시)
+  let grossUpAmount: number | null = null;
+  let comprehensiveTaxBase: number | null = null;
+  let separateTaxTotal: number | null = null;
   let comprehensiveTax: number | null = null;
+  let comprehensiveExtraTax: number | null = null;
   let comprehensiveNetDividend: number | null = null;
+  let isComparisonFloorApplied = false;
 
   if (isComprehensive) {
-    // Gross-up 배당가산
-    const grossUpAmount = Math.floor(dividendAmount * DIVIDEND_GROSS_UP_RATE);
-    const grossedUpDividend = dividendAmount + grossUpAmount;
-    const totalTaxableIncome = grossedUpDividend + otherFinancialIncome;
+    const threshold = DIVIDEND_TAX.FINANCIAL_INCOME_THRESHOLD;
+    const withholdingRate = DIVIDEND_TAX.DOMESTIC_INCOME_TAX_RATE;
+    const excessFinancialIncome = totalFinancialIncome - threshold;
 
-    // 종합소득세 누진세율 적용
-    let progressiveTax = 0;
-    for (const bracket of INCOME_TAX_BRACKETS) {
-      if (totalTaxableIncome <= bracket.min) break;
-      const taxable = Math.min(totalTaxableIncome, bracket.max) - bracket.min;
-      progressiveTax += taxable * bracket.rate;
-    }
+    // 배당가산(gross-up, 소득세법 제17조③): 기준금액 초과분 중 내국법인 배당에만 적용.
+    // 시행령 제116조의2 — 기준금액은 이자(기타 금융소득)부터 채우므로 초과분에 배당이 먼저 남는다.
+    // 해외 배당(제17조①6호)은 배당가산·배당세액공제 대상이 아니다.
+    const grossUpBase = country === "KR" ? Math.min(dividendAmount, excessFinancialIncome) : 0;
+    grossUpAmount = Math.floor(grossUpBase * DIVIDEND_GROSS_UP_RATE);
+    comprehensiveTaxBase = otherComprehensiveIncome + totalFinancialIncome + grossUpAmount;
 
-    // 배당세액공제: gross-up 금액
-    progressiveTax = Math.max(0, progressiveTax - grossUpAmount);
-    // 외국납부세액공제
-    progressiveTax = Math.max(0, progressiveTax - foreignTaxAmount);
-    const localTaxOnComprehensive = Math.floor(progressiveTax * 0.1);
+    const otherIncomeTax = calculateProgressiveTax(otherComprehensiveIncome);
 
-    comprehensiveTax = Math.floor(progressiveTax) + localTaxOnComprehensive;
-    comprehensiveNetDividend = dividendAmount - comprehensiveTax;
+    // 비교과세(소득세법 제62조): 산출세액 = MAX(①, ②)
+    // ① (기준금액 초과 금융소득 + 배당가산 + 다른 종합소득)의 기본세율 산출세액 + 기준금액 × 14%
+    const generalTax =
+      calculateProgressiveTax(otherComprehensiveIncome + excessFinancialIncome + grossUpAmount) +
+      threshold * withholdingRate;
+    // ② 금융소득 전체 × 원천징수세율 14% + 다른 종합소득의 산출세액
+    const comparisonTax = totalFinancialIncome * withholdingRate + otherIncomeTax;
+    const calculatedTax = Math.max(generalTax, comparisonTax);
+    isComparisonFloorApplied = comparisonTax >= generalTax;
+
+    // 배당세액공제(제56조): 배당가산액을 공제하되 ②를 하한으로 둔다 —
+    // 종합과세 세액이 분리과세 상당액(②) 아래로 내려가지 않는 것이 비교과세의 취지.
+    const dividendCredit = Math.min(grossUpAmount, Math.max(0, calculatedTax - comparisonTax));
+    if (dividendCredit >= calculatedTax - comparisonTax) isComparisonFloorApplied = true;
+    let taxAfterCredits = calculatedTax - dividendCredit;
+
+    // 외국납부세액공제: 한도 = 산출세액 × (국외원천소득 ÷ 종합소득금액)
+    const foreignIncome = country === "KR" ? 0 : dividendAmount;
+    const foreignCreditLimit =
+      comprehensiveTaxBase > 0 ? taxAfterCredits * (foreignIncome / comprehensiveTaxBase) : 0;
+    const foreignCredit = Math.min(foreignTaxAmount, Math.floor(foreignCreditLimit));
+    taxAfterCredits -= foreignCredit;
+
+    // 금융소득에 귀속되는 소득세 = 전체 세액 − 다른 종합소득만 있을 때의 세액
+    const incomeTaxOnFinancial = Math.max(0, Math.floor(taxAfterCredits - otherIncomeTax));
+    const localTaxOnFinancial = Math.floor(incomeTaxOnFinancial * 0.1);
+    comprehensiveTax = foreignTaxAmount + incomeTaxOnFinancial + localTaxOnFinancial;
+
+    // 같은 금융소득을 분리과세로 끝냈을 때 — 기타 금융소득은 국내 이자·배당 15.4% 가정
+    separateTaxTotal =
+      totalTax +
+      Math.floor(otherFinancialIncome * DIVIDEND_TAX.DOMESTIC_INCOME_TAX_RATE) +
+      Math.floor(otherFinancialIncome * DIVIDEND_TAX.DOMESTIC_LOCAL_TAX_RATE);
+
+    // 비교과세 구조상 음수가 될 수 없지만 원 단위 절사 차이를 0으로 정리한다
+    comprehensiveExtraTax = Math.max(0, comprehensiveTax - separateTaxTotal);
+    comprehensiveNetDividend = dividendAmount - totalTax - comprehensiveExtraTax;
   }
 
   return {
@@ -143,8 +204,14 @@ export function calculateDividendTax(
     netDividend,
     effectiveRate,
     isComprehensive,
+    otherComprehensiveIncome,
+    grossUpAmount,
+    comprehensiveTaxBase,
+    separateTaxTotal,
     comprehensiveTax,
+    comprehensiveExtraTax,
     comprehensiveNetDividend,
+    isComparisonFloorApplied,
   };
 }
 
