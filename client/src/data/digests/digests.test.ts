@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import { FOREIGN_STOCK_TAX_UPDATED } from "../foreignStockTax";
 import { GIFT_TAX_UPDATED } from "../giftTax";
 import { INHERITANCE_TAX_UPDATED } from "../inheritanceTax";
-import { DIVIDEND_TAX, INVEST_DATA_UPDATED, ISA_TAX } from "../investTaxRates";
+import { INTEREST_DATA_UPDATED, INTEREST_TAX } from "../interestData";
+import { CRYPTO_TAX, DIVIDEND_TAX, INVEST_DATA_UPDATED, ISA_TAX } from "../investTaxRates";
 import {
   COMPOUND_INTEREST_GUIDE,
   CRYPTO_TAX_GUIDE,
@@ -17,23 +19,37 @@ import {
   SAVINGS_INTEREST_GUIDE,
   type GuideData,
 } from "../seoGuides";
+import { DEFAULT_FOREIGN_STOCK_TAX_INPUT } from "@/lib/foreignStockTaxValidators";
 import { DEFAULT_GIFT_TAX_INPUT } from "@/lib/giftTaxValidators";
 import { DEFAULT_INHERITANCE_TAX_INPUT } from "@/lib/inheritanceTaxValidators";
+import { calculateForeignStockTax } from "@/utils/foreignStockTaxCalculator";
 import { calculateGiftTax } from "@/utils/giftTaxCalculator";
 import { calculateInheritanceTax } from "@/utils/inheritanceTaxCalculator";
-import { calculateDividendTax, calculateIsaCompare } from "@/utils/investCalculator";
+import { calculateDepositInterest, calculateSavingsInterest } from "@/utils/interestCalculator";
+import { calculateCryptoTax, calculateDividendTax, calculateIsaCompare } from "@/utils/investCalculator";
+import { useCryptoTaxCalc } from "@/composables/useCryptoTaxCalc";
+import { useDepositInterestCalc } from "@/composables/useDepositInterestCalc";
 import { useDividendTaxCalc } from "@/composables/useDividendTaxCalc";
 import { useIsaCalc } from "@/composables/useIsaCalc";
-import { type Finding, manwon, pct, won } from "./format";
+import { useSavingsInterestCalc } from "@/composables/useSavingsInterestCalc";
+import { type Finding, manwon, num, pct, won } from "./format";
 import {
+  CRYPTO_BASE,
+  CRYPTO_TAX_DIGEST,
+  DEPOSIT_BASE,
+  DEPOSIT_INTEREST_DIGEST,
   DIVIDEND_BASE,
   DIVIDEND_TAX_DIGEST,
+  FOREIGN_BASE,
+  FOREIGN_STOCK_TAX_DIGEST,
   GIFT_BASE,
   GIFT_TAX_DIGEST,
   INHERITANCE_BASE,
   INHERITANCE_TAX_DIGEST,
   ISA_BASE,
   ISA_DIGEST,
+  SAVINGS_BASE,
+  SAVINGS_INTEREST_DIGEST,
 } from "./index";
 
 // 규율: 페이지당 엔진 파생 발견 8개 이상. 세율표·공제액을 한 줄 인용한 문장은 발견이 아니므로,
@@ -53,6 +69,10 @@ const DIGESTS: Record<string, Finding[]> = {
   "inheritance-tax": INHERITANCE_TAX_DIGEST,
   isa: ISA_DIGEST,
   "dividend-tax": DIVIDEND_TAX_DIGEST,
+  "savings-interest": SAVINGS_INTEREST_DIGEST,
+  "deposit-interest": DEPOSIT_INTEREST_DIGEST,
+  "crypto-tax": CRYPTO_TAX_DIGEST,
+  "foreign-stock-tax": FOREIGN_STOCK_TAX_DIGEST,
 };
 const ALL = Object.entries(DIGESTS).flatMap(([page, items]) => items.map((f, i) => ({ id: `${page}#${i + 1}`, ...f })));
 
@@ -83,8 +103,8 @@ function similarity(a: string, b: string): number {
 }
 
 describe("파생 다이제스트 — 발견 밀도", () => {
-  it("비선형 엔진을 가진 계산기 4페이지를 덮는다", () => {
-    expect(Object.keys(DIGESTS)).toHaveLength(4);
+  it("계산기 8페이지를 덮는다", () => {
+    expect(Object.keys(DIGESTS)).toHaveLength(8);
   });
 
   it.each(Object.entries(DIGESTS))(`%s 페이지는 발견 ${MIN_FINDINGS}개 이상`, (_page, items) => {
@@ -187,9 +207,13 @@ describe("파생 다이제스트 — 가이드 배선", () => {
     ["inheritance-tax", INHERITANCE_TAX_GUIDE, INHERITANCE_TAX_DIGEST, [INHERITANCE_TAX_UPDATED]],
     ["isa", ISA_GUIDE, ISA_DIGEST, [INVEST_DATA_UPDATED]],
     ["dividend-tax", DIVIDEND_TAX_GUIDE, DIVIDEND_TAX_DIGEST, [INVEST_DATA_UPDATED]],
+    ["savings-interest", SAVINGS_INTEREST_GUIDE, SAVINGS_INTEREST_DIGEST, [INTEREST_DATA_UPDATED]],
+    ["deposit-interest", DEPOSIT_INTEREST_GUIDE, DEPOSIT_INTEREST_DIGEST, [INTEREST_DATA_UPDATED]],
+    ["crypto-tax", CRYPTO_TAX_GUIDE, CRYPTO_TAX_DIGEST, [INVEST_DATA_UPDATED]],
+    ["foreign-stock-tax", FOREIGN_STOCK_TAX_GUIDE, FOREIGN_STOCK_TAX_DIGEST, [FOREIGN_STOCK_TAX_UPDATED]],
   ];
 
-  it("4페이지 가이드가 각자의 다이제스트를 일반 절보다 앞에 싣는다", () => {
+  it("8페이지 가이드가 각자의 다이제스트를 일반 절보다 앞에 싣는다", () => {
     for (const [page, guide, digest] of pairs) {
       expect(guide.sections!.slice(0, digest.length), page).toEqual(digest);
       expect(guide.sections![digest.length].h2, page).toBe("위 발견의 계산 기준");
@@ -198,15 +222,7 @@ describe("파생 다이제스트 — 가이드 배선", () => {
   });
 
   it("나머지 가이드에는 다이제스트가 섞이지 않는다", () => {
-    const untouched = [
-      INVEST_HUB_GUIDE,
-      INVEST_HOME_GUIDE,
-      COMPOUND_INTEREST_GUIDE,
-      CRYPTO_TAX_GUIDE,
-      DEPOSIT_INTEREST_GUIDE,
-      FOREIGN_STOCK_TAX_GUIDE,
-      SAVINGS_INTEREST_GUIDE,
-    ];
+    const untouched = [INVEST_HUB_GUIDE, INVEST_HOME_GUIDE, COMPOUND_INTEREST_GUIDE];
     for (const g of untouched) {
       expect(g.sections!.some((s) => s.h2 === "위 발견의 계산 기준")).toBe(false);
     }
@@ -222,7 +238,7 @@ describe("파생 다이제스트 — 가이드 배선", () => {
       expect(basis.body, page).toContain("가정");
       bodies.add(basis.body);
     }
-    expect(bodies.size).toBe(4);
+    expect(bodies.size).toBe(8);
   });
 
   // 다이제스트 기준값이 화면 기본값에서 드리프트하면 산문과 첫 화면이 어긋난다.
@@ -253,6 +269,33 @@ describe("파생 다이제스트 — 가이드 배선", () => {
     expect(DIVIDEND_BASE.country).toBe(dv.country.value);
     expect(DIVIDEND_BASE.otherFinancialIncome).toBe(dv.otherFinancialIncome.value);
     expect(DIVIDEND_BASE.otherComprehensiveIncome).toBe(dv.otherComprehensiveIncome.value);
+    // 해외주식만 검증기에 기본값 객체가 따로 있어 참조 공유가 가능하다 — 독립 리터럴임을 먼저 못박는다.
+    expect(FOREIGN_BASE).not.toBe(DEFAULT_FOREIGN_STOCK_TAX_INPUT);
+    expect(FOREIGN_BASE).toEqual(DEFAULT_FOREIGN_STOCK_TAX_INPUT);
+    const sv = useSavingsInterestCalc();
+    expect(SAVINGS_BASE.monthlyDeposit).toBe(sv.monthlyDeposit.value);
+    expect(SAVINGS_BASE.months).toBe(sv.months.value);
+    expect(SAVINGS_BASE.annualRate).toBe(sv.annualRate.value);
+    expect(SAVINGS_BASE.taxType).toBe(sv.taxType.value);
+    const dp = useDepositInterestCalc();
+    expect(DEPOSIT_BASE.principal).toBe(dp.principal.value);
+    expect(DEPOSIT_BASE.months).toBe(dp.months.value);
+    expect(DEPOSIT_BASE.annualRate).toBe(dp.annualRate.value);
+    expect(DEPOSIT_BASE.taxType).toBe(dp.taxType.value);
+    expect(DEPOSIT_BASE.paymentType).toBe(dp.paymentType.value);
+    const cr = useCryptoTaxCalc();
+    expect(CRYPTO_BASE.purchaseAmount).toBe(cr.purchaseAmount.value);
+    expect(CRYPTO_BASE.saleAmount).toBe(cr.saleAmount.value);
+    expect(CRYPTO_BASE.expenses).toBe(cr.expenses.value);
+    // 라벨 필드는 엔진 출력이 아니라 산문이 문자열로 적어 둔 조건이라 숫자 재계산으로 드러나지 않는다.
+    expect(SAVINGS_BASE.taxType).toBe("normal");
+    expect(DEPOSIT_BASE.taxType).toBe("normal");
+    expect(DEPOSIT_BASE.paymentType).toBe("maturity");
+    expect(SAVINGS_INTEREST_DIGEST[0].body).toContain("일반과세");
+    expect(DEPOSIT_INTEREST_DIGEST[0].body).toContain("만기일시지급");
+    expect(DEPOSIT_INTEREST_DIGEST[7].body).toContain("만기일시지급");
+    expect(FOREIGN_STOCK_TAX_DIGEST[0].body).toContain("화면 기본값인 매도");
+    expect(CRYPTO_TAX_DIGEST[0].body).toContain("화면 기본값대로");
   });
 });
 
@@ -548,6 +591,243 @@ describe("파생 다이제스트 — 엔진 리터럴 앵커", () => {
   });
 });
 
+describe("파생 다이제스트 — 인용 수치 엔진 재계산 일치 (이자·양도)", () => {
+  const sav = (patch: Partial<typeof SAVINGS_BASE> = {}) => calculateSavingsInterest({ ...SAVINGS_BASE, ...patch });
+  const dep = (patch: Partial<typeof DEPOSIT_BASE> = {}) => calculateDepositInterest({ ...DEPOSIT_BASE, ...patch });
+  const cry = (gain: number, expenses = 0) => calculateCryptoTax(0, gain, expenses);
+  const fs = (patch: Partial<typeof FOREIGN_BASE> = {}) => calculateForeignStockTax({ ...FOREIGN_BASE, ...patch });
+
+  it("/savings-interest: 실효 수익률·연환산·한계 효율·예금 교차·계단", () => {
+    const base = sav();
+    for (const v of [won(base.totalPrincipal), won(base.grossInterest), won(base.tax), won(base.netInterest), won(base.maturityAmount)]) {
+      expect(bodyOf(SAVINGS_INTEREST_DIGEST, 0)).toContain(v);
+    }
+    expect(SAVINGS_INTEREST_DIGEST[0].h2).toContain(pct(base.effectiveRate, 4));
+    // 실효 수익률이 월 납입액과 무관하다 — 소수점 여섯째 자리 아래에서만 갈린다
+    const small = sav({ monthlyDeposit: 100_000 });
+    const big = sav({ monthlyDeposit: 5_000_000 });
+    expect(Math.abs(small.effectiveRate - big.effectiveRate)).toBeLessThan(1e-6);
+    expect(bodyOf(SAVINGS_INTEREST_DIGEST, 2)).toContain(pct(small.effectiveRate, 6));
+    expect(bodyOf(SAVINGS_INTEREST_DIGEST, 2)).toContain(pct(big.effectiveRate, 6));
+    // 한계 효율 = 평균의 정확히 2배
+    const next = sav({ months: SAVINGS_BASE.months + 1 });
+    const marginal = (next.grossInterest - base.grossInterest) / SAVINGS_BASE.monthlyDeposit;
+    const average = base.grossInterest / base.totalPrincipal;
+    expect(marginal / average).toBeCloseTo(2, 12);
+    expect(bodyOf(SAVINGS_INTEREST_DIGEST, 3)).toContain(won(next.grossInterest - base.grossInterest));
+    expect(bodyOf(SAVINGS_INTEREST_DIGEST, 3)).toContain(pct(marginal, 4));
+    // 과세 유형 세 갈래
+    for (const v of [won(base.netInterest), won(sav({ taxType: "preferential" }).netInterest), won(sav({ taxType: "tax_free" }).netInterest)]) {
+      expect(bodyOf(SAVINGS_INTEREST_DIGEST, 4)).toContain(v);
+    }
+    // 예금 교차 배수 = 2n/(n+1)
+    const asDeposit = calculateDepositInterest({
+      principal: base.totalPrincipal,
+      months: SAVINGS_BASE.months,
+      annualRate: SAVINGS_BASE.annualRate,
+      taxType: "normal",
+      paymentType: "maturity",
+    });
+    expect(asDeposit.grossInterest / base.grossInterest).toBeCloseTo(
+      (2 * SAVINGS_BASE.months) / (SAVINGS_BASE.months + 1),
+      12,
+    );
+    expect(SAVINGS_INTEREST_DIGEST[5].h2).toContain(`${(asDeposit.grossInterest / base.grossInterest).toFixed(2)}배`);
+    // 절반 시점의 누적 이자
+    const half = base.monthlyData[SAVINGS_BASE.months / 2 - 1].interest;
+    expect(SAVINGS_INTEREST_DIGEST[7].h2).toContain(pct(half / base.grossInterest, 2));
+    expect(bodyOf(SAVINGS_INTEREST_DIGEST, 7)).toContain(won(half));
+    // 반올림 계단 — 산문이 적은 폭만큼은 이자가 1원도 늘지 않는다
+    const step = Number(SAVINGS_INTEREST_DIGEST[8].h2.match(/월 납입액 (\d+)원/)![1]);
+    expect(sav({ monthlyDeposit: SAVINGS_BASE.monthlyDeposit + step }).grossInterest).toBe(base.grossInterest);
+    expect(sav({ monthlyDeposit: SAVINGS_BASE.monthlyDeposit + step + 1 }).grossInterest).toBe(base.grossInterest + 1);
+  });
+
+  it("/deposit-interest: 지급 방식 발산·표시 정합·대칭 붕괴·문턱", () => {
+    const atMaturity = dep();
+    const perMonth = dep({ paymentType: "monthly" });
+    for (const v of [won(atMaturity.grossInterest), won(atMaturity.netInterest), won(perMonth.grossInterest), won(perMonth.netInterest)]) {
+      expect(bodyOf(DEPOSIT_INTEREST_DIGEST, 0)).toContain(v);
+    }
+    expect(DEPOSIT_INTEREST_DIGEST[0].h2).toContain(won(perMonth.grossInterest - atMaturity.grossInterest));
+    // 유불리가 원금에 따라 삼등분된다 — 산문이 적은 세 숫자를 다시 센다
+    let ahead = 0;
+    let behind = 0;
+    let level = 0;
+    for (let principal = 1_000_000; principal <= 100_000_000; principal += 100_000) {
+      const gap = dep({ principal, paymentType: "monthly" }).grossInterest - dep({ principal }).grossInterest;
+      if (gap > 0) ahead += 1;
+      else if (gap < 0) behind += 1;
+      else level += 1;
+    }
+    expect(ahead + behind + level).toBe(991);
+    for (const v of [num(ahead), num(behind), num(level)]) expect(bodyOf(DEPOSIT_INTEREST_DIGEST, 1)).toContain(v);
+    // 표시 월이자 × 개월수 ≠ 총 세후이자
+    const drift = perMonth.monthlyInterestNet * DEPOSIT_BASE.months - perMonth.netInterest;
+    expect(drift).not.toBe(0);
+    expect(bodyOf(DEPOSIT_INTEREST_DIGEST, 2)).toContain(won(perMonth.monthlyInterestNet));
+    expect(bodyOf(DEPOSIT_INTEREST_DIGEST, 2)).toContain(won(Math.abs(drift)));
+    // 세후 월이자 계단 — h3가 적은 폭 전체에서 값이 같다
+    const width = Number(DEPOSIT_INTEREST_DIGEST[3].h2.match(/원금 ([\d,]+)원/)![1].replace(/,/g, ""));
+    const start = Number(bodyOf(DEPOSIT_INTEREST_DIGEST, 3).match(/원금을 ([\d,]+)원과/)![1].replace(/,/g, ""));
+    const value = dep({ principal: start, paymentType: "monthly" }).monthlyInterestNet;
+    for (const offset of [0, 1, width - 2, width - 1]) {
+      expect(dep({ principal: start + offset, paymentType: "monthly" }).monthlyInterestNet, `${offset}`).toBe(value);
+    }
+    expect(dep({ principal: start - 1, paymentType: "monthly" }).monthlyInterestNet).not.toBe(value);
+    expect(dep({ principal: start + width, paymentType: "monthly" }).monthlyInterestNet).not.toBe(value);
+    // 금리 2배 ≡ 기간 2배는 만기일시에서만 성립
+    expect(dep({ annualRate: DEPOSIT_BASE.annualRate * 2 }).grossInterest).toBe(dep({ months: DEPOSIT_BASE.months * 2 }).grossInterest);
+    expect(dep({ annualRate: DEPOSIT_BASE.annualRate * 2, paymentType: "monthly" }).grossInterest).not.toBe(
+      dep({ months: DEPOSIT_BASE.months * 2, paymentType: "monthly" }).grossInterest,
+    );
+    // 종합과세 문턱 원금 — 한 칸 아래는 넘지 않고 그 원금부터 넘는다
+    const edge = Number(bodyOf(DEPOSIT_INTEREST_DIGEST, 6).match(/원금이 ([\d,]+)원을 넘어야/)![1].replace(/,/g, ""));
+    expect(dep({ principal: edge }).grossInterest).toBeGreaterThan(DIVIDEND_TAX.FINANCIAL_INCOME_THRESHOLD);
+    expect(dep({ principal: edge - 1 }).grossInterest).toBe(DIVIDEND_TAX.FINANCIAL_INCOME_THRESHOLD);
+    // 기간 선형성 1:2:4:6
+    const byMonth = [6, 12, 24, 36].map((months) => dep({ months }).grossInterest);
+    expect(byMonth).toEqual([byMonth[0], byMonth[0] * 2, byMonth[0] * 4, byMonth[0] * 6]);
+    for (const v of byMonth) expect(bodyOf(DEPOSIT_INTEREST_DIGEST, 8)).toContain(won(v));
+  });
+
+  it("/crypto-tax: 실효세율 점근·내림 경계·분할 포화·해외주식 대조", () => {
+    const base = calculateCryptoTax(CRYPTO_BASE.purchaseAmount, CRYPTO_BASE.saleAmount, CRYPTO_BASE.expenses);
+    for (const v of [won(base.totalGain), won(base.deduction), won(base.taxableAmount), won(base.incomeTax), won(base.localTax), won(base.totalTax), won(base.netProfit)]) {
+      expect(bodyOf(CRYPTO_TAX_DIGEST, 0)).toContain(v);
+    }
+    expect(CRYPTO_TAX_DIGEST[0].h2).toContain(pct(base.effectiveRate, 0));
+    // 실효세율 = 명목세율 − 고정 감액 ÷ 차익. 고정 감액은 차익과 무관하게 일정하다.
+    const fixedAt = (gain: number) => Math.round(gain * CRYPTO_TAX.TOTAL_RATE - cry(gain).totalTax);
+    expect(fixedAt(25_000_000)).toBe(fixedAt(1_000_000_000));
+    expect(bodyOf(CRYPTO_TAX_DIGEST, 1)).toContain(won(fixedAt(1_000_000_000)));
+    expect(CRYPTO_TAX_DIGEST[1].h2).toContain(won(fixedAt(1_000_000_000)));
+    // 공제 경계: 1원 초과에서 0원, 5원 초과에서 소득세 1원, 50원 초과에서 지방소득세 1원
+    const d = CRYPTO_TAX.BASIC_DEDUCTION;
+    expect(cry(d + 1).totalTax).toBe(0);
+    expect(cry(d + 4).totalTax).toBe(0);
+    expect(cry(d + 5).totalTax).toBe(1);
+    expect(cry(d + 49).localTax).toBe(0);
+    expect(cry(d + 50).localTax).toBe(1);
+    expect(bodyOf(CRYPTO_TAX_DIGEST, 2)).toContain(won(d + 50));
+    // 수익 2배 → 세금 배수가 2를 아래로 뚫지 않는다
+    for (const gain of [3_000_000, 10_000_000, 50_000_000, 200_000_000]) {
+      expect(cry(gain * 2).totalTax / cry(gain).totalTax, `${gain}`).toBeGreaterThan(2);
+    }
+    expect(bodyOf(CRYPTO_TAX_DIGEST, 3)).toContain(num(cry(6_000_000).totalTax / cry(3_000_000).totalTax, 2));
+    // 분할: 회당 절감 = 공제 × 세율, 네 번째에서 0원 도달 후 포화
+    const total = 10_000_000;
+    const at = (rounds: number) => cry(Math.floor(total / rounds)).totalTax * rounds;
+    expect(at(1) - at(2)).toBe(Math.round(d * CRYPTO_TAX.TOTAL_RATE));
+    expect(at(4)).toBe(0);
+    expect(at(5)).toBe(0);
+    expect(bodyOf(CRYPTO_TAX_DIGEST, 4)).toContain(won(at(3)));
+    // 해외주식 계산기와의 1원 어긋남 — 산문이 적은 지점에서 실제로 갈린다
+    const gain = Number(bodyOf(CRYPTO_TAX_DIGEST, 6).match(/양도차익 ([\d,]+)원을 가정/)![1].replace(/,/g, ""));
+    const here = cry(gain).totalTax;
+    const there = calculateForeignStockTax({ sellAmount: gain, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 0 }).totalTax;
+    expect(there - here).toBe(1);
+    expect(bodyOf(CRYPTO_TAX_DIGEST, 6)).toContain(won(here));
+    expect(bodyOf(CRYPTO_TAX_DIGEST, 6)).toContain(won(there));
+    // 세후 수익 배수는 2배 아래에서 올라온다
+    for (const g of [5_000_000, 20_000_000, 100_000_000]) {
+      expect(cry(g * 2).netProfit / cry(g).netProfit, `${g}`).toBeLessThan(2);
+    }
+    expect(CRYPTO_TAX_DIGEST[7].h2).toContain(`${(cry(10_000_000).netProfit / cry(5_000_000).netProfit).toFixed(2)}배`);
+    // 공제 이하로 25년 분산하면 세금 0원
+    expect(cry(d).totalTax).toBe(0);
+    expect(cry(d * 25).taxableAmount).toBe(d * 24);
+    expect(bodyOf(CRYPTO_TAX_DIGEST, 9)).toContain(won(cry(d * 25).totalTax));
+  });
+
+  it("/foreign-stock-tax: 손익통산 값어치·연도 경계·환율·입력 되돌림", () => {
+    const base = fs();
+    for (const v of [won(base.netProfit), won(base.totalTax), won(base.taxableAmount)]) {
+      expect(bodyOf(FOREIGN_STOCK_TAX_DIGEST, 0)).toContain(v);
+    }
+    expect(FOREIGN_STOCK_TAX_DIGEST[0].h2).toContain(pct(base.effectiveRate, 2));
+    // 필요경비 한 줄의 값어치
+    expect(bodyOf(FOREIGN_STOCK_TAX_DIGEST, 0)).toContain(won(fs({ fees: 0 }).totalTax - base.totalTax));
+    // 손실의 값어치는 22%이고 산문이 적은 지점에서 정확히 0원이 된다
+    expect(base.totalTax - fs({ otherLosses: 5_000_000 }).totalTax).toBe(Math.round(5_000_000 * base.combinedTaxRate));
+    const zeroPoint = Number(bodyOf(FOREIGN_STOCK_TAX_DIGEST, 1).match(/손실이 ([\d,]+)원을 채워야/)![1].replace(/,/g, ""));
+    expect(fs({ otherLosses: zeroPoint }).totalTax).toBe(0);
+    expect(fs({ otherLosses: zeroPoint - 1 }).totalTax).toBeGreaterThan(0);
+    expect(fs({ otherLosses: zeroPoint + 2_000_000 }).totalTax).toBe(0);
+    // 같은 해 통산과 해를 가른 경우의 차액
+    const together = calculateForeignStockTax({ sellAmount: 20_000_000, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 10_000_000 });
+    const winYear = calculateForeignStockTax({ sellAmount: 20_000_000, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 0 });
+    const loseYear = calculateForeignStockTax({ sellAmount: 0, buyAmount: 10_000_000, fees: 0, otherGains: 0, otherLosses: 0 });
+    expect(loseYear.totalTax).toBe(0);
+    expect(FOREIGN_STOCK_TAX_DIGEST[2].h2).toContain(manwon(winYear.totalTax + loseYear.totalTax - together.totalTax));
+    // 환율 경계 — 산문이 적은 상승률 바로 위에서 세금이 처음 붙는다
+    const rise = Number(FOREIGN_STOCK_TAX_DIGEST[3].h2.match(/환율 ([\d.]+)%/)![1]) / 100;
+    const sellAt = (r: number) => Math.round(FOREIGN_BASE.buyAmount * (1 + r));
+    expect(fs({ sellAmount: sellAt(rise) }).totalTax).toBe(0);
+    expect(fs({ sellAmount: sellAt(rise) + 100 }).totalTax).toBeGreaterThan(0);
+    // 매도금액만으로는 세금이 정해지지 않는다
+    const sameTax = fs({ sellAmount: 500_000_000, buyAmount: 480_000_000 });
+    expect(sameTax.totalTax).toBe(base.totalTax);
+    expect(bodyOf(FOREIGN_STOCK_TAX_DIGEST, 5)).toContain(won(sameTax.totalTax));
+    // sanitize: 범위 밖·소수점·음수가 잘리지 않고 기본값으로 되돌아간다
+    for (const bad of [70_000_000.5, 60_000_000_000, -1]) {
+      expect(calculateForeignStockTax({ ...FOREIGN_BASE, sellAmount: bad }).totalTax, `${bad}`).toBe(base.totalTax);
+    }
+    expect(calculateForeignStockTax({ ...FOREIGN_BASE, sellAmount: 70_000_000 }).totalTax).not.toBe(base.totalTax);
+    expect(bodyOf(FOREIGN_STOCK_TAX_DIGEST, 6)).toContain(won(calculateForeignStockTax({ ...FOREIGN_BASE, sellAmount: 70_000_000 }).totalTax));
+    // 다른 종목 이익과 매도금액 인상이 완전히 같다
+    expect(fs({ sellAmount: FOREIGN_BASE.sellAmount + 10_000_000 }).totalTax).toBe(fs({ otherGains: 10_000_000 }).totalTax);
+    // 같은 1,000만원의 한계 세부담이 공제 소진 여부로 갈린다
+    const rich = fs({ otherGains: 10_000_000 }).totalTax - base.totalTax;
+    const thinBase = fs({ otherLosses: 18_500_000 });
+    const thin = fs({ otherLosses: 18_500_000, otherGains: 10_000_000 }).totalTax - thinBase.totalTax;
+    expect(thinBase.totalTax).toBe(0);
+    expect(thin).toBeLessThan(rich);
+    expect(bodyOf(FOREIGN_STOCK_TAX_DIGEST, 8)).toContain(won(rich));
+    expect(bodyOf(FOREIGN_STOCK_TAX_DIGEST, 8)).toContain(won(thin));
+  });
+});
+
+// 세율·공제 상수를 따라 산문이 다시 쓰이므로, 엔진에서 값을 읽어 비교하는 위 테스트는
+// 상수가 틀려도 산문과 함께 움직여 통과한다. 이자·양도 네 페이지의 앵커를 여기 한 곳에 리터럴로 둔다.
+describe("파생 다이제스트 — 이자·양도 엔진 리터럴 앵커", () => {
+  it("이자소득세 15.4%·조합 5.9%·양도 22%·공제 250만원이 바뀌면 여기가 먼저 red가 된다", () => {
+    // 적금 월 30만원·12개월·연 3.5% — 이자 = 300,000 × (0.035/12) × 78
+    const sav = calculateSavingsInterest(SAVINGS_BASE);
+    expect(sav.totalPrincipal).toBe(3_600_000);
+    expect(sav.grossInterest).toBe(68_250);
+    expect(sav.tax).toBe(10_511);
+    expect(sav.netInterest).toBe(57_739);
+    expect(calculateSavingsInterest({ ...SAVINGS_BASE, taxType: "preferential" }).netInterest).toBe(64_223);
+    expect(calculateSavingsInterest({ ...SAVINGS_BASE, taxType: "tax_free" }).netInterest).toBe(68_250);
+    expect(INTEREST_TAX.NORMAL_RATE).toBe(0.154);
+    // 예금 1,000만원·12개월·연 3.5% — 만기일시와 월이자식이 4원 갈린다
+    const atMaturity = calculateDepositInterest(DEPOSIT_BASE);
+    expect(atMaturity.grossInterest).toBe(350_000);
+    expect(atMaturity.tax).toBe(53_900);
+    expect(atMaturity.netInterest).toBe(296_100);
+    const perMonth = calculateDepositInterest({ ...DEPOSIT_BASE, paymentType: "monthly" });
+    expect(perMonth.monthlyInterestGross).toBe(29_167);
+    expect(perMonth.monthlyInterestNet).toBe(24_675);
+    expect(perMonth.grossInterest).toBe(350_004);
+    expect(perMonth.netInterest).toBe(296_103);
+    // 가상자산 1,000만원 → 1,500만원 — (500만 − 250만) × 20% + × 2%
+    const crypto = calculateCryptoTax(CRYPTO_BASE.purchaseAmount, CRYPTO_BASE.saleAmount, CRYPTO_BASE.expenses);
+    expect(crypto.taxableAmount).toBe(2_500_000);
+    expect(crypto.incomeTax).toBe(500_000);
+    expect(crypto.localTax).toBe(50_000);
+    expect(crypto.totalTax).toBe(550_000);
+    expect(CRYPTO_TAX.BASIC_DEDUCTION).toBe(2_500_000);
+    // 해외주식 기본값 — (1,950만 − 250만) × 22%
+    const foreign = calculateForeignStockTax(FOREIGN_BASE);
+    expect(foreign.gain).toBe(19_500_000);
+    expect(foreign.taxableAmount).toBe(17_000_000);
+    expect(foreign.incomeTax).toBe(3_400_000);
+    expect(foreign.localTax).toBe(340_000);
+    expect(foreign.totalTax).toBe(3_740_000);
+  });
+});
+
 // 산문 서술(부등호 방향·인과·무조건 단언)은 숫자 재계산만으로는 검증되지 않는다.
 // 09-06 QA가 찾은 오류 그대로를 반증 형태로 못박아, 문장이 되돌아가면 red가 나게 한다.
 describe("파생 다이제스트 — 산문 서술 반증", () => {
@@ -615,6 +895,196 @@ describe("파생 다이제스트 — 산문 서술 반증", () => {
     const rateRatio = ISA_TAX.NORMAL_ACCOUNT_TAX_RATE / ISA_TAX.SEPARATE_TAX_RATE;
     expect(heavy.normalTax / heavy.isaTax).toBeGreaterThan(rateRatio);
     expect(ISA_DIGEST[6].h2).not.toContain("수렴");
+  });
+});
+
+// 09-06 QA가 찾은 오류 네 가지(부등호 반대·무조건 단언·한 칸 어긋난 세율·h3와 본문 모순)를
+// 이자·양도 네 페이지에도 그대로 적용한다. 여기서 검사하는 것은 숫자가 아니라 문장이 주장하는 관계다.
+describe("파생 다이제스트 — 산문 서술 반증 (이자·양도)", () => {
+  const sav = (patch: Partial<typeof SAVINGS_BASE> = {}) => calculateSavingsInterest({ ...SAVINGS_BASE, ...patch });
+  const dep = (patch: Partial<typeof DEPOSIT_BASE> = {}) => calculateDepositInterest({ ...DEPOSIT_BASE, ...patch });
+  const cry = (gain: number) => calculateCryptoTax(0, gain, 0);
+  const fs = (patch: Partial<typeof FOREIGN_BASE> = {}) => calculateForeignStockTax({ ...FOREIGN_BASE, ...patch });
+  const annualised = (months: number) => (sav({ months }).effectiveRate * 12) / months;
+
+  it("savings#2: 연환산 비율은 단조 감소하고 세후 배수의 절반을 뚫지 않는다", () => {
+    // "기간을 늘릴수록 내려간다"는 방향 주장 — 600개월까지 한 번도 뒤집히지 않아야 성립한다.
+    for (let months = 2; months <= 600; months += 1) {
+      expect(annualised(months), `${months}`).toBeLessThan(annualised(months - 1));
+    }
+    // "그 아래로 내려가는 기간은 없다"는 하한 주장 — 하한은 명목세율의 절반이 아니라 세후 배수의 절반이다.
+    const base = sav();
+    const floor = (1 - base.tax / base.grossInterest) / 2;
+    expect(annualised(600) / (SAVINGS_BASE.annualRate / 100)).toBeGreaterThan(floor);
+    expect(floor).toBeLessThan(0.5);
+    expect(SAVINGS_INTEREST_DIGEST[1].body).toContain(pct(floor, 1));
+    // 실제로 접근하기만 할 뿐 도달하지 않으므로 "수렴"·"멈춘다"로 마무리하면 안 된다.
+    expect(SAVINGS_INTEREST_DIGEST[1].h2).not.toContain("수렴");
+    expect(SAVINGS_INTEREST_DIGEST[1].h2).not.toContain("멈춘");
+  });
+
+  it("savings#4: 한계 대 평균 2배는 기간과 무관한 항등식이다", () => {
+    for (const months of [1, 2, 6, 12, 36, 120, 360]) {
+      const at = sav({ months });
+      const next = sav({ months: months + 1 });
+      const marginal = (next.grossInterest - at.grossInterest) / SAVINGS_BASE.monthlyDeposit;
+      const average = at.grossInterest / at.totalPrincipal;
+      expect(marginal / average, `${months}`).toBeCloseTo(2, 9);
+    }
+    // "정확히"라고 쓴 이상 반올림으로 깨지는 조합이 없어야 한다.
+    expect(SAVINGS_INTEREST_DIGEST[3].body).toContain("정확히");
+  });
+
+  it("savings#5: 과세 혜택의 금리 환산값은 고정이 아니라 금리에 비례한다", () => {
+    const bumpAt = (rate: number) => {
+      const target = sav({ annualRate: rate, taxType: "tax_free" }).netInterest;
+      let low = rate;
+      let high = rate * 2;
+      for (let i = 0; i < 60; i += 1) {
+        const mid = (low + high) / 2;
+        if (sav({ annualRate: mid, taxType: "normal" }).netInterest < target) low = mid;
+        else high = mid;
+      }
+      return (low + high) / 2 - rate;
+    };
+    expect(bumpAt(2)).toBeLessThan(bumpAt(SAVINGS_BASE.annualRate));
+    expect(bumpAt(SAVINGS_BASE.annualRate)).toBeLessThan(bumpAt(5));
+    // 그래서 "0.6371%p 올린 것과 같다"는 h3는 반드시 기준 금리와 함께 읽혀야 한다.
+    expect(SAVINGS_INTEREST_DIGEST[4].body).toContain("연 2%");
+    expect(SAVINGS_INTEREST_DIGEST[4].body).toContain("연 5%");
+  });
+
+  it("savings#6: 예금 대 적금 배수는 2배로 올라가되 닿지 않는다", () => {
+    let previous = 0;
+    for (let months = 1; months <= 600; months += 1) {
+      const ratio =
+        calculateDepositInterest({
+          principal: SAVINGS_BASE.monthlyDeposit * months,
+          months,
+          annualRate: SAVINGS_BASE.annualRate,
+          taxType: "normal",
+          paymentType: "maturity",
+        }).grossInterest / sav({ months }).grossInterest;
+      expect(ratio, `${months}`).toBeLessThan(2);
+      if (months > 1) expect(ratio, `${months}`).toBeGreaterThan(previous);
+      previous = ratio;
+    }
+    expect(SAVINGS_INTEREST_DIGEST[5].h2).not.toContain("2배다");
+  });
+
+  it("deposit#2: 월이자 방식이 늘 유리하지는 않다", () => {
+    let cheaper = 0;
+    for (let principal = 1_000_000; principal <= 100_000_000; principal += 100_000) {
+      if (dep({ principal, paymentType: "monthly" }).grossInterest < dep({ principal }).grossInterest) cheaper += 1;
+    }
+    expect(cheaper).toBeGreaterThan(0);
+    for (const finding of [DEPOSIT_INTEREST_DIGEST[0], DEPOSIT_INTEREST_DIGEST[1]]) {
+      expect(`${finding.h2} ${finding.body}`).not.toContain("언제나");
+      expect(`${finding.h2} ${finding.body}`).not.toContain("항상");
+    }
+    // 4원 격차는 기본 원금에서만 성립하므로 h3가 아니라 본문이 조건을 밝혀야 한다.
+    expect(DEPOSIT_INTEREST_DIGEST[0].body).toContain(won(DEPOSIT_BASE.principal));
+  });
+
+  it("deposit#6: 실효 수익률 역전은 지표 탓이고 연환산하면 순서가 돌아온다", () => {
+    const rows = [
+      { rate: 3.5, months: 36 },
+      { rate: 5, months: 12 },
+      { rate: 8, months: 6 },
+    ].map(({ rate, months }) => {
+      const r = dep({ principal: 30_000_000, annualRate: rate, months });
+      return { rate, months, effective: r.effectiveRate, annual: (r.effectiveRate * 12) / months };
+    });
+    // 표면금리 오름차순으로 실효 수익률은 내려간다(역전).
+    expect(rows[0].effective).toBeGreaterThan(rows[1].effective);
+    expect(rows[1].effective).toBeGreaterThan(rows[2].effective);
+    // 연환산하면 표면금리와 같은 방향으로 되돌아온다.
+    expect(rows[0].annual).toBeLessThan(rows[1].annual);
+    expect(rows[1].annual).toBeLessThan(rows[2].annual);
+    for (const row of rows) {
+      expect(DEPOSIT_INTEREST_DIGEST[5].body).toContain(pct(row.effective, 4));
+      expect(DEPOSIT_INTEREST_DIGEST[5].body).toContain(pct(row.annual, 4));
+    }
+  });
+
+  it("crypto#2: 실효세율은 22%에 닿지 않지만 어디서도 멈추지 않는다", () => {
+    expect(cry(20_000_000_000).effectiveRate).toBeGreaterThan(cry(10_000_000_000).effectiveRate);
+    expect(cry(20_000_000_000).effectiveRate).toBeLessThan(CRYPTO_TAX.TOTAL_RATE);
+    expect(CRYPTO_TAX_DIGEST[1].h2).not.toContain("멈춘");
+    expect(CRYPTO_TAX_DIGEST[1].body).not.toContain("수렴");
+  });
+
+  it("crypto#5: 회당 절감이 같다는 단언은 나눠떨어지지 않는 분할에서 깨진다", () => {
+    const total = 10_000_000;
+    const at = (rounds: number) => cry(Math.floor(total / rounds)).totalTax * rounds;
+    const perRound = at(1) - at(2);
+    expect(at(2) - at(3)).not.toBe(perRound);
+    // 그러므로 본문은 어긋난 폭과 그 원인(잘린 끝자리)을 함께 적어야 한다.
+    expect(CRYPTO_TAX_DIGEST[4].body).toContain(won(at(2) - at(3) - perRound));
+    expect(CRYPTO_TAX_DIGEST[4].body).toContain(won(Math.floor(total / 3) * 3));
+  });
+
+  it("crypto#6: 필요경비 1원의 값어치는 차익에 따라 갈린다", () => {
+    const worths = new Set<number>();
+    for (let gain = 3_000_000; gain < 3_000_100; gain += 1) {
+      worths.add(cry(gain).totalTax - calculateCryptoTax(0, gain, 1).totalTax);
+    }
+    expect(worths.size).toBeGreaterThan(1);
+    expect(worths.has(0)).toBe(true);
+    // h3가 "1원이 2원을 줄인다"로 단정하면 위 반례에서 거짓이 되므로 폭을 밝혀야 한다.
+    expect(CRYPTO_TAX_DIGEST[5].h2).toContain("0원일 때도");
+    for (const worth of worths) expect(CRYPTO_TAX_DIGEST[5].body).toContain(won(worth));
+  });
+
+  it("foreign#2: 손실의 22% 값어치는 공제선 아래에서 0으로 끊긴다", () => {
+    const base = fs();
+    const worthOf = (loss: number) => base.totalTax - fs({ otherLosses: loss }).totalTax;
+    expect(worthOf(5_000_000) - worthOf(4_000_000)).toBe(Math.round(1_000_000 * base.combinedTaxRate));
+    const beyond = worthOf(25_000_000) - worthOf(24_000_000);
+    expect(beyond).toBe(0);
+    // "손실 1원이 0.22원"이라는 단언이 어디서 끝나는지 본문이 밝혀야 한다.
+    expect(FOREIGN_STOCK_TAX_DIGEST[1].body).toContain("값어치가 0원");
+    expect(FOREIGN_STOCK_TAX_DIGEST[1].h2).not.toContain("언제나");
+  });
+
+  it("foreign#3: 이월공제가 없으므로 실현 순서는 결과를 바꾸지 못한다", () => {
+    const win = 20_000_000;
+    const lose = 10_000_000;
+    const winFirst =
+      calculateForeignStockTax({ sellAmount: win, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 0 }).totalTax +
+      calculateForeignStockTax({ sellAmount: 0, buyAmount: lose, fees: 0, otherGains: 0, otherLosses: 0 }).totalTax;
+    const loseFirst =
+      calculateForeignStockTax({ sellAmount: 0, buyAmount: lose, fees: 0, otherGains: 0, otherLosses: 0 }).totalTax +
+      calculateForeignStockTax({ sellAmount: win, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 0 }).totalTax;
+    expect(winFirst).toBe(loseFirst);
+    const together = calculateForeignStockTax({ sellAmount: win, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: lose });
+    expect(together.totalTax).toBeLessThan(winFirst);
+    expect(FOREIGN_STOCK_TAX_DIGEST[2].body).toContain("순서");
+  });
+
+  it("foreign#5: 계좌를 나눈 절감액이 공제 하나 값인 것은 양쪽이 공제를 다 쓸 때뿐이다", () => {
+    const savedAt = (netGain: number) => {
+      const alone = calculateForeignStockTax({ sellAmount: netGain, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 0 });
+      const half = calculateForeignStockTax({ sellAmount: netGain / 2, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 0 });
+      return alone.totalTax - half.totalTax * 2;
+    };
+    const full = savedAt(20_000_000);
+    const small = savedAt(4_000_000);
+    expect(full).toBe(Math.round(fs().basicDeduction * fs().combinedTaxRate));
+    expect(small).toBeLessThan(full);
+    expect(FOREIGN_STOCK_TAX_DIGEST[4].body).toContain(won(small));
+    expect(FOREIGN_STOCK_TAX_DIGEST[4].body).toContain("다만");
+  });
+
+  it("foreign#9: 추가 이익의 한계 세부담은 남은 공제에 따라 갈린다", () => {
+    const base = fs();
+    const rich = fs({ otherGains: 10_000_000 }).totalTax - base.totalTax;
+    const thin = fs({ otherLosses: 18_500_000, otherGains: 10_000_000 }).totalTax - fs({ otherLosses: 18_500_000 }).totalTax;
+    expect(rich).toBe(Math.round(10_000_000 * base.combinedTaxRate));
+    expect(thin).toBeLessThan(rich);
+    // 22%를 무조건 곱하는 어림셈이 깨지는 구간이라, 본문이 두 비율을 모두 적어야 한다.
+    expect(FOREIGN_STOCK_TAX_DIGEST[8].body).toContain(pct(rich / 10_000_000, 0));
+    expect(FOREIGN_STOCK_TAX_DIGEST[8].body).toContain(pct(thin / 10_000_000, 2));
   });
 });
 
