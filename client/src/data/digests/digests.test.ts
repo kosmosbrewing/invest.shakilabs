@@ -271,9 +271,9 @@ describe("파생 다이제스트 — 인용 수치 엔진 재계산 일치", () 
     for (const v of [won(base.availableDeduction), won(base.taxableAmount), won(base.totalTax)]) {
       expect(bodyOf(GIFT_TAX_DIGEST, 0)).toContain(v);
     }
-    // 실효세율은 구간세율의 정확히 3분의 2 (기본 가정에서)
-    expect(base.effectiveRate / base.appliedRate).toBeCloseTo(2 / 3, 10);
-    expect(GIFT_TAX_DIGEST[0].h2).toContain("3분의 2");
+    // 실효세율 대 적용세율 비율 — 신고세액공제 3%가 붙은 뒤의 값을 h3가 그대로 인용한다
+    expect(base.effectiveRate / base.appliedRate).toBeCloseTo((2 / 3) * 0.97, 10);
+    expect(GIFT_TAX_DIGEST[0].h2).toContain(pct(base.effectiveRate / base.appliedRate, 1));
     // 공제 4,000만원의 값어치가 구간에 따라 4배로 벌어진다
     const smallGap = g({ giftAmount: 100_000_000, relationship: "other" }).totalTax - g({ giftAmount: 100_000_000 }).totalTax;
     const bigGap = g({ giftAmount: 3_000_000_000, relationship: "other" }).totalTax - g({ giftAmount: 3_000_000_000 }).totalTax;
@@ -307,10 +307,18 @@ describe("파생 다이제스트 — 인용 수치 엔진 재계산 일치", () 
     const spouse = g({ giftAmount: 1_000_000_000, relationship: "spouse" });
     const child = g({ giftAmount: 1_000_000_000 });
     expect(GIFT_TAX_DIGEST[6].h2).toContain(manwon(child.totalTax - spouse.totalTax));
-    // 실효세율 상한: 고정 감액이 증여액과 무관하게 일정하다
-    const gapAt50 = 5_000_000_000 * 0.5 - g({ giftAmount: 5_000_000_000 }).totalTax;
-    const gapAt100 = 10_000_000_000 * 0.5 - g({ giftAmount: 10_000_000_000 }).totalTax;
+    // 실효세율 상한: 천장은 최고세율이 아니라 최고세율 × (1 − 신고세액공제율)이고,
+    // 그 천장선에서 잰 고정 감액만이 증여액과 무관하게 일정하다.
+    const top = g({ giftAmount: 10_000_000_000 });
+    const ceiling = top.appliedRate * (1 - top.filingDeduction / top.calculatedTax);
+    expect(ceiling).toBeCloseTo(0.485, 10);
+    const gapAt50 = Math.round(5_000_000_000 * ceiling - g({ giftAmount: 5_000_000_000 }).totalTax);
+    const gapAt100 = Math.round(10_000_000_000 * ceiling - top.totalTax);
     expect(gapAt50).toBe(gapAt100);
+    // 최고세율 기준으로 재면 더 이상 일정하지 않다 — 산문이 50%를 천장으로 쓰면 안 되는 이유다.
+    expect(5_000_000_000 * top.appliedRate - g({ giftAmount: 5_000_000_000 }).totalTax).not.toBe(
+      10_000_000_000 * top.appliedRate - top.totalTax,
+    );
     expect(bodyOf(GIFT_TAX_DIGEST, 8)).toContain(manwon(gapAt100));
   });
 
@@ -510,9 +518,11 @@ describe("파생 다이제스트 — 인용 수치 엔진 재계산 일치", () 
 // 그때 값을 고치는 행위가 곧 "개정을 확인했다"는 서명이 된다.
 describe("파생 다이제스트 — 엔진 리터럴 앵커", () => {
   it("상수가 바뀌면 여기가 먼저 red가 된다", () => {
-    // 증여 3억(성년 자녀) — (3억 − 5천만) × 20% − 누진공제 1천만
+    // 증여 3억(성년 자녀) — (3억 − 5천만) × 20% − 누진공제 1천만 = 4,000만, 신고세액공제 3% 후 3,880만
     expect(calculateGiftTax(GIFT_BASE).taxableAmount).toBe(250_000_000);
-    expect(calculateGiftTax(GIFT_BASE).totalTax).toBe(40_000_000);
+    expect(calculateGiftTax(GIFT_BASE).calculatedTax).toBe(40_000_000);
+    expect(calculateGiftTax(GIFT_BASE).filingDeduction).toBe(1_200_000);
+    expect(calculateGiftTax(GIFT_BASE).totalTax).toBe(38_800_000);
     // 상속 20억(배우자·자녀 2명·금융 5억) — 산출세액과 신고세액공제 3%를 따로 못박는다
     const inh = calculateInheritanceTax(INHERITANCE_BASE);
     expect(inh.taxBase).toBe(540_000_000);
@@ -523,6 +533,10 @@ describe("파생 다이제스트 — 엔진 리터럴 앵커", () => {
     const skip = calculateGiftTax({ ...GIFT_BASE, giftAmount: 1_000_000_000, isGenerationSkipping: true });
     expect(skip.basicTax).toBe(225_000_000);
     expect(skip.surcharge).toBe(67_500_000);
+    // 제69조② 괄호: 제57조 가산액도 신고세액공제 대상이므로 기본세액 + 가산액 전체에 3%가 붙는다
+    expect(skip.calculatedTax).toBe(292_500_000);
+    expect(skip.filingDeduction).toBe(8_775_000);
+    expect(skip.totalTax).toBe(283_725_000);
     // ISA 분리과세 9.9% / 일반계좌 15.4%
     const isa = calculateIsaCompare(12_000_000, 0.05, 3);
     expect(isa.totalProfit).toBe(3_721_500);
@@ -601,5 +615,29 @@ describe("파생 다이제스트 — 산문 서술 반증", () => {
     const rateRatio = ISA_TAX.NORMAL_ACCOUNT_TAX_RATE / ISA_TAX.SEPARATE_TAX_RATE;
     expect(heavy.normalTax / heavy.isaTax).toBeGreaterThan(rateRatio);
     expect(ISA_DIGEST[6].h2).not.toContain("수렴");
+  });
+});
+
+// 상증세법 제69조는 상속세(①)와 증여세(②)에 똑같이 100분의 3 신고세액공제를 준다.
+// 한쪽에만 구현돼 있으면 그 세목만 3% 과다 계산된다 — 대칭을 게이트로 박는다.
+describe("신고세액공제 3% — 상속·증여 대칭", () => {
+  it("두 세목 모두 산출세액의 3%를 공제한다", () => {
+    const gift = calculateGiftTax({ ...GIFT_BASE, giftAmount: 1_000_000_000 });
+    const inh = calculateInheritanceTax(INHERITANCE_BASE);
+    for (const r of [gift, inh]) {
+      expect(r.filingDeduction).toBe(Math.round(r.calculatedTax * 0.03));
+      expect(r.totalTax).toBe(r.calculatedTax - r.filingDeduction);
+    }
+    // 증여 10억(성년 자녀): 225,000,000 × 0.97
+    expect(gift.calculatedTax).toBe(225_000_000);
+    expect(gift.totalTax).toBe(218_250_000);
+  });
+
+  it("제57조 세대생략 가산액도 공제 대상에 포함된다", () => {
+    const skip = calculateGiftTax({ ...GIFT_BASE, giftAmount: 1_000_000_000, isGenerationSkipping: true });
+    expect(skip.calculatedTax).toBe(skip.basicTax + skip.surcharge);
+    // 가산액을 빼고 기본세액에만 3%를 물리면 6,750,000원이 되므로 여기서 갈린다
+    expect(skip.filingDeduction).toBe(8_775_000);
+    expect(skip.filingDeduction).not.toBe(Math.round(skip.basicTax * 0.03));
   });
 });

@@ -13,6 +13,8 @@ const props = defineProps<{
     taxableAmount: number;
     basicTax: number;
     surcharge: number;
+    calculatedTax: number;
+    filingDeduction: number;
     totalTax: number;
     afterTaxGift: number;
     effectiveRate: number;
@@ -32,7 +34,7 @@ const metricRows = computed(() => [
     description: "공제 후 세율이 적용되는 금액",
   },
   {
-    label: "산출세액",
+    label: "기본세액",
     value: formatWon(props.result.basicTax),
     description: `적용 세율 ${formatPercent(props.result.appliedRate, 0)}`,
     tone: "danger",
@@ -42,6 +44,12 @@ const metricRows = computed(() => [
     value: formatWon(props.result.surcharge),
     description: props.result.surcharge > 0 ? "세대생략 가산세 30%" : "가산세 없음",
     tone: props.result.surcharge > 0 ? "warning" : "default",
+  },
+  {
+    label: "산출세액",
+    value: formatWon(props.result.calculatedTax),
+    description: `신고세액공제 ${formatWon(props.result.filingDeduction)} (3%)`,
+    tone: "danger",
   },
   {
     label: "세후 이전 금액",
@@ -80,7 +88,7 @@ const segments = computed(() => [
       <ShBreakdownBar label="증여 금액의 최종 구성" :segments="segments" :format-value="formatWon" surface="outlined" />
 
       <p class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">
-        실효세율은 입력한 총 증여금액 대비 세금 비율입니다. 신고세액공제, 평가방법, 채무인수 조건은 반영하지 않았습니다.
+        기한 내 신고세액공제(3%)를 반영했습니다. 실효세율은 입력한 총 증여금액 대비 세금 비율이며, 혼인·출산 증여재산공제와 평가방법, 채무인수 조건은 반영하지 않았습니다.
       </p>
     </div>
   </div>
