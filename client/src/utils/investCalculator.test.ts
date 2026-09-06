@@ -321,7 +321,24 @@ describe("investCalculator", () => {
 
       expect(result.availableDeduction).toBe(50_000_000);
       expect(result.taxableAmount).toBe(250_000_000);
-      expect(result.totalTax).toBe(40_000_000);
+      expect(result.calculatedTax).toBe(40_000_000);
+      // 상증세법 제69조② 신고세액공제 3% — 4,000만 × 0.97
+      expect(result.filingDeduction).toBe(1_200_000);
+      expect(result.totalTax).toBe(38_800_000);
+    });
+
+    it("기한 내 신고세액공제 3%를 상속세와 같은 방식으로 뺀다", () => {
+      const result = calculateGiftTax({
+        giftAmount: 1_000_000_000,
+        priorDeductionUsed: 0,
+        relationship: "adult-child",
+        isGenerationSkipping: false,
+      });
+
+      // (10억 − 5천만) × 30% − 누진공제 6천만 = 2억 2,500만
+      expect(result.calculatedTax).toBe(225_000_000);
+      expect(result.filingDeduction).toBe(6_750_000);
+      expect(result.totalTax).toBe(218_250_000);
     });
 
     it("세대생략 증여는 30% 가산세를 더한다", () => {
@@ -333,7 +350,10 @@ describe("investCalculator", () => {
       });
 
       expect(result.surcharge).toBe(12_000_000);
-      expect(result.totalTax).toBe(52_000_000);
+      // 제69조②는 "제57조에 따라 산출세액에 가산하는 금액을 포함한다" — 가산액도 3% 공제 대상이다
+      expect(result.calculatedTax).toBe(52_000_000);
+      expect(result.filingDeduction).toBe(1_560_000);
+      expect(result.totalTax).toBe(50_440_000);
     });
   });
 });

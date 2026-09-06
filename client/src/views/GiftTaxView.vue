@@ -63,7 +63,7 @@ const faqJsonLd = {
       </div>
       <div class="retro-panel-content space-y-2">
         <p class="text-body text-muted-foreground">관계별 10년 합산 공제와 누진세율을 기준으로 예상 세액을 계산합니다.</p>
-        <p class="text-tiny text-muted-foreground">배우자, 자녀, 부모, 기타 친족별 공제 차이와 세대생략 가산세까지 확인할 수 있습니다.</p>
+        <p class="text-tiny text-muted-foreground">배우자, 자녀, 부모, 기타 친족별 공제 차이와 세대생략 가산세, 기한 내 신고 시 신고세액공제 3%까지 확인할 수 있습니다.</p>
       </div>
     </section>
 

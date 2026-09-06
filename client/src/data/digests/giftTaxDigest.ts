@@ -6,7 +6,7 @@
 import type { GiftTaxInput } from "@/lib/giftTaxValidators";
 import { calculateGiftTax } from "@/utils/giftTaxCalculator";
 import { calculateInheritanceTax } from "@/utils/inheritanceTaxCalculator";
-import { type Finding, eul, eun, ga, imnida, manwon, pct, pp, ro, times, wa, won } from "./format";
+import { type Finding, eul, eun, ga, ida, imnida, manwon, pct, pp, ro, times, wa, won } from "./format";
 
 /**
  * 화면 기본값과 같은 조건: 성년 자녀에게 3억원, 과거 10년 기공제 사용 0원, 세대생략 아님.
@@ -29,13 +29,16 @@ const run = (patch: Partial<typeof GIFT_BASE> = {}) => calculateGiftTax({ ...GIF
 function effectiveVsApplied(): Finding {
   const base = run();
   const at5 = run({ giftAmount: 500_000_000 });
+  // 세 겹으로 깎인다: 증여재산공제(앞) → 누진공제(뒤) → 신고세액공제 3%(맨 뒤).
+  // 앞의 둘은 정액이지만 신고세액공제는 세액에 비례하므로, 같은 구간 안에서도 과대평가 폭이 조금씩 벌어진다.
+  const bracketDeduction = base.taxableAmount * base.appliedRate - base.calculatedTax;
   return {
-    h2: `증여 ${manwon(GIFT_BASE.giftAmount)}의 실효세율은 적용세율의 3분의 2다`,
+    h2: `증여 ${manwon(GIFT_BASE.giftAmount)}의 실효세율은 적용세율의 ${ida(pct(base.effectiveRate / base.appliedRate, 1))}`,
     body:
-      `성년 자녀에게 ${manwon(GIFT_BASE.giftAmount)}, 과거 10년 기공제 사용 0원을 가정하면 증여재산공제 ${won(base.availableDeduction)}을 뺀 과세표준이 ${won(base.taxableAmount)}, 산출세액이 ${imnida(won(base.totalTax))}. ` +
-      `적용 구간은 ${pct(base.appliedRate, 0)}인데 실제로 부담하는 비율은 ${pct(base.effectiveRate)}에 그치는데, 공제가 앞에서 ${eul(won(base.availableDeduction))} 덜어 내고 누진공제가 뒤에서 ${eul(won(base.taxableAmount * base.appliedRate - base.totalTax))} 다시 빼기 때문입니다. ` +
+      `성년 자녀에게 ${manwon(GIFT_BASE.giftAmount)}, 과거 10년 기공제 사용 0원을 가정하면 증여재산공제 ${won(base.availableDeduction)}을 뺀 과세표준이 ${won(base.taxableAmount)}, 산출세액이 ${won(base.calculatedTax)}, 기한 내 신고 시 3%인 ${won(base.filingDeduction)}까지 빼면 낼 세금이 ${imnida(won(base.totalTax))}. ` +
+      `적용 구간은 ${pct(base.appliedRate, 0)}인데 실제로 부담하는 비율은 ${pct(base.effectiveRate)}에 그치는데, 공제가 앞에서 ${eul(won(base.availableDeduction))} 덜어 내고 뒤에서 누진공제 ${wa(won(bracketDeduction))} 신고세액공제 ${ga(won(base.filingDeduction))} 한 번씩 더 깎기 때문입니다. ` +
       `그래서 같은 ${pct(base.appliedRate, 0)} 구간 안에서는 증여액을 ${manwon(500_000_000)}까지 올려도 실효세율이 ${pct(at5.effectiveRate)}에 머물러 구간세율에 닿지 못합니다. ` +
-      `즉 "20% 구간이니 20%를 낸다"는 계산은 이 구간에서 언제나 ${manwon(base.taxableAmount * base.appliedRate - base.totalTax + base.availableDeduction * base.appliedRate)}만큼 과대평가입니다.`,
+      `즉 "20% 구간이니 20%를 낸다"는 계산은 ${manwon(GIFT_BASE.giftAmount)}에서 ${won(GIFT_BASE.giftAmount * base.appliedRate - base.totalTax)}, ${manwon(500_000_000)}에서 ${won(500_000_000 * at5.appliedRate - at5.totalTax)}만큼 과대평가인데, 앞의 두 공제가 정액인 것과 달리 신고세액공제만 세액에 비례해 커지므로 구간 안에서도 폭이 조금씩 벌어집니다.`,
   };
 }
 
@@ -67,7 +70,7 @@ function bracketEdgeIsFlat(): Finding {
     h2: `누진 구간 경계에는 계단이 없고 한계세율만 한 칸 오른다`,
     body:
       `성년 자녀·기공제 0원 가정으로 과세표준을 구간 경계에 정확히 맞춰 보면 ${manwon(e1.taxBase)} 경계에서 ${won(e1.at.totalTax)}, ${manwon(e2.taxBase)} 경계에서 ${won(e2.at.totalTax)}, ${manwon(e3.taxBase)} 경계에서 ${eul(won(e3.at.totalTax))} 냅니다. ` +
-      `여기서 1원을 더 받아도 세액은 각각 ${won(e1.over.totalTax)}·${won(e2.over.totalTax)}·${ro(won(e3.over.totalTax))} 그대로인데, 누진공제 ${won(e1.taxBase * e2.at.appliedRate - e1.at.totalTax)}·${won(e2.taxBase * e3.at.appliedRate - e2.at.totalTax)}·${ga(won(e3.taxBase * e3.over.appliedRate - e3.at.totalTax))} 딱 그 계단만큼을 상쇄하도록 정해진 값이기 때문입니다. ` +
+      `여기서 1원을 더 받아도 세액은 각각 ${won(e1.over.totalTax)}·${won(e2.over.totalTax)}·${ro(won(e3.over.totalTax))} 그대로인데, 누진공제 ${won(e1.taxBase * e2.at.appliedRate - e1.at.calculatedTax)}·${won(e2.taxBase * e3.at.appliedRate - e2.at.calculatedTax)}·${ga(won(e3.taxBase * e3.over.appliedRate - e3.at.calculatedTax))} 딱 그 계단만큼을 상쇄하도록 정해진 값이기 때문입니다. ` +
       `대신 경계를 넘은 다음 1원부터의 한계세율은 ${pct(e1.over.appliedRate, 0)}에서 ${pct(e2.over.appliedRate, 0)}, ${ro(pct(e3.over.appliedRate, 0))} 한 칸씩 올라가는데, 바로 앞에서 인용한 누진공제 세 값이 각각 그 구간에 붙어 있는 값이기 때문입니다. ` +
       `따라서 "경계를 1원 넘기면 세금이 왈칵 뛴다"는 걱정은 근거가 없고, 실제로 주의할 것은 그 위로 얹는 금액의 단가가 달라진다는 점입니다.`,
   };
@@ -104,7 +107,7 @@ function generationSkipBeatsTwoHops(): Finding {
   return {
     h2: `세대생략 ${pct(skip.surcharge / skip.basicTax, 0)} 가산을 물어도 2단 증여보다 싸다`,
     body:
-      `조부모가 손자녀에게 ${manwon(amount)}을 바로 넘긴다고 가정하면 기본세액 ${manwon(skip.basicTax)}에 가산 ${ga(manwon(skip.surcharge))} 붙어 ${imnida(manwon(skip.totalTax))}. ` +
+      `조부모가 손자녀에게 ${manwon(amount)}을 바로 넘긴다고 가정하면 기본세액 ${manwon(skip.basicTax)}에 가산 ${ga(manwon(skip.surcharge))} 붙어 산출세액이 ${manwon(skip.calculatedTax)}, 여기서 기한 내 신고 시 3%인 ${eul(won(skip.filingDeduction))} 빼면 ${imnida(won(skip.totalTax))}. ` +
       `같은 돈을 자녀에게 한 번(${manwon(hop1.totalTax)}) 준 뒤 세후 ${eul(manwon(amount - hop1.totalTax))} 다시 손자녀에게 넘기면(${manwon(hop2.totalTax)}) 합계가 ${ro(manwon(twoHop))} 불어나, 세대생략 쪽이 ${eul(manwon(twoHop - skip.totalTax))} 아낍니다. ` +
       `${manwon(100_000_000)}처럼 작은 금액에서도 ${wa(won(small.totalTax))} ${ro(won(smallHop1.totalTax + smallHop2.totalTax))} 방향이 같은데, 가산율 ${pct(skip.surcharge / skip.basicTax, 0)}보다 두 번째 증여에서 새로 발생하는 세금의 비중이 더 크기 때문입니다. ` +
       `한편 증여액이 증여재산공제 한도 ${won(skip.deductionLimit)} 이하이면 세대생략도 2단 증여도 세액이 ${ro(won(tiny.totalTax))} 같아져 우열 자체가 사라지므로, 이 비교는 세금이 실제로 붙는 구간에서만 뜻이 있습니다. ` +
@@ -121,7 +124,7 @@ function priorDeductionSaturates(): Finding {
     h2: `기공제는 ${won(none.deductionLimit)}에서 효과가 멈춘다`,
     body:
       `성년 자녀에게 ${manwon(GIFT_BASE.giftAmount)}을 준다고 가정하고 과거 10년 기공제 사용액만 바꾸면 세액이 0원일 때 ${won(none.totalTax)}, ${manwon(30_000_000)}일 때 ${won(half.totalTax)}, ${manwon(50_000_000)}일 때 ${ro(won(full.totalTax))} 오릅니다. ` +
-      `기공제 ${manwon(30_000_000)}이 세금을 ${won(half.totalTax - none.totalTax)} 올렸으니 1원당 정확히 한계세율 ${pct(none.appliedRate, 0)}인 셈입니다. ` +
+      `기공제 ${manwon(30_000_000)}이 세금을 ${won(half.totalTax - none.totalTax)} 올렸으니 1원당 ${pct((half.totalTax - none.totalTax) / 30_000_000, 1)}인데, 한계세율 ${pct(none.appliedRate, 0)}에 신고세액공제 ${pct(none.filingDeduction / none.calculatedTax, 0)}를 먹인 값이라 세율표보다 조금 낮습니다. ` +
       `그런데 사용액을 한도의 두 배인 ${manwon(100_000_000)}으로 올려도 세액은 ${ro(won(over.totalTax))} 그대로인데, 남은 공제가 0에서 더 내려가지 않기 때문입니다. ` +
       `따라서 "10년 안에 이미 한도를 다 썼다"와 "한도의 두 배를 썼다"는 이 계산기에서 같은 결과이고, 구분이 필요한 것은 한도를 넘겼는지가 아니라 얼마나 남았는지입니다.`,
   };
@@ -166,7 +169,8 @@ function giftVersusInheritance(): Finding {
     h2: `같은 ${manwon(amount)}을 상속으로 넘기면 증여의 ${pct(inherit.totalTax / gift.totalTax, 1)}만 낸다`,
     body:
       `자녀 한 사람이 ${manwon(amount)}을 받는 상황을 가정하고 두 계산기를 같은 금액으로 돌리면, 증여세는 ${manwon(gift.totalTax)}인데 상속세(배우자 없음·금융재산 0원·채무 0원 가정)는 ${ro(manwon(inherit.totalTax))} ${times(gift.totalTax, inherit.totalTax)} 차이가 납니다. ` +
-      `상속 쪽 공제가 일괄공제 ${manwon(inherit.generalDeduction)} 한 항목만으로도 증여재산공제 ${manwon(gift.deductionLimit)}의 열 배이고, 여기에 기한 내 신고 시 산출세액의 3%인 ${won(inherit.filingDeduction)}까지 더 빠지기 때문입니다. ` +
+      `격차의 거의 전부는 공제 차이에서 나오는데, 상속 쪽은 일괄공제 ${manwon(inherit.generalDeduction)} 한 항목만으로도 증여재산공제 ${manwon(gift.deductionLimit)}의 열 배이기 때문입니다. ` +
+      `기한 내 신고 시 산출세액의 3%를 빼 주는 신고세액공제는 상속세 및 증여세법 제69조가 두 세목에 똑같이 주는 것이라 상속 ${won(inherit.filingDeduction)}, 증여 ${ro(won(gift.filingDeduction))} 양쪽 모두 붙고, 그래서 이 격차를 만드는 쪽이 아닙니다. ` +
       `${manwon(half)}에서는 격차가 더 극단적이어서 상속은 ${won(inheritHalf.totalTax)}, 증여는 ${eul(manwon(giftHalf.totalTax))} 냅니다. ` +
       `그럼에도 생전 증여가 선택지로 남는 것은 세액 비교 때문이 아니라, 상속개시 10년 전에 끝낸 증여가 상속재산에 합산되지 않고 증여 시점의 평가액으로 과세가 마감된다는 점 때문입니다.`,
   };
@@ -179,14 +183,17 @@ function effectiveRateCeiling(): Finding {
   }));
   const [s1, s2, s3, s4] = steps;
   const top = s4.r.appliedRate;
-  // 실효세율이 최고세율에 닿지 못하게 만드는 고정 감액 = 최고세율 × 증여액 − 실제 세액 (증여액과 무관하게 일정)
-  const gap = s4.amount * top - s4.r.totalTax;
+  // 실효세율의 천장은 최고세율이 아니라 "최고세율 × (1 − 신고세액공제율)"이다.
+  // 그 천장선에서 잰 고정 감액만이 증여액과 무관하게 일정하다 — 최고세율 기준으로 재면 금액마다 달라진다.
+  const filingRate = s4.r.filingDeduction / s4.r.calculatedTax;
+  const ceiling = top * (1 - filingRate);
+  const gap = Math.round(s4.amount * ceiling - s4.r.totalTax);
   return {
     h2: `증여액을 ${manwon(10_000_000_000)}으로 키워도 실효세율은 ${pct(s4.r.effectiveRate)}에 그친다`,
     body:
       `성년 자녀·기공제 0원 가정에서 증여액만 키우면 실효세율이 ${manwon(s1.amount)} ${pct(s1.r.effectiveRate)}, ${manwon(s2.amount)} ${pct(s2.r.effectiveRate)}, ${manwon(s3.amount)} ${pct(s3.r.effectiveRate)}, ${manwon(s4.amount)} ${ro(pct(s4.r.effectiveRate))} 오릅니다. ` +
-      `최고세율이 ${pct(top, 0)}인데도 끝내 닿지 못하는 이유는, 증여재산공제 ${wa(won(s4.r.deductionLimit))} 최고구간 누진공제가 만들어 내는 고정 감액 ${ga(manwon(gap))} 분모가 커져도 사라지지 않기 때문입니다. ` +
-      `즉 실효세율은 ${pct(top, 0)}에서 "${manwon(gap)} ÷ 증여액"을 뺀 값으로만 움직입니다. ` +
+      `세율표의 최고세율은 ${pct(top, 0)}이지만 기한 내 신고 시 산출세액의 ${pct(filingRate, 0)}가 빠지므로 실효세율이 다가갈 수 있는 천장부터가 ${ro(pct(ceiling, 1))} 내려앉고, 여기에 증여재산공제 ${wa(won(s4.r.deductionLimit))} 최고구간 누진공제가 만들어 내는 고정 감액 ${ga(manwon(gap))} 분모가 커져도 사라지지 않습니다. ` +
+      `즉 실효세율은 ${pct(ceiling, 1)}에서 "${manwon(gap)} ÷ 증여액"을 뺀 값으로만 움직입니다. ` +
       `그래서 큰 금액일수록 세율표의 최고 구간을 그대로 부담률로 읽는 오차가 줄기는 하지만, ${manwon(s4.amount)}에서도 여전히 ${eun(pp((top - s4.r.effectiveRate) * 100))} 남습니다.`,
   };
 }
