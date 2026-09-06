@@ -3,13 +3,26 @@
 // 직관과 반대 방향의 결과를 내는 구간이 생긴다. 아래 수치는 전부 calculateInheritanceTax
 // (교차 비교분은 calculateGiftTax) 실행값이며, 어느 것도 공제표를 옮겨 적은 값이 아니다.
 
-import { DEFAULT_INHERITANCE_TAX_INPUT } from "@/lib/inheritanceTaxValidators";
+import type { InheritanceTaxInput } from "@/lib/inheritanceTaxValidators";
 import { calculateGiftTax } from "@/utils/giftTaxCalculator";
 import { calculateInheritanceTax } from "@/utils/inheritanceTaxCalculator";
 import { type Finding, eul, eun, ga, ida, imnida, manwon, num, people, pct, ro, times, wa, won, years } from "./format";
 
-/** 화면 기본값과 같은 조건: 상속재산 20억원, 채무 0원, 금융재산 5억원, 배우자 있음, 자녀 2명 */
-export const INHERITANCE_BASE = DEFAULT_INHERITANCE_TAX_INPUT;
+/**
+ * 화면 기본값과 같은 조건: 상속재산 20억원, 채무 0원, 금융재산 5억원, 배우자 있음, 자녀 2명.
+ *
+ * 왜 DEFAULT_INHERITANCE_TAX_INPUT을 참조하지 않고 값을 손으로 다시 적는가:
+ * 같은 객체를 가리키면 드리프트 테스트가 자기 자신을 비교하게 되어 화면 기본값이 바뀌어도 red가 나지 않는다.
+ * (실측: financialAssets를 5억에서 6억으로 바꿔도 게이트 22건이 전부 통과했다.)
+ * 산문은 "배우자와 자녀 2명"처럼 조건을 문장에 박아 두므로, 기준값 드리프트는 곧 산문의 거짓말이 된다.
+ */
+export const INHERITANCE_BASE: InheritanceTaxInput = {
+  totalEstate: 2_000_000_000,
+  debt: 0,
+  financialAssets: 500_000_000,
+  hasSpouse: true,
+  childrenCount: 2,
+};
 const run = (patch: Partial<typeof INHERITANCE_BASE> = {}) =>
   calculateInheritanceTax({ ...INHERITANCE_BASE, ...patch });
 
@@ -93,12 +106,16 @@ function debtIsPartlyOffset(): Finding {
   const with1 = run({ debt: 100_000_000 });
   const with5 = run({ debt: 500_000_000 });
   const shareCut = none.spouseDeduction - with1.spouseDeduction;
+  // 잘려 나간 과세표준은 5억 경계를 걸치므로 절감액은 두 구간세율을 곱한 값 사이에 놓인다.
+  // 낮은 쪽(20%)이 하한, 높은 쪽(30%)이 상한이다 — 부등호 방향을 산문에 그대로 옮긴다.
+  const drop = none.taxBase - with1.taxBase;
   return {
     h2: `채무 ${manwon(100_000_000)}을 넣어도 세금은 ${manwon(none.totalTax - with1.totalTax)}만 준다`,
     body:
       `상속재산 ${manwon(INHERITANCE_BASE.totalEstate)}·금융재산 ${manwon(INHERITANCE_BASE.financialAssets)}·배우자와 자녀 ${eul(people(INHERITANCE_BASE.childrenCount))} 가정하고 채무 금액만 넣으면 세액이 ${wa(won(none.totalTax))} ${ro(won(with1.totalTax))} 내려갑니다. ` +
-      `채무 ${manwon(100_000_000)}이 과세가액을 그만큼 줄이는 것은 맞지만 배우자공제도 같은 비율로 ${manwon(shareCut)} 함께 줄어드는 상쇄가 일어나, 과세표준은 ${manwon(100_000_000)}이 아니라 ${won(none.taxBase - with1.taxBase)}만 내려가는 데 그칩니다. ` +
-      `그런데도 절감액이 그 금액에 ${eul(pct(none.appliedRate, 0))} 곱한 값보다 큰 이유는, 과세표준이 ${manwon(500_000_000)} 아래로 내려가며 적용 구간이 ${pct(none.appliedRate, 0)}에서 ${ro(pct(with1.appliedRate, 0))} 바뀌었기 때문입니다. ` +
+      `채무 ${manwon(100_000_000)}이 과세가액을 그만큼 줄이는 것은 맞지만 배우자공제도 같은 비율로 ${manwon(shareCut)} 함께 줄어드는 상쇄가 일어나, 과세표준은 ${manwon(100_000_000)}이 아니라 ${won(drop)}만 내려가는 데 그칩니다. ` +
+      `절감액 ${eun(won(none.totalTax - with1.totalTax))} 그 감소분에 내려앉은 구간세율 ${eul(pct(with1.appliedRate, 0))} 곱한 ${won(drop * with1.appliedRate)}보다는 크고, 원래 구간세율 ${eul(pct(none.appliedRate, 0))} 곱한 ${won(drop * none.appliedRate)}에는 미치지 못합니다. ` +
+      `깎여 나간 ${won(drop)}이 ${manwon(500_000_000)} 경계를 걸치고 있어 그중 일부만 ${pct(none.appliedRate, 0)} 구간에서 잘려 나가고 나머지는 ${pct(with1.appliedRate, 0)} 구간에서 잘려 나갔기 때문입니다. ` +
       `채무를 ${ro(manwon(500_000_000))} 늘리면 세액은 ${won(with5.totalTax)}, 절감은 ${imnida(manwon(none.totalTax - with5.totalTax))}.`,
   };
 }

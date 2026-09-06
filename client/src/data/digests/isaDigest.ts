@@ -30,12 +30,17 @@ function savingIsLinear(): Finding {
   const base = run();
   const rateGap = ISA_TAX.NORMAL_ACCOUNT_TAX_RATE - ISA_TAX.SEPARATE_TAX_RATE;
   const fixedPart = ISA_TAX.GENERAL_TAX_FREE_LIMIT * ISA_TAX.SEPARATE_TAX_RATE;
+  // 이 1차식은 수익 > 비과세 한도에서만 성립한다. 한도 안에서는 ISA 세금이 0원이라
+  // 절세액 = 일반계좌 세금 전액이고, 1차식은 고정 몫만큼을 통째로 지어낸다.
+  // 그래서 반증 사례를 엔진에서 직접 뽑아 같은 문단에 붙인다(무조건 단언 금지).
+  const under = run({ annualInvestment: 1_000_000 });
   return {
-    h2: `ISA 절세액은 수익의 ${pct(rateGap, 1)}에 ${eul(won(fixedPart))} 더한 값이다`,
+    h2: `수익이 ${eul(manwon(ISA_TAX.GENERAL_TAX_FREE_LIMIT))} 넘어야 절세액이 1차식이 된다`,
     body:
       `연 ${manwon(ISA_BASE.annualInvestment)} 납입, 연 ${pct(ISA_BASE.annualReturnRate, 0)} 수익률, ${years(ISA_BASE.holdingYears)} 보유, 일반형을 가정하면 총수익 ${won(base.totalProfit)}에 일반계좌 세금 ${won(base.normalTax)}, ISA 세금 ${won(base.isaTax)}으로 절세액이 ${imnida(won(base.taxSaving))}. ` +
       `이 값은 우연이 아니라 세율 차 ${pct(rateGap, 1)}에 수익을 곱한 몫과 비과세 한도 ${manwon(ISA_TAX.GENERAL_TAX_FREE_LIMIT)}에 ${eul(pct(ISA_TAX.SEPARATE_TAX_RATE, 1))} 곱한 ${won(fixedPart)}을 더한 1차식이며, 실제로 두 조각을 더하면 ${won(rateGap * base.totalProfit + fixedPart)}으로 엔진 값과 일치합니다. ` +
-      `그래서 비과세 한도가 만들어 내는 이득은 수익이 얼마든 ${won(fixedPart)}에 고정이고, 나머지는 전부 세율 차가 만듭니다. ` +
+      `다만 이 1차식은 총수익이 비과세 한도 ${manwon(ISA_TAX.GENERAL_TAX_FREE_LIMIT)}을 넘는 구간에서만 성립합니다. 한도 안에서는 ISA 세금이 0원이라 절세액이 일반계좌 세금 그대로가 되는데, 연 ${manwon(1_000_000)} 납입을 가정하면 총수익 ${won(under.totalProfit)}에 절세액이 ${won(under.taxSaving)}으로 1차식이 예측하는 ${won(rateGap * under.totalProfit + fixedPart)}에 한참 못 미칩니다. ` +
+      `그러므로 비과세 한도가 만드는 고정 몫 ${won(fixedPart)}은 한도를 넘어선 뒤에야 온전히 붙고, 그 위로는 나머지를 전부 세율 차가 만듭니다. ` +
       `즉 한쪽은 수익과 무관한 정액이고 다른 한쪽은 수익에 정비례하기 때문에, 아래 항목에서 절세액과 절세율이 서로 반대 방향으로 움직이는 결과가 나옵니다.`,
   };
 }
@@ -121,7 +126,8 @@ function taxRatioConverges(): Finding {
   const base = run();
   const heavy = run({ annualInvestment: 20_000_000, holdingYears: 5, annualReturnRate: 0.2 });
   return {
-    h2: `일반계좌 세금은 ISA 세금의 ${times(base.normalTax, base.isaTax)}에서 ${ro(times(heavy.normalTax, heavy.isaTax))} 수렴한다`,
+    // 진짜 수렴점은 세율 비율(15.4/9.9 = 1.5556배)이고 1.60배는 이 가정에서 나온 한 점일 뿐이라 "수렴"이라 쓰지 않는다.
+    h2: `일반계좌 세금은 ISA 세금의 ${times(base.normalTax, base.isaTax)}에서 ${times(heavy.normalTax, heavy.isaTax)}까지 내려온다`,
     body:
       `기본 가정(연 ${manwon(ISA_BASE.annualInvestment)}·연 ${pct(ISA_BASE.annualReturnRate, 0)}·${years(ISA_BASE.holdingYears)}·일반형)에서 두 계좌의 세금은 ${wa(won(base.normalTax))} ${ro(won(base.isaTax))} ${imnida(times(base.normalTax, base.isaTax))}. ` +
       `세율만 놓고 보면 ${pct(ISA_TAX.NORMAL_ACCOUNT_TAX_RATE, 1)} 대 ${pct(ISA_TAX.SEPARATE_TAX_RATE, 1)}로 ${times(ISA_TAX.NORMAL_ACCOUNT_TAX_RATE, ISA_TAX.SEPARATE_TAX_RATE)} 차이일 뿐인데 실제 배수가 그보다 큰 이유는, ISA가 세율을 낮출 뿐 아니라 과세 대상 수익 자체를 비과세 한도만큼 잘라 내기 때문입니다. ` +
