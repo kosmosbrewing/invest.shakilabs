@@ -227,8 +227,22 @@ describe("파생 다이제스트 — 가이드 배선", () => {
 
   // 다이제스트 기준값이 화면 기본값에서 드리프트하면 산문과 첫 화면이 어긋난다.
   it("다이제스트 기준값이 화면 기본값과 같다", () => {
+    // 왜 not.toBe부터 거는가: 두 상수가 같은 객체를 참조하면 아래 toEqual이 자기 자신과의 비교가 되어
+    // 화면 기본값을 무엇으로 바꾸든 통과한다(실측: relationship·financialAssets 변경에도 22건 전부 green).
+    // 독립 리터럴임을 먼저 못박아야 그다음 줄의 toEqual이 비로소 게이트가 된다.
+    expect(GIFT_BASE).not.toBe(DEFAULT_GIFT_TAX_INPUT);
+    expect(INHERITANCE_BASE).not.toBe(DEFAULT_INHERITANCE_TAX_INPUT);
     expect(GIFT_BASE).toEqual(DEFAULT_GIFT_TAX_INPUT);
     expect(INHERITANCE_BASE).toEqual(DEFAULT_INHERITANCE_TAX_INPUT);
+    // 라벨 필드는 엔진 출력이 아니라 산문이 문자열로 적어 둔 조건이라, 숫자 재계산으로는 드리프트가 드러나지 않는다.
+    // 화면 기본값과 함께 바뀌면 toEqual도 통과해 버리므로 여기서 리터럴로 고정한다.
+    expect(GIFT_BASE.relationship).toBe("adult-child");
+    expect(GIFT_BASE.isGenerationSkipping).toBe(false);
+    expect(INHERITANCE_BASE.hasSpouse).toBe(true);
+    expect(INHERITANCE_BASE.childrenCount).toBe(2);
+    expect(ISA_BASE.isaType).toBe("general");
+    expect(GIFT_TAX_DIGEST[0].body).toContain("성년 자녀에게");
+    expect(INHERITANCE_TAX_DIGEST[0].body).toContain("배우자와 자녀 2명");
     const isa = useIsaCalc();
     expect(ISA_BASE.annualInvestment).toBe(isa.annualInvestment.value);
     expect(ISA_BASE.annualReturnRate).toBe(isa.annualReturnRate.value);
@@ -487,5 +501,105 @@ describe("파생 다이제스트 — 인용 수치 엔진 재계산 일치", () 
     expect(d(15_000_000, "KR", 5_000_001, other).comprehensiveExtraTax).toBe(0);
     expect(d(15_000_000, "KR", 10_000_000, other).comprehensiveExtraTax!).toBeGreaterThan(0);
     expect(bodyOf(DIVIDEND_TAX_DIGEST, 9)).toContain(won(d(15_000_000, "KR", 10_000_000, other).comprehensiveExtraTax!));
+  });
+});
+
+// 상수를 따라 산문이 다시 쓰이는 구조라, 엔진에서 값을 읽어 비교하는 테스트는 상수가 틀려도 같이 움직여 통과한다.
+// (실측: SEPARATE_TAX_RATE 0.099→0.089, 상속 신고세액공제 3%→5%, 세대생략 가산 30%→40% 모두 22건 green)
+// 그래서 여기 한 곳에만 하드코딩된 리터럴을 둔다. 세법이 실제로 개정되면 이 테스트가 가장 먼저 red가 되고,
+// 그때 값을 고치는 행위가 곧 "개정을 확인했다"는 서명이 된다.
+describe("파생 다이제스트 — 엔진 리터럴 앵커", () => {
+  it("상수가 바뀌면 여기가 먼저 red가 된다", () => {
+    // 증여 3억(성년 자녀) — (3억 − 5천만) × 20% − 누진공제 1천만
+    expect(calculateGiftTax(GIFT_BASE).taxableAmount).toBe(250_000_000);
+    expect(calculateGiftTax(GIFT_BASE).totalTax).toBe(40_000_000);
+    // 상속 20억(배우자·자녀 2명·금융 5억) — 산출세액과 신고세액공제 3%를 따로 못박는다
+    const inh = calculateInheritanceTax(INHERITANCE_BASE);
+    expect(inh.taxBase).toBe(540_000_000);
+    expect(inh.calculatedTax).toBe(102_000_000);
+    expect(inh.filingDeduction).toBe(3_060_000);
+    expect(inh.totalTax).toBe(98_940_000);
+    // 세대생략 가산 30% — 산문 h3가 이 비율을 문자 그대로 인용하므로 상수와 함께 움직이면 안 된다
+    const skip = calculateGiftTax({ ...GIFT_BASE, giftAmount: 1_000_000_000, isGenerationSkipping: true });
+    expect(skip.basicTax).toBe(225_000_000);
+    expect(skip.surcharge).toBe(67_500_000);
+    // ISA 분리과세 9.9% / 일반계좌 15.4%
+    const isa = calculateIsaCompare(12_000_000, 0.05, 3);
+    expect(isa.totalProfit).toBe(3_721_500);
+    expect(isa.isaTax).toBe(170_428);
+    expect(isa.normalTax).toBe(573_111);
+    expect(isa.taxSaving).toBe(402_683);
+    // 국내 배당 15.4% (현지 0%인 홍콩은 국내 원천징수만 남는다)
+    expect(calculateDividendTax(10_000_000, "HK").totalTax).toBe(1_540_000);
+  });
+});
+
+// 산문 서술(부등호 방향·인과·무조건 단언)은 숫자 재계산만으로는 검증되지 않는다.
+// 09-06 QA가 찾은 오류 그대로를 반증 형태로 못박아, 문장이 되돌아가면 red가 나게 한다.
+describe("파생 다이제스트 — 산문 서술 반증", () => {
+  const g = (patch: Partial<typeof GIFT_BASE> = {}) => calculateGiftTax({ ...GIFT_BASE, ...patch });
+  const h = (patch: Partial<typeof INHERITANCE_BASE> = {}) => calculateInheritanceTax({ ...INHERITANCE_BASE, ...patch });
+
+  it("inheritance#6: 채무 절감액은 두 구간세율 사이에 놓인다", () => {
+    const base = h();
+    const withDebt = h({ debt: 100_000_000 });
+    const drop = base.taxBase - withDebt.taxBase;
+    const saving = base.totalTax - withDebt.totalTax;
+    // 잘려 나간 과세표준이 5억 경계를 걸치므로 절감액은 낮은 구간세율 위, 원래 구간세율 아래다.
+    expect(withDebt.appliedRate).toBeLessThan(base.appliedRate);
+    expect(saving).toBeGreaterThan(drop * withDebt.appliedRate);
+    expect(saving).toBeLessThan(drop * base.appliedRate);
+    // 산문이 기준으로 삼는 값이 낮은 구간세율 쪽인지 확인한다(30%만 기준으로 삼으면 red).
+    expect(bodyOf(INHERITANCE_TAX_DIGEST, 5)).toContain(won(drop * withDebt.appliedRate));
+    expect(bodyOf(INHERITANCE_TAX_DIGEST, 5)).toContain(won(drop * base.appliedRate));
+  });
+
+  it("isa#1: 절세액 1차식은 비과세 한도 아래에서 깨진다", () => {
+    const small = calculateIsaCompare(1_000_000, 0.05, 3);
+    expect(small.isaTax).toBe(0);
+    expect(small.taxSaving).toBe(small.normalTax);
+    const rateGap = ISA_TAX.NORMAL_ACCOUNT_TAX_RATE - ISA_TAX.SEPARATE_TAX_RATE;
+    const linear = rateGap * small.totalProfit + ISA_TAX.GENERAL_TAX_FREE_LIMIT * ISA_TAX.SEPARATE_TAX_RATE;
+    expect(Math.abs(small.taxSaving - linear)).toBeGreaterThan(100_000);
+    // 수익 0원이면 절세액도 0원 — 1차식은 여기서 고정 몫을 통째로 지어낸다.
+    expect(calculateIsaCompare(0, 0.05, 3).taxSaving).toBe(0);
+    // 그러므로 산문은 조건을 밝혀야 한다: h3에 한도가, 본문에 반례 수치가 있어야 한다.
+    expect(ISA_DIGEST[0].h2).toContain(manwon(ISA_TAX.GENERAL_TAX_FREE_LIMIT));
+    expect(ISA_DIGEST[0].body).toContain(won(small.taxSaving));
+    expect(ISA_DIGEST[0].body).not.toContain("수익이 얼마든");
+  });
+
+  it("gift#3: 경계 위 한계세율은 경계 아래 세율이 아니라 다음 구간 세율이다", () => {
+    const avail = g().availableDeduction;
+    const overRates = [100_000_000, 500_000_000, 1_000_000_000].map(
+      (taxBase) => g({ giftAmount: taxBase + avail + 1 }).appliedRate,
+    );
+    expect(overRates).toEqual([0.2, 0.3, 0.4]);
+    for (const r of overRates) expect(bodyOf(GIFT_TAX_DIGEST, 2), pct(r, 0)).toContain(pct(r, 0));
+    // 첫 경계에서만 두 배이고 나머지는 1.5배·1.33배라 "두 배"는 h3에 쓸 수 없다.
+    expect(overRates[2] / overRates[1]).toBeLessThan(1.5);
+    expect(GIFT_TAX_DIGEST[2].h2).not.toContain("두 배");
+  });
+
+  it("gift#5: 공제 한도 이하에서는 세대생략과 2단 증여의 우열이 없다", () => {
+    const limit = g().deductionLimit;
+    expect(g({ giftAmount: limit, isGenerationSkipping: true }).totalTax).toBe(0);
+    expect(g({ giftAmount: limit }).totalTax).toBe(0);
+    expect(bodyOf(GIFT_TAX_DIGEST, 4)).not.toContain("언제나");
+    expect(bodyOf(GIFT_TAX_DIGEST, 4)).toContain(won(limit));
+  });
+
+  it("gift#9: 실효세율은 100억 위에서도 계속 오른다", () => {
+    expect(g({ giftAmount: 20_000_000_000 }).effectiveRate).toBeGreaterThan(
+      g({ giftAmount: 10_000_000_000 }).effectiveRate,
+    );
+    expect(GIFT_TAX_DIGEST[8].h2).not.toContain("멈춘");
+  });
+
+  it("isa#7: 세금 배수의 수렴점은 1.60배가 아니라 세율 비율이다", () => {
+    const heavy = calculateIsaCompare(20_000_000, 0.2, 5);
+    const rateRatio = ISA_TAX.NORMAL_ACCOUNT_TAX_RATE / ISA_TAX.SEPARATE_TAX_RATE;
+    expect(heavy.normalTax / heavy.isaTax).toBeGreaterThan(rateRatio);
+    expect(ISA_DIGEST[6].h2).not.toContain("수렴");
   });
 });
