@@ -1,8 +1,11 @@
 // /deposit-interest 파생 다이제스트 — 예금 엔진은 겉보기와 달리 한 갈래가 아니다.
 // 만기일시는 round(원금 × 연이율 × 개월/12)을 한 번, 월이자식은 round(원금 × 연이율/12)을
 // 매월 적용해 개월수만큼 곱하므로, 반올림 오차가 한쪽에서만 누적돼 두 방식의 총이자가 어긋난다.
+// 세금도 마찬가지로 월이자식은 매월 지급분마다 원천징수되어(소득세법 제127조①·제128조①)
+// 열두 번 따로 걸리므로, 같은 세전 이자에 한 번 매긴 값과 몇 원씩 갈린다.
 // 아래 수치는 전부 calculateDepositInterest 실행값이다.
 
+import { INTEREST_TAX } from "@/data/interestData";
 import {
   calculateDepositInterest,
   type DepositInterestInput,
@@ -60,11 +63,11 @@ function paymentTypeSplitsTheSameProduct(): Finding {
   const gap = perMonth.grossInterest - atMaturity.grossInterest;
   const exact = (DEPOSIT_BASE.principal * (DEPOSIT_BASE.annualRate / 100)) / 12;
   return {
-    h2: `같은 예금인데 지급 방식만 바꾸면 이자가 ${won(gap)} 갈린다`,
+    h2: `같은 예금인데 지급 방식만 바꾸면 세전 이자가 ${won(gap)} 갈린다`,
     body:
       `원금 ${won(DEPOSIT_BASE.principal)}·${DEPOSIT_BASE.months}개월·연 ${DEPOSIT_BASE.annualRate}%·일반과세를 가정하면 만기일시지급의 세전 이자는 ${ga(won(atMaturity.grossInterest))}지만, 월이자지급으로 바꾸면 ${ro(won(perMonth.grossInterest))} ${won(gap)} 많아집니다. ` +
       `만기일시는 전체 기간을 한 번에 곱해 마지막에 딱 한 번 원 단위로 맞추는 반면, 월이자식은 ${num(exact, 4)}원인 월이자를 ${ro(won(perMonth.monthlyInterestGross))} 올림한 뒤 ${DEPOSIT_BASE.months}번 곱하기 때문입니다. ` +
-      `세후로도 격차가 남아 각각 ${wa(won(atMaturity.netInterest))} ${ro(won(perMonth.netInterest))} 갈리는데, 세금이 이미 어긋난 세전 이자 위에서 다시 계산되기 때문입니다. ` +
+      `그런데 세후로 내려오면 이 격차가 기본값에서는 사라져 양쪽 모두 ${imnida(won(atMaturity.netInterest))}. 세전에서 앞섰던 ${won(gap)}이 세금 쪽 계단 하나에 그대로 먹혀 상쇄되기 때문이며, 원금을 바꾸면 다시 갈리므로 상쇄는 이 조건에서만 성립합니다. ` +
       `금액 자체는 커피 한 잔에도 못 미치지만, 같은 상품·같은 금리에서 나온 두 숫자가 다르다는 사실이 이 계산기의 구조를 드러냅니다.`,
   };
 }
@@ -84,27 +87,38 @@ function whoWinsDependsOnPrincipal(): Finding {
   };
 }
 
-function displayedMonthlyDoesNotAddUp(): Finding {
+function withholdingHappensTwelveTimes(): Finding {
   const perMonth = monthly();
-  const sumOfMonths = perMonth.monthlyInterestNet * DEPOSIT_BASE.months;
-  const drift = sumOfMonths - perMonth.netInterest;
+  const taxRate = INTEREST_TAX.NORMAL_RATE;
+  const oneShot = Math.round(perMonth.grossInterest * taxRate);
+  // 월별 원천징수 누적과 "총이자에 한 번" 사이의 어긋남을 원금 축으로 센다.
   let mismatched = 0;
   let total = 0;
   let widest = 0;
   for (let principal = 1_000_000; principal <= 100_000_000; principal += 100_000) {
     const r = monthly({ principal });
-    const d = r.monthlyInterestNet * DEPOSIT_BASE.months - r.netInterest;
+    const d = r.tax - Math.round(r.grossInterest * taxRate);
     total += 1;
     if (d !== 0) mismatched += 1;
     if (Math.abs(d) > Math.abs(widest)) widest = d;
   }
+  const widestFor = (months: number) => {
+    let w = 0;
+    for (let principal = 10_000_000; principal <= 10_001_000; principal += 1) {
+      const r = monthly({ principal, months });
+      const d = r.tax - Math.round(r.grossInterest * taxRate);
+      if (Math.abs(d) > Math.abs(w)) w = d;
+    }
+    return Math.abs(w);
+  };
+  const sumOfMonths = perMonth.monthlyInterestNet * DEPOSIT_BASE.months;
   return {
-    h2: `세후 월이자에 ${DEPOSIT_BASE.months}를 곱하면 총 이자와 어긋난다`,
+    h2: `월이자 방식은 세금이 한 번이 아니라 ${DEPOSIT_BASE.months}번 걸린다`,
     body:
-      `원금 ${won(DEPOSIT_BASE.principal)}·연 ${DEPOSIT_BASE.annualRate}%·월이자지급을 가정하면 화면의 세후 월 수령액은 ${ga(won(perMonth.monthlyInterestNet))}지만, 여기에 ${DEPOSIT_BASE.months}를 곱한 ${eun(won(sumOfMonths))} 같은 화면의 세후 총이자 ${wa(won(perMonth.netInterest))} ${won(Math.abs(drift))} 어긋납니다. ` +
-      `세금을 월 수령액에서 한 번, 총액에서 다시 한 번 각각 원 단위로 반올림하는데 두 반올림이 서로 다른 값에 걸리기 때문이며, 어느 쪽도 틀린 계산은 아니지만 두 숫자를 곱셈으로 이으면 맞아떨어지지 않습니다. ` +
-      `같은 조건에서 원금을 10만원 단위로 ${num(total)}개 훑으면 ${num(mismatched)}개가 어긋나 ${pct(mismatched / total, 1)}에 이르고, 벌어지는 폭은 최대 ${imnida(won(Math.abs(widest)))}. ` +
-      `그러므로 월 수령액을 개월수만큼 곱해 총액을 가늠하는 대신 총이자 항목을 그대로 읽는 편이 정확합니다.`,
+      `원금 ${won(DEPOSIT_BASE.principal)}·연 ${DEPOSIT_BASE.annualRate}%·월이자지급을 가정하면 세전 월이자 ${won(perMonth.monthlyInterestGross)}에서 세금 ${eul(won(perMonth.monthlyInterestGross - perMonth.monthlyInterestNet))} 떼고 ${eul(won(perMonth.monthlyInterestNet))} 받는 일이 ${DEPOSIT_BASE.months}번 반복되어, 세금 합계가 ${imnida(won(perMonth.tax))}. ` +
+      `같은 세전 총이자 ${won(perMonth.grossInterest)}에 ${eul(pct(taxRate, 1))} 한 번에 매기면 ${ga(won(oneShot))} 나오므로 ${won(Math.abs(perMonth.tax - oneShot))} 다른데, 이자를 받을 때마다 그 자리에서 원천징수가 이뤄지기 때문입니다. ` +
+      `원금을 ${won(1_000_000)}부터 ${won(100_000_000)}까지 10만원 단위로 ${num(total)}개 훑으면 ${num(mismatched)}개에서 두 값이 어긋나 ${pct(mismatched / total, 1)}에 이르고, 벌어지는 폭은 최대 ${won(Math.abs(widest))}입니다. 징수 횟수가 곧 반올림 횟수라 6개월 ${won(widestFor(6))}, ${DEPOSIT_BASE.months}개월 ${won(widestFor(DEPOSIT_BASE.months))}, 36개월 ${ro(won(widestFor(36)))} 기간에 따라 커집니다. ` +
+      `대신 이 구조 덕분에 화면의 세후 월 수령액 ${eul(won(perMonth.monthlyInterestNet))} ${DEPOSIT_BASE.months}번 더한 ${eun(won(sumOfMonths))} 같은 화면의 세후 총이자 ${wa(won(perMonth.netInterest))} 1원도 다르지 않으므로, 월 수령액을 곱해 총액을 가늠해도 됩니다.`,
   };
 }
 
@@ -233,7 +247,7 @@ function interestIsExactlyProportionalToTerm(): Finding {
 export const DEPOSIT_INTEREST_DIGEST: Finding[] = [
   paymentTypeSplitsTheSameProduct(),
   whoWinsDependsOnPrincipal(),
-  displayedMonthlyDoesNotAddUp(),
+  withholdingHappensTwelveTimes(),
   monthlyPayoutIsAStaircase(),
   rateAndTermStopBeingInterchangeable(),
   effectiveRateRankingFlips(),

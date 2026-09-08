@@ -7,6 +7,7 @@ import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
 import { mergeFaqs } from "@/lib/faqMerge";
 import { FOREIGN_STOCK_TAX_GUIDE } from "@/data/seoGuides";
+import InputRangeNotice from "@/components/common/InputRangeNotice.vue";
 import ForeignStockTaxInputPanel from "@/components/foreignStock/ForeignStockTaxInputPanel.vue";
 import ForeignStockTaxResultPanel from "@/components/foreignStock/ForeignStockTaxResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -89,6 +90,7 @@ const faqJsonLd = {
       />
     </CalculatorInteractionTracker>
 
+    <InputRangeNotice :notices="calc.rangeNotices.value" />
     <ForeignStockTaxResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/foreign-stock-tax" />
     <FaqAccordionPanel title="출처 및 FAQ" :items="mergedFaqs">

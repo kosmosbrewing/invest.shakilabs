@@ -118,6 +118,39 @@ describe("calculateDepositInterest", () => {
     expect(result.netInterest).toBe(304_560);
   });
 
+  // 월이자지급식은 이자를 지급할 때마다 원천징수가 일어난다
+  // (소득세법 제127조① 지급자의 원천징수 의무 · 제128조① 징수일이 속하는 달의 다음 달 10일 납부).
+  // 예전에는 총이자에 세율을 한 번 더 곱해 반올림해서, 화면의 "세후 월 수령액 × 개월수"가
+  // 같은 화면의 "세후 총이자"와 몇 원씩 어긋났다(기본값 3원, 원금 991개 중 742개).
+  it("월이자 방식 세금은 월별 원천징수의 누적이라 표시값이 정확히 맞아떨어진다", () => {
+    const base = {
+      principal: 10_000_000,
+      months: 12,
+      annualRate: 3.5,
+      taxType: "normal" as const,
+      paymentType: "monthly" as const,
+    };
+    const r = calculateDepositInterest(base);
+    // 월 세전 29,167 → 월 세금 4,492 → 월 세후 24,675
+    expect(r.monthlyInterestGross).toBe(29_167);
+    expect(r.monthlyInterestNet).toBe(24_675);
+    expect(r.tax).toBe(4_492 * 12);
+    expect(r.netInterest).toBe(24_675 * 12);
+
+    // 원금·기간·과세유형을 훑어도 표시 정합이 깨지지 않는다
+    for (let principal = 1_000_000; principal <= 100_000_000; principal += 100_000) {
+      const m = calculateDepositInterest({ ...base, principal });
+      expect(m.monthlyInterestNet * base.months, `principal=${principal}`).toBe(m.netInterest);
+      expect(m.monthlyInterestGross * base.months, `principal=${principal}`).toBe(m.grossInterest);
+    }
+    for (const months of [1, 6, 24, 36]) {
+      for (const taxType of ["normal", "preferential", "tax_free"] as const) {
+        const m = calculateDepositInterest({ ...base, months, taxType });
+        expect(m.monthlyInterestNet * months, `${months}/${taxType}`).toBe(m.netInterest);
+      }
+    }
+  });
+
   it("월이자 방식 세금 정합성 (grossInterest === tax + netInterest)", () => {
     const result = calculateDepositInterest({
       principal: 10_000_000,

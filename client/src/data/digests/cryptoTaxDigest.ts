@@ -143,31 +143,42 @@ function feeIsWorthTwoWonThenNothing(): Finding {
   };
 }
 
-function roundingSplitsFromForeignStock(): Finding {
-  const gain = 10_000_003;
-  const here = byGain(gain);
-  const there = calculateForeignStockTax({ sellAmount: gain, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 0 });
-  const deduction = here.deduction;
+function deductionAppliesPerIncomeCategory(): Finding {
+  const each = 5_000_000;
+  const crypto = byGain(each);
+  const foreign = calculateForeignStockTax({
+    sellAmount: each,
+    buyAmount: 0,
+    fees: 0,
+    otherGains: 0,
+    otherLosses: 0,
+  });
+  const apart = crypto.totalTax + foreign.totalTax;
+  const lumped = byGain(each * 2);
+  const saved = lumped.totalTax - apart;
+  // 두 계산기가 같은 과세표준에서 1원까지 같은 답을 내는지 실제로 훑는다.
+  const deduction = crypto.deduction;
+  const sampled = 20_000;
   let mismatched = 0;
-  const sampled = 1_000;
   for (let taxable = 1; taxable <= sampled; taxable += 1) {
-    const a = byGain(deduction + taxable).totalTax;
-    const c = calculateForeignStockTax({
+    const here = byGain(deduction + taxable).totalTax;
+    const there = calculateForeignStockTax({
       sellAmount: deduction + taxable,
       buyAmount: 0,
       fees: 0,
       otherGains: 0,
       otherLosses: 0,
     }).totalTax;
-    if (a !== c) mismatched += 1;
+    if (here !== there) mismatched += 1;
   }
   return {
-    h2: `같은 22% 구조인데 해외주식 계산기와 1원이 갈린다`,
+    h2: `가상자산과 해외주식은 같은 해에 팔아도 공제를 두 번 받는다`,
     body:
-      `기본공제 ${wa(won(deduction))} 세율 22%가 똑같으니 해외주식 양도소득세 계산기에 같은 숫자를 넣으면 같은 답이 나올 것 같지만, 양도차익 ${eul(won(gain))} 가정하면 이 계산기는 ${eul(won(here.totalTax))}, 저쪽은 ${eul(won(there.totalTax))} 냅니다. ` +
-      `이 계산기가 소득세·지방소득세를 각각 내림으로 끊는 반면 해외주식 쪽은 반올림으로 맞추기 때문이며, 세법이 아니라 구현이 만든 차이입니다. ` +
-      `공제 바로 위 과세표준 1원부터 ${won(sampled)}까지 ${num(sampled)}개 지점에서 두 계산기를 나란히 돌리면 ${num(mismatched)}개가 서로 다른 값을 내 ${pct(mismatched / sampled, 0)}에 이르는데, 어긋나는 폭은 언제나 1~2원에 그칩니다. ` +
-      `두 자산에 모두 투자해 세금을 합산해 볼 때는 이 원 단위 차이를 감안해야 하고, 실제 신고서의 원 단위 처리는 시행 시점의 공식 안내를 따라야 합니다.`,
+      `가상자산 양도차익 ${wa(manwon(each))} 해외주식 양도차익 ${eul(manwon(each))} 같은 해에 실현한다고 가정하면, 가상자산 쪽 세금이 ${won(crypto.totalTax)}, 해외주식 쪽이 ${ga(won(foreign.totalTax))} 되어 합계가 ${imnida(won(apart))}. ` +
+      `같은 ${eul(manwon(each * 2))} 가상자산 한 갈래에서만 벌었다면 과세표준이 ${ga(won(lumped.taxableAmount))} 되어 세금이 ${ro(won(lumped.totalTax))} 올라가므로, 갈래를 나눈 쪽이 ${eul(won(saved))} 덜 냅니다. ` +
+      `두 소득이 각각 다른 소득 구분이라 연 ${won(deduction)} 기본공제가 서로를 잡아먹지 않고 한 번씩 따로 붙기 때문이며, 아끼는 금액은 공제 하나에 22%를 먹인 값 그대로라 양쪽 차익이 공제를 넘는 한 규모와 무관하게 일정합니다. ` +
+      `두 계산기는 공제·세율·소득세와 지방소득세를 각각 내림하는 방식까지 같아, 공제 바로 위 과세표준 1원부터 ${won(sampled)}까지 ${num(sampled)}개 지점을 나란히 돌려도 어긋난 지점이 ${num(mismatched)}개입니다. 그래서 두 결과를 그냥 더해도 원 단위까지 맞습니다. ` +
+      `다만 이는 양쪽 모두 공제를 다 쓸 만큼 차익이 남아 있을 때의 이야기이고, 한쪽이 공제 아래로 내려가면 남는 공제는 다른 쪽으로 넘어가지 않고 그대로 버려집니다.`,
   };
 }
 
@@ -227,7 +238,7 @@ export const CRYPTO_TAX_DIGEST: Finding[] = [
   doublingGainDoesNotDoubleTax(),
   splittingAcrossYearsSaturates(),
   feeIsWorthTwoWonThenNothing(),
-  roundingSplitsFromForeignStock(),
+  deductionAppliesPerIncomeCategory(),
   afterTaxGrowsSlowerThanTwoFold(),
   whatTheEngineDoesNotModel(),
   taxIsZeroBelowTheDeductionForever(),

@@ -235,6 +235,49 @@ describe("investCalculator", () => {
       expect(result.totalTax).toBe(0);
       expect(result.netProfit).toBe(-5_000_000);
     });
+
+    // 「국고금 관리법」 제47조(국고금의 끝수 계산)는 끝수를 버리는 방향으로만 규정한다.
+    // ① 수입·지출의 10원 미만 끝수는 "계산하지 아니한다" ② 국세 과세표준의 1원 미만도 같다.
+    // 지방소득세는 「지방세기본법」 제59조가 같은 조를 준용한다. 끝수를 올리는 조문은 없으므로
+    // 세액은 절사여야 하고, 해외주식 계산기가 쓰던 Math.round는 법령상 도달할 수 없는
+    // 1원 높은 세액을 만들어 같은 22% 구조인 가상자산 계산기와 결과가 갈렸다.
+    it("세액의 원 미만 끝수를 절사한다 — 반올림이면 1원 높은 값이 나온다", () => {
+      const gain = 10_000_003;
+      const r = calculateForeignStockTax({ sellAmount: gain, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 0 });
+      // 과세표준 7,500,003 × 20% = 1,500,000.6 → 절사 1,500,000 (반올림이면 1,500,001)
+      expect(r.taxableAmount).toBe(7_500_003);
+      expect(r.incomeTax).toBe(1_500_000);
+      expect(r.localTax).toBe(150_000);
+      expect(r.totalTax).toBe(1_650_000);
+    });
+
+    it("가상자산 계산기와 같은 과세표준에서 1원도 갈리지 않는다", () => {
+      // 같은 기본공제(250만원)·같은 22%(소득세 20% + 지방소득세 2%) 구조이므로
+      // 두 엔진의 결과는 과세표준 전 구간에서 항등이어야 한다.
+      const deduction = 2_500_000;
+      for (let taxable = 0; taxable <= 5_000; taxable += 1) {
+        const gain = deduction + taxable;
+        const crypto = calculateCryptoTax(0, gain, 0);
+        const foreign = calculateForeignStockTax({
+          sellAmount: gain,
+          buyAmount: 0,
+          fees: 0,
+          otherGains: 0,
+          otherLosses: 0,
+        });
+        expect(foreign.incomeTax, `taxable=${taxable}`).toBe(crypto.incomeTax);
+        expect(foreign.localTax, `taxable=${taxable}`).toBe(crypto.localTax);
+        expect(foreign.totalTax, `taxable=${taxable}`).toBe(crypto.totalTax);
+      }
+      // 큰 금액 구간에서도 같은 경계에서 계단이 걸린다
+      for (const taxable of [1_000_003, 33_333_333, 777_777_777]) {
+        const gain = deduction + taxable;
+        expect(
+          calculateForeignStockTax({ sellAmount: gain, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 0 }).totalTax,
+          `taxable=${taxable}`,
+        ).toBe(calculateCryptoTax(0, gain, 0).totalTax);
+      }
+    });
   });
 
   describe("calculateInheritanceTax", () => {

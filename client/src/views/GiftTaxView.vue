@@ -6,6 +6,7 @@ import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
 import { mergeFaqs } from "@/lib/faqMerge";
 import { GIFT_TAX_GUIDE } from "@/data/seoGuides";
+import InputRangeNotice from "@/components/common/InputRangeNotice.vue";
 import GiftTaxInputPanel from "@/components/gift/GiftTaxInputPanel.vue";
 import GiftTaxResultPanel from "@/components/gift/GiftTaxResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -83,6 +84,7 @@ const faqJsonLd = {
       />
     </CalculatorInteractionTracker>
 
+    <InputRangeNotice :notices="calc.rangeNotices.value" />
     <GiftTaxResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/gift-tax" />
     <FaqAccordionPanel title="출처 및 FAQ" :items="mergedFaqs">

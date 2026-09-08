@@ -1,13 +1,27 @@
 import { z } from "zod";
+import {
+  clampNoticesFor,
+  numField,
+  readAllNumbers,
+  readBoolean,
+  schemasOf,
+  type ClampNotice,
+  type NumField,
+} from "@/lib/inputRange";
 
-const amountSchema = z.coerce.number().int().min(0).max(50_000_000_000);
+const AMOUNT_MAX = 50_000_000_000;
+
+// 필드 정의 한 곳 — 스키마와 sanitize·클램프 알림이 모두 이 객체를 읽는다
+const FIELDS = {
+  totalEstate: numField("총 상속재산", 0, AMOUNT_MAX),
+  debt: numField("채무", 0, AMOUNT_MAX),
+  financialAssets: numField("금융재산", 0, AMOUNT_MAX),
+  childrenCount: numField("자녀 수", 0, 10),
+} satisfies Record<string, NumField>;
 
 export const inheritanceTaxInputSchema = z.object({
-  totalEstate: amountSchema,
-  debt: amountSchema,
-  financialAssets: amountSchema,
+  ...schemasOf(FIELDS),
   hasSpouse: z.boolean(),
-  childrenCount: z.coerce.number().int().min(0).max(10),
 });
 
 export type InheritanceTaxInput = z.infer<typeof inheritanceTaxInputSchema>;
@@ -20,17 +34,18 @@ export const DEFAULT_INHERITANCE_TAX_INPUT: InheritanceTaxInput = {
   childrenCount: 2,
 };
 
-function readField<T>(schema: z.ZodType<T>, value: unknown, fallback: T): T {
-  const parsed = schema.safeParse(value);
-  return parsed.success ? parsed.data : fallback;
+export function sanitizeInheritanceTaxInput(
+  input?: Partial<InheritanceTaxInput>,
+): InheritanceTaxInput {
+  return {
+    ...readAllNumbers(FIELDS, input, DEFAULT_INHERITANCE_TAX_INPUT),
+    hasSpouse: readBoolean(input?.hasSpouse, DEFAULT_INHERITANCE_TAX_INPUT.hasSpouse),
+  };
 }
 
-export function sanitizeInheritanceTaxInput(input?: Partial<InheritanceTaxInput>): InheritanceTaxInput {
-  return {
-    totalEstate: readField(amountSchema, input?.totalEstate, DEFAULT_INHERITANCE_TAX_INPUT.totalEstate),
-    debt: readField(amountSchema, input?.debt, DEFAULT_INHERITANCE_TAX_INPUT.debt),
-    financialAssets: readField(amountSchema, input?.financialAssets, DEFAULT_INHERITANCE_TAX_INPUT.financialAssets),
-    hasSpouse: readField(z.boolean(), input?.hasSpouse, DEFAULT_INHERITANCE_TAX_INPUT.hasSpouse),
-    childrenCount: readField(z.coerce.number().int().min(0).max(10), input?.childrenCount, DEFAULT_INHERITANCE_TAX_INPUT.childrenCount),
-  };
+/** 범위 밖이라 잘린 필드 — 화면 배너로 알린다 */
+export function inheritanceTaxClampNotices(
+  input?: Partial<InheritanceTaxInput>,
+): ClampNotice[] {
+  return clampNoticesFor(FIELDS, input as Record<string, unknown> | undefined);
 }
