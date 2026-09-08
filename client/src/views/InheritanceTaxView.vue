@@ -7,6 +7,7 @@ import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
 import { mergeFaqs } from "@/lib/faqMerge";
 import { INHERITANCE_TAX_GUIDE } from "@/data/seoGuides";
+import InputRangeNotice from "@/components/common/InputRangeNotice.vue";
 import InheritanceTaxInputPanel from "@/components/inheritance/InheritanceTaxInputPanel.vue";
 import InheritanceTaxResultPanel from "@/components/inheritance/InheritanceTaxResultPanel.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
@@ -89,6 +90,7 @@ const faqJsonLd = {
       />
     </CalculatorInteractionTracker>
 
+    <InputRangeNotice :notices="calc.rangeNotices.value" />
     <InheritanceTaxResultPanel :result="calc.result.value" />
     <IntentRelatedLinks current-path="/inheritance-tax" />
     <FaqAccordionPanel title="출처 및 FAQ" :items="mergedFaqs">

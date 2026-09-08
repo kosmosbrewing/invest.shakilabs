@@ -19,7 +19,11 @@ import {
   SAVINGS_INTEREST_GUIDE,
   type GuideData,
 } from "../seoGuides";
-import { DEFAULT_FOREIGN_STOCK_TAX_INPUT } from "@/lib/foreignStockTaxValidators";
+import {
+  DEFAULT_FOREIGN_STOCK_TAX_INPUT,
+  foreignStockTaxClampNotices,
+  sanitizeForeignStockTaxInput,
+} from "@/lib/foreignStockTaxValidators";
 import { DEFAULT_GIFT_TAX_INPUT } from "@/lib/giftTaxValidators";
 import { DEFAULT_INHERITANCE_TAX_INPUT } from "@/lib/inheritanceTaxValidators";
 import { calculateForeignStockTax } from "@/utils/foreignStockTaxCalculator";
@@ -662,11 +666,30 @@ describe("파생 다이제스트 — 인용 수치 엔진 재계산 일치 (이�
     }
     expect(ahead + behind + level).toBe(991);
     for (const v of [num(ahead), num(behind), num(level)]) expect(bodyOf(DEPOSIT_INTEREST_DIGEST, 1)).toContain(v);
-    // 표시 월이자 × 개월수 ≠ 총 세후이자
+    // 월이자식 세금은 매월 원천징수의 누적이다 — 표시 월이자 × 개월수가 총 세후이자와 정확히 같아야 한다
     const drift = perMonth.monthlyInterestNet * DEPOSIT_BASE.months - perMonth.netInterest;
-    expect(drift).not.toBe(0);
+    expect(drift).toBe(0);
+    expect(perMonth.tax).toBe((perMonth.monthlyInterestGross - perMonth.monthlyInterestNet) * DEPOSIT_BASE.months);
+    // 그 대신 "총이자에 한 번" 매긴 값과는 어긋난다 — 산문이 적는 폭이 실제 폭이다
+    const oneShot = Math.round(perMonth.grossInterest * INTEREST_TAX.NORMAL_RATE);
+    expect(perMonth.tax).not.toBe(oneShot);
     expect(bodyOf(DEPOSIT_INTEREST_DIGEST, 2)).toContain(won(perMonth.monthlyInterestNet));
-    expect(bodyOf(DEPOSIT_INTEREST_DIGEST, 2)).toContain(won(Math.abs(drift)));
+    expect(bodyOf(DEPOSIT_INTEREST_DIGEST, 2)).toContain(won(perMonth.tax));
+    expect(bodyOf(DEPOSIT_INTEREST_DIGEST, 2)).toContain(won(Math.abs(perMonth.tax - oneShot)));
+    // 어긋남은 징수 횟수에 비례해 커진다 — h3가 "12번"을 적는 근거
+    const wedge = (months: number) => {
+      let w = 0;
+      for (let principal = 10_000_000; principal <= 10_001_000; principal += 1) {
+        const r = dep({ principal, months, paymentType: "monthly" });
+        const d = Math.abs(r.tax - Math.round(r.grossInterest * INTEREST_TAX.NORMAL_RATE));
+        if (d > w) w = d;
+      }
+      return w;
+    };
+    expect(wedge(36)).toBeGreaterThan(wedge(6));
+    // 기본값에서는 세전 4원 차이가 세후에서 상쇄된다 — 산문 #1이 적는 사실
+    expect(perMonth.netInterest).toBe(atMaturity.netInterest);
+    expect(perMonth.grossInterest).not.toBe(atMaturity.grossInterest);
     // 세후 월이자 계단 — h3가 적은 폭 전체에서 값이 같다
     const width = Number(DEPOSIT_INTEREST_DIGEST[3].h2.match(/원금 ([\d,]+)원/)![1].replace(/,/g, ""));
     const start = Number(bodyOf(DEPOSIT_INTEREST_DIGEST, 3).match(/원금을 ([\d,]+)원과/)![1].replace(/,/g, ""));
@@ -722,13 +745,23 @@ describe("파생 다이제스트 — 인용 수치 엔진 재계산 일치 (이�
     expect(at(4)).toBe(0);
     expect(at(5)).toBe(0);
     expect(bodyOf(CRYPTO_TAX_DIGEST, 4)).toContain(won(at(3)));
-    // 해외주식 계산기와의 1원 어긋남 — 산문이 적은 지점에서 실제로 갈린다
-    const gain = Number(bodyOf(CRYPTO_TAX_DIGEST, 6).match(/양도차익 ([\d,]+)원을 가정/)![1].replace(/,/g, ""));
-    const here = cry(gain).totalTax;
-    const there = calculateForeignStockTax({ sellAmount: gain, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 0 }).totalTax;
-    expect(there - here).toBe(1);
-    expect(bodyOf(CRYPTO_TAX_DIGEST, 6)).toContain(won(here));
-    expect(bodyOf(CRYPTO_TAX_DIGEST, 6)).toContain(won(there));
+    // 소득 구분이 다르면 공제가 두 번 붙는다 — 절감액은 공제 하나에 22%를 먹인 값
+    const each = 5_000_000;
+    const fsGain = (gain: number) =>
+      calculateForeignStockTax({ sellAmount: gain, buyAmount: 0, fees: 0, otherGains: 0, otherLosses: 0 });
+    const apart = cry(each).totalTax + fsGain(each).totalTax;
+    const lumped = cry(each * 2).totalTax;
+    expect(lumped - apart).toBe(
+      Math.floor(d * CRYPTO_TAX.INCOME_TAX_RATE) + Math.floor(d * CRYPTO_TAX.LOCAL_TAX_RATE),
+    );
+    expect(bodyOf(CRYPTO_TAX_DIGEST, 6)).toContain(won(apart));
+    expect(bodyOf(CRYPTO_TAX_DIGEST, 6)).toContain(won(lumped));
+    // 두 계산기는 같은 과세표준에서 1원도 갈리지 않아야 한다 — 둘 다 절사(내림)로 통일했다.
+    // 국고금 관리법 제47조는 끝수를 버리는 방향으로만 규정하므로 반올림 쪽이 틀렸었다.
+    for (let taxable = 1; taxable <= 2_000; taxable += 1) {
+      expect(fsGain(d + taxable).totalTax, `taxable=${taxable}`).toBe(cry(d + taxable).totalTax);
+    }
+    expect(bodyOf(CRYPTO_TAX_DIGEST, 6)).toContain("어긋난 지점이 0개입니다");
     // 세후 수익 배수는 2배 아래에서 올라온다
     for (const g of [5_000_000, 20_000_000, 100_000_000]) {
       expect(cry(g * 2).netProfit / cry(g).netProfit, `${g}`).toBeLessThan(2);
@@ -769,12 +802,28 @@ describe("파생 다이제스트 — 인용 수치 엔진 재계산 일치 (이�
     const sameTax = fs({ sellAmount: 500_000_000, buyAmount: 480_000_000 });
     expect(sameTax.totalTax).toBe(base.totalTax);
     expect(bodyOf(FOREIGN_STOCK_TAX_DIGEST, 5)).toContain(won(sameTax.totalTax));
-    // sanitize: 범위 밖·소수점·음수가 잘리지 않고 기본값으로 되돌아간다
-    for (const bad of [70_000_000.5, 60_000_000_000, -1]) {
-      expect(calculateForeignStockTax({ ...FOREIGN_BASE, sellAmount: bad }).totalTax, `${bad}`).toBe(base.totalTax);
+    // sanitize: 범위 밖 입력은 기본값이 아니라 경계로 클램프된다
+    const clampCases: [number, number][] = [
+      [70_000_000.5, 70_000_001],
+      [60_000_000_000, 50_000_000_000],
+      [-1, 0],
+    ];
+    for (const [entered, applied] of clampCases) {
+      expect(sanitizeForeignStockTaxInput({ ...FOREIGN_BASE, sellAmount: entered }).sellAmount, `${entered}`).toBe(applied);
+      expect(calculateForeignStockTax({ ...FOREIGN_BASE, sellAmount: entered }).totalTax, `${entered}`).toBe(
+        calculateForeignStockTax({ ...FOREIGN_BASE, sellAmount: applied }).totalTax,
+      );
     }
-    expect(calculateForeignStockTax({ ...FOREIGN_BASE, sellAmount: 70_000_000 }).totalTax).not.toBe(base.totalTax);
+    // 범위 밖 두 건만 배너로 알린다 — 소수점은 범위 안이라 알림 대상이 아니다
+    expect(foreignStockTaxClampNotices({ ...FOREIGN_BASE, sellAmount: 70_000_000.5 })).toEqual([]);
+    expect(foreignStockTaxClampNotices({ ...FOREIGN_BASE, sellAmount: 60_000_000_000 })).toEqual([
+      { key: "sellAmount", label: "매도금액", entered: 60_000_000_000, applied: 50_000_000_000 },
+    ]);
+    // 숫자로 읽을 수 없는 값만 기본값으로 간다 — 이때는 클램프가 아니므로 알림도 없다
+    expect(calculateForeignStockTax({ ...FOREIGN_BASE, sellAmount: Number.NaN }).totalTax).toBe(base.totalTax);
+    expect(foreignStockTaxClampNotices({ ...FOREIGN_BASE, sellAmount: Number.NaN })).toEqual([]);
     expect(bodyOf(FOREIGN_STOCK_TAX_DIGEST, 6)).toContain(won(calculateForeignStockTax({ ...FOREIGN_BASE, sellAmount: 70_000_000 }).totalTax));
+    expect(bodyOf(FOREIGN_STOCK_TAX_DIGEST, 6)).toContain(won(50_000_000_000));
     // 다른 종목 이익과 매도금액 인상이 완전히 같다
     expect(fs({ sellAmount: FOREIGN_BASE.sellAmount + 10_000_000 }).totalTax).toBe(fs({ otherGains: 10_000_000 }).totalTax);
     // 같은 1,000만원의 한계 세부담이 공제 소진 여부로 갈린다
@@ -801,7 +850,7 @@ describe("파생 다이제스트 — 이자·양도 엔진 리터럴 앵커", ()
     expect(calculateSavingsInterest({ ...SAVINGS_BASE, taxType: "preferential" }).netInterest).toBe(64_223);
     expect(calculateSavingsInterest({ ...SAVINGS_BASE, taxType: "tax_free" }).netInterest).toBe(68_250);
     expect(INTEREST_TAX.NORMAL_RATE).toBe(0.154);
-    // 예금 1,000만원·12개월·연 3.5% — 만기일시와 월이자식이 4원 갈린다
+    // 예금 1,000만원·12개월·연 3.5% — 세전은 만기일시와 월이자식이 4원 갈린다
     const atMaturity = calculateDepositInterest(DEPOSIT_BASE);
     expect(atMaturity.grossInterest).toBe(350_000);
     expect(atMaturity.tax).toBe(53_900);
@@ -810,7 +859,12 @@ describe("파생 다이제스트 — 이자·양도 엔진 리터럴 앵커", ()
     expect(perMonth.monthlyInterestGross).toBe(29_167);
     expect(perMonth.monthlyInterestNet).toBe(24_675);
     expect(perMonth.grossInterest).toBe(350_004);
-    expect(perMonth.netInterest).toBe(296_103);
+    // 세금은 월 4,492원 × 12 = 53,904원(매월 원천징수 누적)이라 세후는 24,675 × 12 = 296,100원.
+    // 예전에는 총이자에 한 번 더 반올림해 53,901원·296,103원이 나왔고, 그 3원이 화면의
+    // "세후 월 수령액 × 12"와 "세후 총이자"를 어긋나게 만들었다.
+    expect(perMonth.tax).toBe(53_904);
+    expect(perMonth.netInterest).toBe(296_100);
+    expect(perMonth.monthlyInterestNet * DEPOSIT_BASE.months).toBe(perMonth.netInterest);
     // 가상자산 1,000만원 → 1,500만원 — (500만 − 250만) × 20% + × 2%
     const crypto = calculateCryptoTax(CRYPTO_BASE.purchaseAmount, CRYPTO_BASE.saleAmount, CRYPTO_BASE.expenses);
     expect(crypto.taxableAmount).toBe(2_500_000);
@@ -818,7 +872,7 @@ describe("파생 다이제스트 — 이자·양도 엔진 리터럴 앵커", ()
     expect(crypto.localTax).toBe(50_000);
     expect(crypto.totalTax).toBe(550_000);
     expect(CRYPTO_TAX.BASIC_DEDUCTION).toBe(2_500_000);
-    // 해외주식 기본값 — (1,950만 − 250만) × 22%
+    // 해외주식 기본값 — (1,950만 − 250만) × 22%. 원 미만 끝수는 절사(국고금 관리법 제47조).
     const foreign = calculateForeignStockTax(FOREIGN_BASE);
     expect(foreign.gain).toBe(19_500_000);
     expect(foreign.taxableAmount).toBe(17_000_000);

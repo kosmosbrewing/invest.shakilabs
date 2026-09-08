@@ -29,6 +29,9 @@ export function calculateCryptoTax(
   const totalGain = saleAmount - purchaseAmount - expenses;
   const deduction = CRYPTO_TAX.BASIC_DEDUCTION;
   const taxableAmount = Math.max(0, totalGain - deduction);
+  // 원 미만 끝수는 절사한다 — 「국고금 관리법」 제47조(끝수 계산)가 끝수를 버리는 방향으로만
+  // 규정하고(① 10원 미만, ② 과세표준 1원 미만), 지방소득세는 「지방세기본법」 제59조가 이를 준용한다.
+  // 해외주식 양도소득세(calculateForeignStockTax)도 같은 22% 구조라 같은 절사를 쓴다.
   const incomeTax = Math.floor(taxableAmount * CRYPTO_TAX.INCOME_TAX_RATE);
   const localTax = Math.floor(taxableAmount * CRYPTO_TAX.LOCAL_TAX_RATE);
   const totalTax = incomeTax + localTax;

@@ -1,5 +1,9 @@
 import { computed, ref, type ComputedRef, type Ref } from "vue";
-import { DEFAULT_INHERITANCE_TAX_INPUT } from "@/lib/inheritanceTaxValidators";
+import type { ClampNotice } from "@/lib/inputRange";
+import {
+  DEFAULT_INHERITANCE_TAX_INPUT,
+  inheritanceTaxClampNotices,
+} from "@/lib/inheritanceTaxValidators";
 import { calculateInheritanceTax } from "@/utils/inheritanceTaxCalculator";
 
 export type InheritanceTaxCalcResult = {
@@ -9,6 +13,7 @@ export type InheritanceTaxCalcResult = {
   hasSpouse: Ref<boolean>;
   childrenCount: Ref<number>;
   result: ComputedRef<ReturnType<typeof calculateInheritanceTax>>;
+  rangeNotices: ComputedRef<ClampNotice[]>;
 };
 
 export function useInheritanceTaxCalc(initialEstate?: number): InheritanceTaxCalcResult {
@@ -28,6 +33,16 @@ export function useInheritanceTaxCalc(initialEstate?: number): InheritanceTaxCal
     })
   );
 
+  // 범위 밖 입력은 기본값 복귀가 아니라 경계 클램프이므로, 잘린 사실을 화면에 알린다
+  const rangeNotices = computed(() =>
+    inheritanceTaxClampNotices({
+      totalEstate: totalEstate.value,
+      debt: debt.value,
+      financialAssets: financialAssets.value,
+      childrenCount: childrenCount.value,
+    })
+  );
+
   return {
     totalEstate,
     debt,
@@ -35,5 +50,6 @@ export function useInheritanceTaxCalc(initialEstate?: number): InheritanceTaxCal
     hasSpouse,
     childrenCount,
     result,
+    rangeNotices,
   };
 }

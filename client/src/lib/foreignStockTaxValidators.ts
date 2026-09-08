@@ -1,14 +1,25 @@
 import { z } from "zod";
+import {
+  clampNoticesFor,
+  numField,
+  readAllNumbers,
+  schemasOf,
+  type ClampNotice,
+  type NumField,
+} from "@/lib/inputRange";
 
-const amountSchema = z.coerce.number().int().min(0).max(50_000_000_000);
+const AMOUNT_MAX = 50_000_000_000;
 
-export const foreignStockTaxInputSchema = z.object({
-  sellAmount: amountSchema,
-  buyAmount: amountSchema,
-  fees: amountSchema,
-  otherGains: amountSchema,
-  otherLosses: amountSchema,
-});
+// 필드 정의 한 곳 — 스키마와 sanitize·클램프 알림이 모두 이 객체를 읽는다
+const FIELDS = {
+  sellAmount: numField("매도금액", 0, AMOUNT_MAX),
+  buyAmount: numField("매수금액", 0, AMOUNT_MAX),
+  fees: numField("필요경비", 0, AMOUNT_MAX),
+  otherGains: numField("다른 종목 양도차익", 0, AMOUNT_MAX),
+  otherLosses: numField("다른 종목 양도차손", 0, AMOUNT_MAX),
+} satisfies Record<string, NumField>;
+
+export const foreignStockTaxInputSchema = z.object(schemasOf(FIELDS));
 
 export type ForeignStockTaxInput = z.infer<typeof foreignStockTaxInputSchema>;
 
@@ -20,17 +31,15 @@ export const DEFAULT_FOREIGN_STOCK_TAX_INPUT: ForeignStockTaxInput = {
   otherLosses: 0,
 };
 
-function readField<T>(schema: z.ZodType<T>, value: unknown, fallback: T): T {
-  const parsed = schema.safeParse(value);
-  return parsed.success ? parsed.data : fallback;
+export function sanitizeForeignStockTaxInput(
+  input?: Partial<ForeignStockTaxInput>,
+): ForeignStockTaxInput {
+  return readAllNumbers(FIELDS, input, DEFAULT_FOREIGN_STOCK_TAX_INPUT);
 }
 
-export function sanitizeForeignStockTaxInput(input?: Partial<ForeignStockTaxInput>): ForeignStockTaxInput {
-  return {
-    sellAmount: readField(amountSchema, input?.sellAmount, DEFAULT_FOREIGN_STOCK_TAX_INPUT.sellAmount),
-    buyAmount: readField(amountSchema, input?.buyAmount, DEFAULT_FOREIGN_STOCK_TAX_INPUT.buyAmount),
-    fees: readField(amountSchema, input?.fees, DEFAULT_FOREIGN_STOCK_TAX_INPUT.fees),
-    otherGains: readField(amountSchema, input?.otherGains, DEFAULT_FOREIGN_STOCK_TAX_INPUT.otherGains),
-    otherLosses: readField(amountSchema, input?.otherLosses, DEFAULT_FOREIGN_STOCK_TAX_INPUT.otherLosses),
-  };
+/** 범위 밖이라 잘린 필드 — 화면 배너로 알린다 */
+export function foreignStockTaxClampNotices(
+  input?: Partial<ForeignStockTaxInput>,
+): ClampNotice[] {
+  return clampNoticesFor(FIELDS, input as Record<string, unknown> | undefined);
 }

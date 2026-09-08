@@ -1,8 +1,10 @@
 import { computed, ref, type ComputedRef, type Ref } from "vue";
 import {
   DEFAULT_GIFT_TAX_INPUT,
+  giftTaxClampNotices,
   type GiftTaxInput,
 } from "@/lib/giftTaxValidators";
+import type { ClampNotice } from "@/lib/inputRange";
 import { calculateGiftTax } from "@/utils/giftTaxCalculator";
 
 export type GiftTaxCalcResult = {
@@ -11,6 +13,7 @@ export type GiftTaxCalcResult = {
   relationship: Ref<GiftTaxInput["relationship"]>;
   isGenerationSkipping: Ref<boolean>;
   result: ComputedRef<ReturnType<typeof calculateGiftTax>>;
+  rangeNotices: ComputedRef<ClampNotice[]>;
 };
 
 export function useGiftTaxCalc(initialGift?: number): GiftTaxCalcResult {
@@ -28,11 +31,20 @@ export function useGiftTaxCalc(initialGift?: number): GiftTaxCalcResult {
     })
   );
 
+  // 범위 밖 입력은 기본값 복귀가 아니라 경계 클램프이므로, 잘린 사실을 화면에 알린다
+  const rangeNotices = computed(() =>
+    giftTaxClampNotices({
+      giftAmount: giftAmount.value,
+      priorDeductionUsed: priorDeductionUsed.value,
+    })
+  );
+
   return {
     giftAmount,
     priorDeductionUsed,
     relationship,
     isGenerationSkipping,
     result,
+    rangeNotices,
   };
 }

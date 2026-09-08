@@ -125,10 +125,21 @@ export function calculateDepositInterest(input: DepositInterestInput): DepositIn
   const monthlyInterestNet = monthlyInterestGross - monthlyTax;
 
   if (paymentType === "monthly") {
-    // 월이자 방식: 매월 이자를 받으므로 만기에는 원금만 돌려받음
+    // 월이자 방식: 매월 이자를 받으므로 만기에는 원금만 돌려받음.
+    //
+    // 세금은 총액에 한 번이 아니라 **매월 지급분마다** 원천징수된다 —
+    // 「소득세법」 제127조①은 이자소득을 "지급하는 자"에게 원천징수 의무를 지우고,
+    // 제128조①은 원천징수한 세액을 "그 징수일이 속하는 달의 다음 달 10일까지" 납부하게 한다.
+    // 즉 12개월짜리 월이자지급식 예금은 원천징수가 12번 따로 일어난다.
+    //
+    // 예전에는 총이자에 세율을 한 번 더 곱해 반올림했는데(round(총이자 × 세율)),
+    // 그러면 화면의 "세후 월 수령액 × 개월수"와 "세후 총이자"가 몇 원씩 어긋났다
+    // (기본값에서 3원). 월별 원천징수를 그대로 누적하면 실제 과세 방식과도 맞고
+    // 두 표시값이 정확히 일치한다.
     const totalGrossInterest = monthlyInterestGross * months;
-    const totalTax = Math.round(totalGrossInterest * taxRate);
+    const totalTax = monthlyTax * months;
     // grossInterest - tax === netInterest 정합성을 보장하기 위해 차감으로 산출
+    // (= monthlyInterestNet × months와 항등)
     const totalNetInterest = totalGrossInterest - totalTax;
 
     return {

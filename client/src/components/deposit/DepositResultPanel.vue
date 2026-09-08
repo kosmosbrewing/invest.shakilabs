@@ -36,7 +36,13 @@ const metricRows = computed(() => {
     {
       label: "이자소득세",
       value: formatWon(props.result.tax),
-      description: props.result.tax > 0 ? "이자에 부과되는 세금" : "비과세 적용",
+      // 월이자지급식은 지급할 때마다 원천징수되므로(소득세법 제127조①) 세금이 매월 따로 걸린다
+      description:
+        props.result.tax > 0
+          ? props.paymentType === "monthly"
+            ? "매월 지급분마다 원천징수한 합계"
+            : "이자에 부과되는 세금"
+          : "비과세 적용",
       tone: props.result.tax > 0 ? "danger" : "default",
     },
     {
@@ -51,7 +57,7 @@ const metricRows = computed(() => {
     rows.push({
       label: "월 이자 수령액",
       value: formatWon(props.result.monthlyInterestNet),
-      description: `세전 ${formatWon(props.result.monthlyInterestGross)}`,
+      description: `세전 ${formatWon(props.result.monthlyInterestGross)} · 개월수를 곱하면 위 세후 이자와 같습니다`,
       badge: "매월 지급",
       tone: "success",
     });

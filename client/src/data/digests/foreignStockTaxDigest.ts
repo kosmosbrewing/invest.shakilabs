@@ -1,9 +1,10 @@
 // /foreign-stock-tax 파생 다이제스트 — 이 엔진의 특징은 세율이 아니라 입력 구조에 있다.
 // 다른 종목의 이익·손실을 한 해 안에서 합산(손익통산)한 뒤 기본공제를 한 번 적용하고,
-// 해를 넘기는 이월은 아예 없다. 게다가 sanitize가 범위 밖 입력을 잘라 내지 않고 기본값으로 되돌린다.
+// 해를 넘기는 이월은 아예 없다. 범위 밖 입력은 기본값 복귀가 아니라 경계 클램프이며, 잘린 사실은 배너로 알린다.
 // 아래 수치는 전부 calculateForeignStockTax 실행값이다.
 
 import type { ForeignStockTaxInput } from "@/lib/foreignStockTaxValidators";
+import { foreignStockTaxClampNotices } from "@/lib/foreignStockTaxValidators";
 import { calculateForeignStockTax } from "@/utils/foreignStockTaxCalculator";
 import { type Finding, eul, eun, ga, ida, imnida, manwon, num, pct, ro, wa, won } from "./format";
 
@@ -165,20 +166,23 @@ function sellAmountTellsYouNothing(): Finding {
   };
 }
 
-function outOfRangeInputSilentlyResets(): Finding {
-  const b = run();
+function outOfRangeInputIsClampedNotReset(): Finding {
   const raw = (sellAmount: number) => calculateForeignStockTax({ ...FOREIGN_BASE, sellAmount });
   const fractional = raw(70_000_000.5);
-  const overRange = raw(60_000_000_000);
-  const negative = raw(-1);
   const valid = raw(70_000_000);
+  const over = 60_000_000_000;
+  const overRange = raw(over);
+  const overNotice = foreignStockTaxClampNotices({ ...FOREIGN_BASE, sellAmount: over })[0];
+  const negative = raw(-1);
+  const blank = raw(Number.NaN);
+  const b = run();
   return {
-    h2: `소수점을 붙이면 입력이 통째로 기본값으로 되돌아간다`,
+    h2: `범위를 벗어난 입력은 기본값이 아니라 경계로 잘려 계산된다`,
     body:
-      `매도금액 칸에 ${eul(won(70_000_000))} 넣으면 세금이 ${ro(won(valid.totalTax))} 나오는데, 똑같은 값에 소수점 아래 5만 붙여 넣는 경우를 가정하면 결과가 ${ro(won(fractional.totalTax))} 돌아갑니다. 이는 기본값 ${manwon(FOREIGN_BASE.sellAmount)}으로 계산한 값 ${wa(won(b.totalTax))} 정확히 같습니다. ` +
-      `입력 검증이 정수·0 이상·500억원 이하만 통과시키고 벗어난 값은 잘라 내는 대신 기본값으로 되돌리기 때문이며, ${eul(won(60_000_000_000))} 넣어도 ${won(overRange.totalTax)}, 음수를 넣어도 ${ro(won(negative.totalTax))} 같은 결과가 나옵니다. ` +
-      `화면에는 오류 표시 없이 숫자만 바뀌므로, 값을 넣었는데 결과가 처음 화면과 똑같다면 계산이 안 된 것이 아니라 입력이 되돌려진 것일 수 있습니다. ` +
-      `원 단위 정수로, 그리고 허용 범위 안에서 넣어야 넣은 값 그대로 계산됩니다.`,
+      `매수 ${wa(manwon(FOREIGN_BASE.buyAmount))} 필요경비 ${eul(won(FOREIGN_BASE.fees))} 그대로 두고 매도금액만 ${eul(won(70_000_000))} 넣는 경우를 가정하면 세금이 ${ro(won(valid.totalTax))} 나오는데, 같은 값에 소수점 아래 5를 붙여도 원 단위로 반올림될 뿐이라 ${ro(won(fractional.totalTax))} 답이 그대로입니다. ` +
+      `상한을 넘긴 ${eul(won(over))} 넣으면 허용 상한인 ${ro(won(overNotice.applied))} 잘려 세금이 ${ga(won(overRange.totalTax))} 되고, 음수를 넣으면 ${ro(won(0))} 잘려 ${imnida(won(negative.totalTax))}. 잘린 필드는 화면 위쪽에 "입력 가능 범위를 벗어나 … 로 계산했습니다"라는 경고 배너로 뜨므로, 결과가 어느 값으로 계산된 것인지 화면에서 확인할 수 있습니다. ` +
+      `예전에는 같은 입력이 경계로 잘리는 대신 필드 기본값으로 통째로 되돌아갔습니다. 그래서 소수점 하나만 붙여도 결과가 기본값 ${manwon(FOREIGN_BASE.sellAmount)} 기준인 ${ro(won(b.totalTax))} 돌아가면서도 화면에는 아무 표시가 없었는데, 넣은 값과 결과가 어긋난 채 남는 조용한 오답이라 잘라 내는 쪽으로 바꿨습니다. ` +
+      `지금 기본값으로 돌아가는 경우는 숫자로 읽을 수 없는 입력뿐이고, 그때는 클램프가 아니라 입력이 없는 것이므로 배너도 뜨지 않습니다. 칸을 비우면 다시 ${ga(won(blank.totalTax))} 되는 이유가 이것입니다.`,
   };
 }
 
@@ -221,7 +225,7 @@ export const FOREIGN_STOCK_TAX_DIGEST: Finding[] = [
   exchangeRateAloneCreatesTax(),
   twoAccountsGetTwoDeductions(),
   sellAmountTellsYouNothing(),
-  outOfRangeInputSilentlyResets(),
+  outOfRangeInputIsClampedNotReset(),
   otherGainsAreIndistinguishable(),
   sameTenMillionCostsDifferentTax(),
 ];
