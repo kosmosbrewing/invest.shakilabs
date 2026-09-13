@@ -1,6 +1,7 @@
 import { nextTick } from "vue";
 import type { Router, RouteRecordRaw } from "vue-router";
 import { trackPageView } from "@/lib/analytics";
+import { normalizeTitle } from "@/composables/useSEO";
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -173,7 +174,9 @@ export function createScrollBehavior(): Router["options"]["scrollBehavior"] {
 export function setupRouterGuards(router: Router): void {
   router.beforeEach((to) => {
     if (!isBrowser() || !to.meta.title) return;
-    document.title = to.meta.title as string;
+    // useHead가 붙기 전에 잠깐 보이는 초기 title도 최종 렌더와 같은 레시피여야
+    // 한다 — 그렇지 않으면 하이드레이션 순간 title이 바뀌는 깜빡임이 생긴다.
+    document.title = normalizeTitle(to.meta.title as string);
   });
 
   router.afterEach((to, _from, failure) => {
