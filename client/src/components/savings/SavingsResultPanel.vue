@@ -53,7 +53,7 @@ const segments = computed(() => [
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p class="text-caption font-semibold text-muted-foreground">예상 만기 수령액</p>
-            <p class="result-amount mt-1 font-bold text-primary tabular-nums"><CountUpAmount :value="formatWon(result.maturityAmount)" /></p>
+            <p class="result-amount mt-1 font-bold font-brand text-primary tabular-nums"><CountUpAmount :value="formatWon(result.maturityAmount)" /></p>
           </div>
           <Badge variant="outline" class="border-primary/25 bg-primary/5 text-primary">
             세후 이자 {{ formatWon(result.netInterest) }}
