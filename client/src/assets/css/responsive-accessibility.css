@@ -5,11 +5,10 @@
   line-height: 1.4;
 }
 
-/* 네비 배경은 --primary이므로 링크 색은 그 짝 토큰을 그대로 쓴다.
-   white 하드코딩은 다크에서 짝이 어긋나므로 금지 — 라이트 6.03:1 */
-:root:not(.dark) nav[aria-label="주요 메뉴"] a {
-  color: hsl(var(--primary-foreground));
-}
+/* v3 BL-006으로 2차 내비 배경이 --primary 풀폭에서 card(흰색)로 중성화됐다.
+   이 규칙은 그 옛 배경을 전제로 한 on-primary 텍스트 보정이라 지금 켜두면
+   흰 배경 위 흰 글자(대비 1:1)가 된다 — src/assets/css/v3-appshell.css의
+   .sh-primary-navigation__link 오버라이드로 대체됐으므로 제거한다. */
 
 .tabular-nums {
   overflow-wrap: normal;

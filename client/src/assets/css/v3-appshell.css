@@ -1,0 +1,108 @@
+/* v3 AppShell 마이그레이션 (BL-004/006) — invest
+   이 파일은 @shakilabs/ui/styles.css **뒤에** 로드된다(main.ts import 순서).
+   패키지 .sh-primary-navigation은 아직 구 문법(배경 = --sh-color-primary 풀폭)이라
+   여기서 앱 로컬로 중성화한다. 패키지 자체는 vendored라 손대지 않는다. */
+
+:root {
+  /* v3 §4.1 액센트 주입 — 기존 --primary(invest 청록/파랑)를 지우지 않고 별도 이름으로 복제한다.
+     주입 안 해도 --sh-color-accent는 --primary로 폴백하지만, 명시해 두면 --primary가
+     나중에 바뀌어도 언더라인·결과 강조색이 조용히 같이 안 바뀐다. */
+  --accent-hsl: 200 85% 32%;
+  --accent-muted-hsl: 200 85% 32%;
+
+  /* v3 §3.1 — 헤더(56px, 패키지 고정) + 2차 내비 실측 높이 + 여백 8px. */
+  --secondary-nav-h: 56px;
+}
+
+.dark {
+  --accent-hsl: 200 85% 55%;
+  --accent-muted-hsl: 200 85% 55%;
+}
+
+html {
+  scroll-padding-top: calc(var(--sh-header-h) + var(--secondary-nav-h, 0px) + 8px);
+}
+
+/* ── GlobalHeader 유틸 버튼 대비 보정 ───────────────────────────────────────
+   패키지 .design-system-theme-toggle.sh-button은 색 틴트 헤더 시절 훅이라
+   color: var(--muted-foreground)를 쓴다 — 검정 헤더 위에서 AA 미달(house 실측 2.91:1과 동일 구조).
+   헤더 안에서만 header-ink로 되받는다(패키지 자체는 vendored라 미변경). */
+.sh-global-header .design-system-theme-toggle.sh-button {
+  border-color: rgb(255 255 255 / 24%);
+  color: var(--sh-color-header-ink);
+}
+
+.sh-global-header .design-system-theme-toggle.sh-button:hover {
+  border-color: var(--sh-color-header-ink);
+  color: var(--sh-color-header-ink);
+}
+
+/* ── SecondaryNav 중성화 (BL-006/BL-033) ──────────────────────────────────
+   풀폭 브랜드색 바 → card 배경 + accent 밑줄. 배경을 accent로 채우지 않는다. */
+.sh-primary-navigation {
+  background: hsl(var(--card));
+  color: hsl(var(--muted-foreground));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.sh-primary-navigation__link {
+  color: hsl(var(--muted-foreground));
+}
+
+.sh-primary-navigation__link--active {
+  color: hsl(var(--foreground));
+  font-weight: 700;
+}
+
+.sh-primary-navigation__link:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: -3px;
+}
+
+.sh-primary-navigation__link--mobile:hover,
+.sh-primary-navigation__link--mobile.sh-primary-navigation__link--active {
+  background: hsl(var(--muted) / 0.6);
+}
+
+.sh-primary-navigation__link--desktop:hover {
+  background: hsl(var(--muted) / 0.6);
+}
+
+/* 데스크톱 우측 잘림 fade는 배경색을 따라가야 한다 — 그대로 두면 파랑 그라데이션만 남는다 */
+.sh-primary-navigation__container::after {
+  background: linear-gradient(to left, hsl(var(--card)), transparent);
+}
+
+/* 활성 밑줄 = accent 2px (§4.2 "SecondaryNav 활성 underline"). currentColor를 쓰면
+   비활성/활성 텍스트가 ink라서 밑줄도 회색이 된다 — accent를 명시로 지정한다. */
+.sh-primary-navigation__link--mobile.sh-primary-navigation__link--active
+  .sh-primary-navigation__label::after,
+.sh-primary-navigation__link--desktop.sh-primary-navigation__link--active
+  .sh-primary-navigation__label::after {
+  background: hsl(var(--sh-color-accent));
+  height: 2px;
+}
+
+/* 모바일 2행 그리드 금지(§3.3) → 가로 스크롤 1행. invest는 mobile-columns=2라
+   grid-template-columns 클래스가 다르지만 display:flex로 덮으면 무관해진다.
+   탭 44px는 패키지 --sh-control-height가 min-height로 보장한다. */
+@media (max-width: 639px) {
+  .sh-primary-navigation__mobile {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sh-primary-navigation__mobile::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sh-primary-navigation__link--mobile {
+    flex: 0 0 auto;
+    min-width: 44px;
+    padding-inline: 0.75rem;
+    white-space: nowrap;
+  }
+}

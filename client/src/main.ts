@@ -7,6 +7,7 @@ import { initSentry } from "./lib/sentry";
 import "./assets/css/main.css";
 import "@shakilabs/ui/styles.css";
 import "./assets/css/responsive-accessibility.css";
+import "./assets/css/v3-appshell.css";
 
 let hasRegisteredGlobalErrorTracking = false;
 
