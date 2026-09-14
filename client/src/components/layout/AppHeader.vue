@@ -2,12 +2,22 @@
 // v3 AppShell(BL-003/004) — 앱 자체 헤더 마크업을 패키지 ShGlobalHeader로 교체한다.
 // 검정 고정 배경·56px 높이·로고→포털 홈(/)은 패키지가 강제하므로 앱은 유틸(테마 토글)만 채운다.
 // 기존 헤더 안 팁 티커는 헤더 내용물이 아니므로 AppLayout의 본문 배너로 옮겼다(BL-005).
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { Moon, Sun } from "lucide-vue-next";
+import { RouterLink, useRoute } from "vue-router";
 import { ShButton, ShGlobalHeader } from "@shakilabs/ui";
+import { INVEST_TABS } from "@/data/investTabs";
 
 const THEME_STORAGE_KEY = "invest-calc:theme:v1";
 type ThemeMode = "light" | "dark";
+
+// 모바일 드로어(v3 §3.3-1)에 실을 도구 목록 — 2차 내비(TabNavigation)와 같은
+// 출처(INVEST_TABS)를 쓴다. 목록을 복제하지 않는다.
+const route = useRoute();
+const navItems = INVEST_TABS;
+const navActiveKey = computed(
+  () => navItems.find((item) => route.path.startsWith(`/${item.key}`))?.key ?? "",
+);
 
 const theme = ref<ThemeMode>("light");
 
@@ -29,7 +39,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <ShGlobalHeader>
+  <ShGlobalHeader
+    :nav-items="navItems"
+    :nav-active-key="navActiveKey"
+    nav-title="투자 도구"
+    :link-component="RouterLink"
+  >
     <template #utility>
       <ShButton
         type="button"
