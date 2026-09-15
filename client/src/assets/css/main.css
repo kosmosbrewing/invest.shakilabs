@@ -1,6 +1,10 @@
 @font-face { font-family: "Pretendard"; src: url("/fonts/Pretendard-Regular-subset.woff2") format("woff2"), url("/fonts/Pretendard-Regular.woff") format("woff"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "Pretendard"; src: url("/fonts/Pretendard-Bold-subset.woff2") format("woff2"), url("/fonts/Pretendard-Bold.woff") format("woff"); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: "GmarketSans"; src: url("/fonts/GmarketSansBold.woff") format("woff"); font-weight: 700; font-style: normal; font-display: swap; }
+/* 제목+숫자 서브셋(BL-020 개정판, 108자, 7.3KB). 숫자 전용안은 폐기 —
+   font-brand(h1 제목·retro-title·결과 금액)가 실제로 렌더하는 텍스트 전수를
+   Playwright 렌더 수집(scripts/font-subset-config.mjs 참고)으로 모아 만들었다.
+   원본 944KB .woff는 더 이상 src에 없다 — 참조 안 하면 받아가지 않는다. */
+@font-face { font-family: "GmarketSans"; src: url("/fonts/GmarketSansBold-brand-v1.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
 
 @tailwind base;
 @tailwind components;

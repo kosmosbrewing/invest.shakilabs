@@ -1,0 +1,636 @@
+{
+  "schemaVersion": 1,
+  "recipe": "docs/BRAND_FONT_SUBSET.md",
+  "note": "제목+숫자 서브셋 — 렌더 수집(§3) ∪ NUMERAL_CHARACTERS. 소스 grep 아님.",
+  "routesCrawled": 52,
+  "renderedEntryCount": 66,
+  "renderedTexts": [
+    {
+      "text": "0원",
+      "locs": [
+        "span.@/gift-tax/5000",
+        "span.@/inheritance-tax/50000",
+        "span.@/inheritance-tax/100000",
+        "span.@/foreign-stock-tax/1000",
+        "span.@/foreign-stock-tax/3000"
+      ]
+    },
+    {
+      "text": "1,219,246원",
+      "locs": [
+        "span.@/savings-interest/10"
+      ]
+    },
+    {
+      "text": "10,296,100원",
+      "locs": [
+        "span.@/deposit-interest",
+        "span.@/deposit-interest/1000"
+      ]
+    },
+    {
+      "text": "102,961,000원",
+      "locs": [
+        "span.@/deposit-interest/10000"
+      ]
+    },
+    {
+      "text": "112,518,182원",
+      "locs": [
+        "span.@/compound-interest/3000"
+      ]
+    },
+    {
+      "text": "12,192,465원",
+      "locs": [
+        "span.@/savings-interest/100"
+      ]
+    },
+    {
+      "text": "12,250,000원",
+      "locs": [
+        "span.@/crypto-tax/3000"
+      ]
+    },
+    {
+      "text": "14,740,000원",
+      "locs": [
+        "span.@/foreign-stock-tax/10000"
+      ]
+    },
+    {
+      "text": "152,711,409원",
+      "locs": [
+        "span.@/compound-interest/5000"
+      ]
+    },
+    {
+      "text": "16,920,000원",
+      "locs": [
+        "span.@/dividend-tax/2000"
+      ]
+    },
+    {
+      "text": "2,655,375,000원",
+      "locs": [
+        "span.@/inheritance-tax/1000000"
+      ]
+    },
+    {
+      "text": "20,050,000원",
+      "locs": [
+        "span.@/crypto-tax/5000"
+      ]
+    },
+    {
+      "text": "238,796원",
+      "locs": [
+        "span.@/isa/500"
+      ]
+    },
+    {
+      "text": "253,194,478원",
+      "locs": [
+        "span.@/compound-interest/10000"
+      ]
+    },
+    {
+      "text": "3,657,739원",
+      "locs": [
+        "span.@/savings-interest",
+        "span.@/savings-interest/30"
+      ]
+    },
+    {
+      "text": "3,740,000원",
+      "locs": [
+        "span.@/foreign-stock-tax",
+        "span.@/foreign-stock-tax/5000"
+      ]
+    },
+    {
+      "text": "30,888,300원",
+      "locs": [
+        "span.@/deposit-interest/3000"
+      ]
+    },
+    {
+      "text": "368,569원",
+      "locs": [
+        "span.@/isa/1000"
+      ]
+    },
+    {
+      "text": "38,800,000원",
+      "locs": [
+        "span.@/gift-tax",
+        "span.@/gift-tax/30000"
+      ]
+    },
+    {
+      "text": "39,550,000원",
+      "locs": [
+        "span.@/crypto-tax/10000"
+      ]
+    },
+    {
+      "text": "4,230,000원",
+      "locs": [
+        "span.@/dividend-tax",
+        "span.@/dividend-tax/500"
+      ]
+    },
+    {
+      "text": "4,450,000원",
+      "locs": [
+        "span.@/crypto-tax",
+        "span.@/crypto-tax/1000"
+      ]
+    },
+    {
+      "text": "4,850,000원",
+      "locs": [
+        "span.@/gift-tax/10000"
+      ]
+    },
+    {
+      "text": "402,683원",
+      "locs": [
+        "span.@/isa",
+        "span.@/isa/1200"
+      ]
+    },
+    {
+      "text": "42,300,000원",
+      "locs": [
+        "span.@/dividend-tax/5000"
+      ]
+    },
+    {
+      "text": "51,480,500원",
+      "locs": [
+        "span.@/deposit-interest/5000"
+      ]
+    },
+    {
+      "text": "539,138원",
+      "locs": [
+        "span.@/isa/2000"
+      ]
+    },
+    {
+      "text": "58,740,000원",
+      "locs": [
+        "span.@/foreign-stock-tax/30000"
+      ]
+    },
+    {
+      "text": "6,096,232원",
+      "locs": [
+        "span.@/savings-interest/50"
+      ]
+    },
+    {
+      "text": "719,462,857원",
+      "locs": [
+        "span.@/inheritance-tax/500000"
+      ]
+    },
+    {
+      "text": "72,324,954원",
+      "locs": [
+        "span.@/compound-interest",
+        "span.@/compound-interest/1000"
+      ]
+    },
+    {
+      "text": "77,600,000원",
+      "locs": [
+        "span.@/gift-tax/50000"
+      ]
+    },
+    {
+      "text": "8,460,000원",
+      "locs": [
+        "span.@/dividend-tax/1000"
+      ]
+    },
+    {
+      "text": "98,940,000원",
+      "locs": [
+        "span.@/inheritance-tax",
+        "span.@/inheritance-tax/200000"
+      ]
+    },
+    {
+      "text": "가상자산 세금 시뮬레이터",
+      "locs": [
+        "h1.break-keep text-h1 font-brand@/crypto-tax",
+        "h1.break-keep text-h1 font-brand@/crypto-tax/1000",
+        "h1.break-keep text-h1 font-brand@/crypto-tax/3000",
+        "h1.break-keep text-h1 font-brand@/crypto-tax/5000",
+        "h1.break-keep text-h1 font-brand@/crypto-tax/10000"
+      ]
+    },
+    {
+      "text": "가상자산 세액 시뮬레이션",
+      "locs": [
+        "h2.retro-title flex items-center gap-2@/crypto-tax",
+        "h2.retro-title flex items-center gap-2@/crypto-tax/1000",
+        "h2.retro-title flex items-center gap-2@/crypto-tax/3000",
+        "h2.retro-title flex items-center gap-2@/crypto-tax/5000",
+        "h2.retro-title flex items-center gap-2@/crypto-tax/10000"
+      ]
+    },
+    {
+      "text": "개인정보 처리방침",
+      "locs": [
+        "h1.retro-title@/privacy"
+      ]
+    },
+    {
+      "text": "계산 결과",
+      "locs": [
+        "h2.retro-title@/dividend-tax",
+        "h2.retro-title@/gift-tax",
+        "h2.retro-title@/inheritance-tax",
+        "h2.retro-title@/foreign-stock-tax",
+        "h2.retro-title@/dividend-tax/500",
+        "h2.retro-title@/dividend-tax/1000",
+        "h2.retro-title@/dividend-tax/2000",
+        "h2.retro-title@/dividend-tax/5000",
+        "h2.retro-title@/gift-tax/5000",
+        "h2.retro-title@/gift-tax/10000",
+        "h2.retro-title@/gift-tax/30000",
+        "h2.retro-title@/gift-tax/50000",
+        "h2.retro-title@/inheritance-tax/50000",
+        "h2.retro-title@/inheritance-tax/100000",
+        "h2.retro-title@/inheritance-tax/200000",
+        "h2.retro-title@/inheritance-tax/500000",
+        "h2.retro-title@/inheritance-tax/1000000",
+        "h2.retro-title@/foreign-stock-tax/1000",
+        "h2.retro-title@/foreign-stock-tax/3000",
+        "h2.retro-title@/foreign-stock-tax/5000",
+        "h2.retro-title@/foreign-stock-tax/10000",
+        "h2.retro-title@/foreign-stock-tax/30000"
+      ]
+    },
+    {
+      "text": "계산 기준 안내",
+      "locs": [
+        "h2.retro-title@/savings-interest",
+        "h2.retro-title@/deposit-interest",
+        "h2.retro-title@/compound-interest",
+        "h2.retro-title@/savings-interest/10",
+        "h2.retro-title@/savings-interest/30",
+        "h2.retro-title@/savings-interest/50",
+        "h2.retro-title@/savings-interest/100",
+        "h2.retro-title@/deposit-interest/1000",
+        "h2.retro-title@/deposit-interest/3000",
+        "h2.retro-title@/deposit-interest/5000",
+        "h2.retro-title@/deposit-interest/10000",
+        "h2.retro-title@/compound-interest/1000",
+        "h2.retro-title@/compound-interest/3000",
+        "h2.retro-title@/compound-interest/5000",
+        "h2.retro-title@/compound-interest/10000"
+      ]
+    },
+    {
+      "text": "과세 기준 안내",
+      "locs": [
+        "h2.retro-title@/dividend-tax",
+        "h2.retro-title@/gift-tax",
+        "h2.retro-title@/inheritance-tax",
+        "h2.retro-title@/foreign-stock-tax",
+        "h2.retro-title@/dividend-tax/500",
+        "h2.retro-title@/dividend-tax/1000",
+        "h2.retro-title@/dividend-tax/2000",
+        "h2.retro-title@/dividend-tax/5000",
+        "h2.retro-title@/gift-tax/5000",
+        "h2.retro-title@/gift-tax/10000",
+        "h2.retro-title@/gift-tax/30000",
+        "h2.retro-title@/gift-tax/50000",
+        "h2.retro-title@/inheritance-tax/50000",
+        "h2.retro-title@/inheritance-tax/100000",
+        "h2.retro-title@/inheritance-tax/200000",
+        "h2.retro-title@/inheritance-tax/500000",
+        "h2.retro-title@/inheritance-tax/1000000",
+        "h2.retro-title@/foreign-stock-tax/1000",
+        "h2.retro-title@/foreign-stock-tax/3000",
+        "h2.retro-title@/foreign-stock-tax/5000",
+        "h2.retro-title@/foreign-stock-tax/10000",
+        "h2.retro-title@/foreign-stock-tax/30000"
+      ]
+    },
+    {
+      "text": "관련 서비스",
+      "locs": [
+        "h2.retro-title@/",
+        "h2.retro-title@/crypto-tax",
+        "h2.retro-title@/crypto-tax/1000",
+        "h2.retro-title@/crypto-tax/3000",
+        "h2.retro-title@/crypto-tax/5000",
+        "h2.retro-title@/crypto-tax/10000"
+      ]
+    },
+    {
+      "text": "단리 vs 복리 비교",
+      "locs": [
+        "h2.retro-title@/compound-interest",
+        "h2.retro-title@/compound-interest/1000",
+        "h2.retro-title@/compound-interest/3000",
+        "h2.retro-title@/compound-interest/5000",
+        "h2.retro-title@/compound-interest/10000"
+      ]
+    },
+    {
+      "text": "배당소득세 계산",
+      "locs": [
+        "h2.retro-title flex items-center gap-2@/dividend-tax",
+        "h2.retro-title flex items-center gap-2@/dividend-tax/500",
+        "h2.retro-title flex items-center gap-2@/dividend-tax/1000",
+        "h2.retro-title flex items-center gap-2@/dividend-tax/2000",
+        "h2.retro-title flex items-center gap-2@/dividend-tax/5000"
+      ]
+    },
+    {
+      "text": "배당소득세 계산기",
+      "locs": [
+        "h1.break-keep text-h1 font-brand@/dividend-tax",
+        "h1.break-keep text-h1 font-brand@/dividend-tax/500",
+        "h1.break-keep text-h1 font-brand@/dividend-tax/1000",
+        "h1.break-keep text-h1 font-brand@/dividend-tax/2000",
+        "h1.break-keep text-h1 font-brand@/dividend-tax/5000"
+      ]
+    },
+    {
+      "text": "복리 계산기",
+      "locs": [
+        "h1.break-keep text-h1 font-brand@/compound-interest",
+        "h1.break-keep text-h1 font-brand@/compound-interest/1000",
+        "h1.break-keep text-h1 font-brand@/compound-interest/3000",
+        "h1.break-keep text-h1 font-brand@/compound-interest/5000",
+        "h1.break-keep text-h1 font-brand@/compound-interest/10000"
+      ]
+    },
+    {
+      "text": "복리 조건 입력",
+      "locs": [
+        "h2.retro-title flex items-center gap-2@/compound-interest",
+        "h2.retro-title flex items-center gap-2@/compound-interest/1000",
+        "h2.retro-title flex items-center gap-2@/compound-interest/3000",
+        "h2.retro-title flex items-center gap-2@/compound-interest/5000",
+        "h2.retro-title flex items-center gap-2@/compound-interest/10000"
+      ]
+    },
+    {
+      "text": "비교 기준 안내",
+      "locs": [
+        "h2.retro-title@/isa",
+        "h2.retro-title@/isa/500",
+        "h2.retro-title@/isa/1000",
+        "h2.retro-title@/isa/1200",
+        "h2.retro-title@/isa/2000"
+      ]
+    },
+    {
+      "text": "상속 정보",
+      "locs": [
+        "h2.retro-title flex items-center gap-2@/inheritance-tax",
+        "h2.retro-title flex items-center gap-2@/inheritance-tax/50000",
+        "h2.retro-title flex items-center gap-2@/inheritance-tax/100000",
+        "h2.retro-title flex items-center gap-2@/inheritance-tax/200000",
+        "h2.retro-title flex items-center gap-2@/inheritance-tax/500000",
+        "h2.retro-title flex items-center gap-2@/inheritance-tax/1000000"
+      ]
+    },
+    {
+      "text": "상속세 계산기",
+      "locs": [
+        "h1.break-keep text-h1 font-brand@/inheritance-tax",
+        "h1.break-keep text-h1 font-brand@/inheritance-tax/50000",
+        "h1.break-keep text-h1 font-brand@/inheritance-tax/100000",
+        "h1.break-keep text-h1 font-brand@/inheritance-tax/200000",
+        "h1.break-keep text-h1 font-brand@/inheritance-tax/500000",
+        "h1.break-keep text-h1 font-brand@/inheritance-tax/1000000"
+      ]
+    },
+    {
+      "text": "서비스 안내",
+      "locs": [
+        "h1.retro-title@/about"
+      ]
+    },
+    {
+      "text": "시뮬레이션 결과",
+      "locs": [
+        "h2.retro-title@/crypto-tax",
+        "h2.retro-title@/crypto-tax/1000",
+        "h2.retro-title@/crypto-tax/3000",
+        "h2.retro-title@/crypto-tax/5000",
+        "h2.retro-title@/crypto-tax/10000"
+      ]
+    },
+    {
+      "text": "양도 정보",
+      "locs": [
+        "h2.retro-title flex items-center gap-2@/foreign-stock-tax",
+        "h2.retro-title flex items-center gap-2@/foreign-stock-tax/1000",
+        "h2.retro-title flex items-center gap-2@/foreign-stock-tax/3000",
+        "h2.retro-title flex items-center gap-2@/foreign-stock-tax/5000",
+        "h2.retro-title flex items-center gap-2@/foreign-stock-tax/10000",
+        "h2.retro-title flex items-center gap-2@/foreign-stock-tax/30000"
+      ]
+    },
+    {
+      "text": "예금 만기 시뮬레이션",
+      "locs": [
+        "h2.retro-title@/deposit-interest",
+        "h2.retro-title@/deposit-interest/1000",
+        "h2.retro-title@/deposit-interest/3000",
+        "h2.retro-title@/deposit-interest/5000",
+        "h2.retro-title@/deposit-interest/10000"
+      ]
+    },
+    {
+      "text": "예금 이자 계산기",
+      "locs": [
+        "h1.break-keep text-h1 font-brand@/deposit-interest",
+        "h1.break-keep text-h1 font-brand@/deposit-interest/1000",
+        "h1.break-keep text-h1 font-brand@/deposit-interest/3000",
+        "h1.break-keep text-h1 font-brand@/deposit-interest/5000",
+        "h1.break-keep text-h1 font-brand@/deposit-interest/10000"
+      ]
+    },
+    {
+      "text": "예금 조건 입력",
+      "locs": [
+        "h2.retro-title flex items-center gap-2@/deposit-interest",
+        "h2.retro-title flex items-center gap-2@/deposit-interest/1000",
+        "h2.retro-title flex items-center gap-2@/deposit-interest/3000",
+        "h2.retro-title flex items-center gap-2@/deposit-interest/5000",
+        "h2.retro-title flex items-center gap-2@/deposit-interest/10000"
+      ]
+    },
+    {
+      "text": "이용약관",
+      "locs": [
+        "h1.retro-title@/terms"
+      ]
+    },
+    {
+      "text": "자주 묻는 질문",
+      "locs": [
+        "h2.retro-title@/crypto-tax",
+        "h2.retro-title@/dividend-tax",
+        "h2.retro-title@/isa",
+        "h2.retro-title@/savings-interest",
+        "h2.retro-title@/deposit-interest",
+        "h2.retro-title@/compound-interest",
+        "h2.retro-title@/crypto-tax/1000",
+        "h2.retro-title@/crypto-tax/3000",
+        "h2.retro-title@/crypto-tax/5000",
+        "h2.retro-title@/crypto-tax/10000",
+        "h2.retro-title@/dividend-tax/500",
+        "h2.retro-title@/dividend-tax/1000",
+        "h2.retro-title@/dividend-tax/2000",
+        "h2.retro-title@/dividend-tax/5000",
+        "h2.retro-title@/isa/500",
+        "h2.retro-title@/isa/1000",
+        "h2.retro-title@/isa/1200",
+        "h2.retro-title@/isa/2000",
+        "h2.retro-title@/savings-interest/10",
+        "h2.retro-title@/savings-interest/30",
+        "h2.retro-title@/savings-interest/50",
+        "h2.retro-title@/savings-interest/100",
+        "h2.retro-title@/deposit-interest/1000",
+        "h2.retro-title@/deposit-interest/3000",
+        "h2.retro-title@/deposit-interest/5000",
+        "h2.retro-title@/deposit-interest/10000",
+        "h2.retro-title@/compound-interest/1000",
+        "h2.retro-title@/compound-interest/3000",
+        "h2.retro-title@/compound-interest/5000",
+        "h2.retro-title@/compound-interest/10000"
+      ]
+    },
+    {
+      "text": "적금 만기 시뮬레이션",
+      "locs": [
+        "h2.retro-title@/savings-interest",
+        "h2.retro-title@/savings-interest/10",
+        "h2.retro-title@/savings-interest/30",
+        "h2.retro-title@/savings-interest/50",
+        "h2.retro-title@/savings-interest/100"
+      ]
+    },
+    {
+      "text": "적금 이자 계산기",
+      "locs": [
+        "h1.break-keep text-h1 font-brand@/savings-interest",
+        "h1.break-keep text-h1 font-brand@/savings-interest/10",
+        "h1.break-keep text-h1 font-brand@/savings-interest/30",
+        "h1.break-keep text-h1 font-brand@/savings-interest/50",
+        "h1.break-keep text-h1 font-brand@/savings-interest/100"
+      ]
+    },
+    {
+      "text": "적금 조건 입력",
+      "locs": [
+        "h2.retro-title flex items-center gap-2@/savings-interest",
+        "h2.retro-title flex items-center gap-2@/savings-interest/10",
+        "h2.retro-title flex items-center gap-2@/savings-interest/30",
+        "h2.retro-title flex items-center gap-2@/savings-interest/50",
+        "h2.retro-title flex items-center gap-2@/savings-interest/100"
+      ]
+    },
+    {
+      "text": "증여 정보",
+      "locs": [
+        "h2.retro-title flex items-center gap-2@/gift-tax",
+        "h2.retro-title flex items-center gap-2@/gift-tax/5000",
+        "h2.retro-title flex items-center gap-2@/gift-tax/10000",
+        "h2.retro-title flex items-center gap-2@/gift-tax/30000",
+        "h2.retro-title flex items-center gap-2@/gift-tax/50000"
+      ]
+    },
+    {
+      "text": "증여세 계산기",
+      "locs": [
+        "h1.break-keep text-h1 font-brand@/gift-tax",
+        "h1.break-keep text-h1 font-brand@/gift-tax/5000",
+        "h1.break-keep text-h1 font-brand@/gift-tax/10000",
+        "h1.break-keep text-h1 font-brand@/gift-tax/30000",
+        "h1.break-keep text-h1 font-brand@/gift-tax/50000"
+      ]
+    },
+    {
+      "text": "출처 및 FAQ",
+      "locs": [
+        "h2.retro-title@/gift-tax",
+        "h2.retro-title@/inheritance-tax",
+        "h2.retro-title@/foreign-stock-tax",
+        "h2.retro-title@/gift-tax/5000",
+        "h2.retro-title@/gift-tax/10000",
+        "h2.retro-title@/gift-tax/30000",
+        "h2.retro-title@/gift-tax/50000",
+        "h2.retro-title@/inheritance-tax/50000",
+        "h2.retro-title@/inheritance-tax/100000",
+        "h2.retro-title@/inheritance-tax/200000",
+        "h2.retro-title@/inheritance-tax/500000",
+        "h2.retro-title@/inheritance-tax/1000000",
+        "h2.retro-title@/foreign-stock-tax/1000",
+        "h2.retro-title@/foreign-stock-tax/3000",
+        "h2.retro-title@/foreign-stock-tax/5000",
+        "h2.retro-title@/foreign-stock-tax/10000",
+        "h2.retro-title@/foreign-stock-tax/30000"
+      ]
+    },
+    {
+      "text": "해외주식 양도소득세 계산기",
+      "locs": [
+        "h1.break-keep text-h1 font-brand@/foreign-stock-tax",
+        "h1.break-keep text-h1 font-brand@/foreign-stock-tax/1000",
+        "h1.break-keep text-h1 font-brand@/foreign-stock-tax/3000",
+        "h1.break-keep text-h1 font-brand@/foreign-stock-tax/5000",
+        "h1.break-keep text-h1 font-brand@/foreign-stock-tax/10000",
+        "h1.break-keep text-h1 font-brand@/foreign-stock-tax/30000"
+      ]
+    },
+    {
+      "text": "ISA 만기 세후 비교",
+      "locs": [
+        "h1.break-keep text-h1 font-brand@/isa",
+        "h2.retro-title flex items-center gap-2@/isa",
+        "h1.break-keep text-h1 font-brand@/isa/500",
+        "h2.retro-title flex items-center gap-2@/isa/500",
+        "h1.break-keep text-h1 font-brand@/isa/1000",
+        "h2.retro-title flex items-center gap-2@/isa/1000",
+        "h1.break-keep text-h1 font-brand@/isa/1200",
+        "h2.retro-title flex items-center gap-2@/isa/1200",
+        "h1.break-keep text-h1 font-brand@/isa/2000",
+        "h2.retro-title flex items-center gap-2@/isa/2000"
+      ]
+    },
+    {
+      "text": "ISA vs 일반계좌 비교",
+      "locs": [
+        "h2.retro-title@/isa",
+        "h2.retro-title@/isa/500",
+        "h2.retro-title@/isa/1000",
+        "h2.retro-title@/isa/1200",
+        "h2.retro-title@/isa/2000"
+      ]
+    }
+  ],
+  "numeralCharacters": "0123456789,.%+-~/()· 원억만천조년월일개회건세명점배급시간분초",
+  "characterSet": " %()+,-./0123456789AFIQSsv~·가간개건결계과관교금급기내년는단당도득레력련리만명문묻뮬및반방배보복분비산상서세션소속스시식안액약양억여예외용원월이인일입자적점정조좌주준증질처천초출침터해회후",
+  "characterCount": 108,
+  "characterSha256": "2b4273e0577a4775181aed181997db68fc88943c4116b67e357c1bee03aa8081",
+  "fonts": [
+    {
+      "publicName": "GmarketSansBold-brand-v1.woff2",
+      "bytes": 7300,
+      "sha256": "eff7c206b521a19bb7a4d5d9670cf975e03c458241ee62a79094a421b8c897d2"
+    }
+  ]
+}

@@ -142,6 +142,17 @@ if (result.status !== 0) {
 removeRenderedNoscriptFallbacks();
 removeAdLoaderFromNotFound();
 
+// 브랜드 폰트 서브셋 게이트(BL-020) — 다른 앱은 build에 붙어 있는데 invest만
+// 빠져 있으면 함대 게이트가 불균일해진다(이 저장소 라이브 결함의 공통 뿌리).
+const fontGate = spawnSync(
+  process.execPath,
+  [resolve(projectRoot, "scripts", "verify-font-brand.mjs")],
+  { cwd: projectRoot, stdio: "inherit" }
+);
+if (fontGate.status !== 0) {
+  process.exit(fontGate.status ?? 1);
+}
+
 const validationResult = spawnSync(
   process.execPath,
   [resolve(projectRoot, "scripts", "validate-static-output.mjs")],
