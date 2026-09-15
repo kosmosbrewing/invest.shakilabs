@@ -6,9 +6,9 @@
 // document.fonts.check()는 이 환경에서 항상 true를 반환해 쓸 수 없다.
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { clientRoot, fontJobs, manifestPath } from "./font-subset-config.mjs";
+import { woff2CodePoints } from "./woff2-cmap.mjs";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -19,18 +19,12 @@ function hash(content) {
 }
 
 function cmapCoverage(fontPath, texts) {
-  const script = `
-import json, sys
-from fontTools.ttLib import TTFont
-cm = set(TTFont(${JSON.stringify(fontPath)}).getBestCmap())
-texts = json.loads(sys.argv[1])
-missing = sorted({c for text in texts for c in text if ord(c) not in cm})
-print(json.dumps(missing))
-`;
-  const out = execFileSync("python3", ["-c", script, JSON.stringify(texts)], {
-    encoding: "utf8",
-  });
-  return JSON.parse(out.trim().split("\n").pop());
+  // cmap은 python fontTools가 아니라 순수 Node로 읽는다 — 이 게이트는 빌드에 얹혀
+  // Vercel에서도 도는데 그쪽 빌드 이미지에 fontTools(pip 패키지)가 없다.
+  const codePoints = woff2CodePoints(readFileSync(fontPath));
+  return [...new Set(texts.flatMap((text) => [...text]))]
+    .filter((character) => !codePoints.has(character.codePointAt(0)))
+    .sort();
 }
 
 function main() {
