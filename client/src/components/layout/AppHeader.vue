@@ -1,12 +1,15 @@
 <script setup lang="ts">
 // v3 AppShell(BL-003/004) — 앱 자체 헤더 마크업을 패키지 ShGlobalHeader로 교체한다.
 // 검정 고정 배경·56px 높이·로고→포털 홈(/)은 패키지가 강제하므로 앱은 유틸(테마 토글)만 채운다.
-// 기존 헤더 안 팁 티커는 헤더 내용물이 아니므로 AppLayout의 본문 배너로 옮겼다(BL-005).
+// 팁 티커는 0.3.24부터 #tip 슬롯으로 헤더에 복귀 — 패키지가 out-of-flow(absolute)로
+// 렌더해 텍스트 길이가 바뀌어도 헤더 높이가 56px로 고정되므로 BL-005 재발 없이 안전하다.
 import { computed, onMounted, ref } from "vue";
 import { Moon, Sun } from "lucide-vue-next";
 import { RouterLink, useRoute } from "vue-router";
 import { ShButton, ShGlobalHeader } from "@shakilabs/ui";
 import { INVEST_TABS } from "@/data/investTabs";
+import TickerBar from "@/components/common/TickerBar.vue";
+import { tickerMessages } from "@/data/tickerMessages";
 
 const THEME_STORAGE_KEY = "invest-calc:theme:v1";
 type ThemeMode = "light" | "dark";
@@ -45,6 +48,9 @@ onMounted(() => {
     nav-title="투자 도구"
     :link-component="RouterLink"
   >
+    <template #tip>
+      <TickerBar :messages="tickerMessages" />
+    </template>
     <template #utility>
       <ShButton
         type="button"
