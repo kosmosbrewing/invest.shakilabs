@@ -36,7 +36,7 @@ defineProps<{
 </script>
 
 <template>
-  <section class="seo-rich-guide space-y-4 rounded-lg border border-border/40 bg-muted/10 p-4 md:p-6">
+  <section class="seo-rich-guide max-w-[65ch] space-y-4 rounded-lg border border-border/40 bg-muted/10 p-4 md:p-6">
     <header class="space-y-2">
       <h2 class="text-xl font-bold text-foreground">{{ title }}</h2>
       <p class="text-sm leading-relaxed text-muted-foreground">{{ intro }}</p>

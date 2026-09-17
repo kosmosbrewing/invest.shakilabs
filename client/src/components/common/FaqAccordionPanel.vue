@@ -20,7 +20,7 @@ const visibleItems = computed(() => mergeFaqs(props.items, props.extra));
 </script>
 
 <template>
-  <section class="retro-panel overflow-hidden">
+  <section class="retro-panel overflow-hidden max-w-[65ch]">
     <div class="retro-titlebar rounded-t-2xl">
       <h2 class="retro-title">{{ title ?? "자주 묻는 질문" }}</h2>
     </div>
