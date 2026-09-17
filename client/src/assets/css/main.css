@@ -13,8 +13,11 @@
 @layer base {
   /* 라이트 의미색은 본문 텍스트로 쓰이므로 WCAG AA(4.5:1) 기준. 배경 최악값은 --muted(204 40% 96%).
      success 27%/5.67:1 · warning 28%/5.07:1 · caution 33%/5.50:1 · danger 52%/4.36:1 · info 45%/4.67:1 */
-  :root { --status-success: 148 61% 27%; --status-warning: 43 88% 28%; --status-caution: 28 82% 33%; --status-danger: 0 70% 52%; --status-info: 212 83% 45%; --chart-profit: 148 61% 36%; --chart-tax: 0 84% 60%; --chart-net: 200 90% 42%; }
-  .dark { --status-success: 148 63% 66%; --status-warning: 43 95% 70%; --status-caution: 28 91% 66%; --status-danger: 0 86% 73%; --status-info: 205 90% 72%; --chart-profit: 148 61% 62%; --chart-tax: 0 87% 70%; --chart-net: 200 85% 55%; }
+  /* v3 §2.1 의미색 — 12앱 공통 고정 hex(목표 hex에서 역산·왕복 검증). 앱이 명도를
+     다시 고르지 않는다. --status-caution(5번째 단계)은 warning과 겹쳐 폐기했다.
+     --chart-net은 옛 브랜드 파랑이라 인디고 primary와 같은 값으로 맞춘다. */
+  :root { --status-success: 149.7 63.8% 29.2%; --status-warning: 26 90.5% 37.1%; --status-danger: 0 66.4% 46.7%; --status-info: 213.5 65.7% 33.1%; --chart-profit: 148 61% 36%; --chart-tax: 0 84% 60%; --chart-net: 243 55% 41%; }
+  .dark { --status-success: 147 50.7% 57.8%; --status-warning: 41.9 86.9% 55.1%; --status-danger: 0 80.9% 69.2%; --status-info: 213.5 66.9% 72.7%; --chart-profit: 148 61% 62%; --chart-tax: 0 87% 70%; --chart-net: 243 60% 72%; }
   * { @apply border-border; }
   :where(a, button, input, select, textarea, summary, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; border-radius: 3px; }
   /* 한국어 어절 단위 개행 (keep-all) + 긴 숫자·URL 예외 */
@@ -141,4 +144,22 @@
   height: 2px;
   border-radius: 1px;
   background: currentColor;
+}
+
+/* ── 선택 칩: 진한 fill → 액센트 틴트 (v3 §4.2) ─────────────────────────
+   §4.2는 "선택 칩/세그먼트 한 줄에 1개 · 페이지당 fill CTA 1개"인데, 프리셋 그룹이
+   한 화면에 2~3줄이면 패키지 기본값(.sh-preset-chip[data-selected]:before{
+   background:var(--sh-color-primary)})이 진한 브랜드 fill을 3면까지 쌓았다
+   (라이브 실측 2026-09-17: finance /quit 3면 · /salary 칩+세그먼트, invest /isa 3면,
+   biz /vat-compare 2면, loan /mortgage-compare 1면+최저 배지).
+   선택은 틴트 면 + 액센트 보더 + 액센트 글자로도 충분히 읽힌다 — 색만이 아니라
+   보더 두께까지 같이 바뀌므로 WCAG 1.4.1(색이 유일한 수단 금지)도 만족한다.
+   패키지 규칙이 (0,2,0)이라 셸 클래스를 하나 더 물려 (0,3,0)으로 이긴다. */
+.design-system-shell .sh-preset-chip[data-selected] {
+  color: hsl(var(--accent-foreground));
+}
+
+.design-system-shell .sh-preset-chip[data-selected]::before {
+  border-color: hsl(var(--primary));
+  background: hsl(var(--accent));
 }

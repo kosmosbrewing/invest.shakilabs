@@ -162,4 +162,16 @@ const validationResult = spawnSync(
   }
 );
 
-process.exit(validationResult.status ?? 1);
+if (validationResult.status !== 0) {
+  process.exit(validationResult.status ?? 1);
+}
+
+// 액센트·의미색 토큰 게이트(DESIGN_CLEANUP_PLAN §4.2). 게이트가 앱마다 있고 없으면
+// 함대 작업 때 특정 앱만 검사를 건너뛴다 — 이 저장소 라이브 결함의 공통 뿌리였다.
+const accentGate = spawnSync(
+  process.execPath,
+  [resolve(projectRoot, "scripts", "verify-accent-tokens.mjs")],
+  { cwd: projectRoot, stdio: "inherit" }
+);
+
+process.exit(accentGate.status ?? 1);

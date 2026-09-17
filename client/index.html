@@ -37,8 +37,8 @@
     <link rel="alternate" hreflang="x-default" href="https://shakilabs.com/invest" />
 
     <!-- sky-600 테마 -->
-    <meta name="theme-color" content="hsl(200, 90%, 42%)" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="hsl(200, 50%, 14%)" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)" />
 
     <script type="application/ld+json">
       {
@@ -85,12 +85,14 @@
         --muted-foreground: 60 3.37% 34.9%; /* color.ink-muted #5C5C56 */
         --card: 0 0% 100%; /* color.card #FFFFFF */
         --card-foreground: 0 0% 3.92%;
-        --primary: 200 85% 32%;
+        /* 파랑(200)은 주거·자동차 그룹(house·car 214)과 겹쳤다 — 돈·세금 그룹을 인디고로
+           모은다. DESIGN_CLEANUP_PLAN §2.2 확정 표 그대로(앱이 재계산하지 않는다). */
+        --primary: 243 55% 41%;
         --primary-foreground: 0 0% 100%;
-        --secondary: 200 15% 91%;
+        --secondary: 243 15% 91%;
         --secondary-foreground: 222 47% 11%;
-        --accent: 200 58% 95%;
-        --accent-foreground: 200 90% 30%;
+        --accent: 243 53% 95%;
+        --accent-foreground: 243 55% 30%;
         --popover: 0 0% 100%;
         --popover-foreground: 0 0% 3.92%;
         --destructive: 0 72% 52%;
@@ -98,7 +100,14 @@
         --destructive-foreground: 0 0% 100%;
         --border: 60 8% 90.2%; /* color.line #E8E8E4 */
         --input: 214 16% 85%;
-        --ring: 0 0% 3.92%; /* color.focus #0A0A0A (v3 §2.1 — 포커스는 브랜드색이 아니라 ink) */
+        /* v3 §2.1 color.focus — 포커스 링은 액센트가 아니라 ink다(#0A0A0A / #F5F5F5).
+           패키지 --sh-color-focus가 이 값을 그대로 가져간다 — 미선언 시 리터럴
+           222 47% 20%(슬레이트)로 조용히 폴백하므로 반드시 명시한다. */
+        --ring: 0 0% 3.92%;
+        /* @shakilabs/ui 카테고리 액센트 API (v3 §4.1) — 2차 내비 밑줄이 읽는다.
+           v3-appshell.css에 있던 중복 정의를 토큰 블록 한곳으로 모았다. */
+        --accent-hsl: 243 55% 41%;
+        --accent-muted-hsl: 243 55% 41%;
         --radius: 0.4rem;
       }
 
@@ -109,12 +118,13 @@
         --muted-foreground: 60 3.33% 64.71%; /* color.ink-muted dark #A8A8A2 */
         --card: 0 0% 10.98%; /* color.card dark #1C1C1C */
         --card-foreground: 0 0% 96.08%;
-        --primary: 200 85% 55%;
-        --primary-foreground: 200 90% 8%;
-        --secondary: 200 15% 20%;
+        /* 다크는 hue만 옮기면 틴트 위 4.5:1이 깨진다(loan 다크 27건 전례) — 명도를 다시 골랐다. */
+        --primary: 243 60% 72%;
+        --primary-foreground: 243 60% 10%;
+        --secondary: 243 15% 20%;
         --secondary-foreground: 210 40% 96%;
-        --accent: 200 40% 22%;
-        --accent-foreground: 198 85% 78%;
+        --accent: 243 40% 22%;
+        --accent-foreground: 243 60% 78%;
         --popover: 0 0% 10.98%;
         --popover-foreground: 0 0% 96.08%;
         --destructive: 0 72% 58%;
@@ -124,7 +134,9 @@
         --destructive-foreground: 0 90% 8%;
         --border: 0 0% 16.47%; /* color.line dark #2A2A2A */
         --input: 214 16% 30%;
-        --ring: 0 0% 96.08%; /* color.focus dark #F5F5F5 */
+        --ring: 0 0% 96.08%;
+        --accent-hsl: 243 60% 72%;
+        --accent-muted-hsl: 243 60% 72%;
       }
 
       html {
