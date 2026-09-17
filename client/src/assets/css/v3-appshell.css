@@ -3,20 +3,12 @@
    패키지 .sh-primary-navigation은 아직 구 문법(배경 = --sh-color-primary 풀폭)이라
    여기서 앱 로컬로 중성화한다. 패키지 자체는 vendored라 손대지 않는다. */
 
+/* --accent-hsl / --accent-muted-hsl은 index.html의 토큰 블록으로 옮겼다 —
+   액센트 값이 두 파일에 나뉘어 있으면 하나만 고쳐 내비 밑줄만 옛 브랜드색으로
+   남는 사고가 난다(게이트 scripts/verify-accent-tokens.mjs가 index.html을 본다). */
 :root {
-  /* v3 §4.1 액센트 주입 — 기존 --primary(invest 청록/파랑)를 지우지 않고 별도 이름으로 복제한다.
-     주입 안 해도 --sh-color-accent는 --primary로 폴백하지만, 명시해 두면 --primary가
-     나중에 바뀌어도 언더라인·결과 강조색이 조용히 같이 안 바뀐다. */
-  --accent-hsl: 200 85% 32%;
-  --accent-muted-hsl: 200 85% 32%;
-
   /* v3 §3.1 — 헤더(56px, 패키지 고정) + 2차 내비 실측 높이 + 여백 8px. */
   --secondary-nav-h: 56px;
-}
-
-.dark {
-  --accent-hsl: 200 85% 55%;
-  --accent-muted-hsl: 200 85% 55%;
 }
 
 html {
