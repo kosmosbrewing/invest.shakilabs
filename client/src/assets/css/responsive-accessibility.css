@@ -65,21 +65,10 @@
     min-width: 24px;
   }
 
-  nav[aria-label="주요 메뉴"] .container {
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: auto;
-    padding-inline: 0;
-  }
-
-  nav[aria-label="주요 메뉴"] .container > div {
-    width: max-content;
-    min-width: 100%;
-    gap: 4px;
-  }
-
-  .text-resize-layout.container,
-  .text-resize-layout .container {
+  /* 본문 컨테이너는 v3 §2.7 역할 클래스(.sh-container)로 바뀌었다 —
+     옛 .container 셀렉터만 남겨 두면 이 좁은 화면 보정이 조용히 죽는다. */
+  .text-resize-layout.sh-container,
+  .text-resize-layout .sh-container {
     padding-inline: 12px;
   }
 

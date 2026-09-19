@@ -47,11 +47,11 @@ const itemListJsonLd = {
     :json-ld="[faqJsonLd, itemListJsonLd]"
   />
 
-  <div class="container space-y-5 py-5">
+  <div class="sh-container sh-container--page space-y-5 py-5">
     <ShSurface padding="lg">
       <ShText as="p" variant="caption" tone="muted">SHAKILABS INVEST</ShText>
       <ShText as="h1" variant="display" class="mt-2">세금을 뺀 다음에 비교해야 답이 보입니다</ShText>
-      <ShText tone="muted" class="mt-3 max-w-3xl">
+      <ShText tone="muted" class="mt-3">
         이자에는 15.4%, 해외주식·가상자산 양도차익에는 22%가 붙습니다. 상품을 고르기 전에 세후 금액으로
         바꿔 보는 계산기 9개를 모았습니다. 입력값은 브라우저를 벗어나지 않습니다.
       </ShText>

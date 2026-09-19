@@ -73,7 +73,7 @@ const faqJsonLd = {
     :canonical-path="canonicalPath"
   />
 
-  <div class="text-resize-layout container space-y-5 py-5">
+  <div class="text-resize-layout sh-container sh-container--tool space-y-5 py-5">
     <CalculatorPageHeader title="가상자산 세금 시뮬레이터" />
 
     <ShSurface as="section" padding="none" class="overflow-hidden">

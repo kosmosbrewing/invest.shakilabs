@@ -7,15 +7,9 @@ const config: Config = {
   prefix: "",
   content: ["./index.html", "./src/**/*.{ts,vue}"],
   theme: {
-    container: {
-      center: true,
-      padding: "1rem",
-      screens: {
-        // 검정 헤더(.sh-global-header__inner)가 72rem(1152px)인데 본문 컨테이너만 960px이면
-        // 헤더만 혼자 넓어 보인다 — 72rem + 좌우 padding 32px = 1184px로 맞춘다.
-        xl: "1184px",
-      },
-    },
+    // 본문 컨테이너는 여기서 정의하지 않는다. v3 §2.7은 화면 역할마다 폭이 다르다고
+    // 규정하므로(.sh-container--tool 72rem / --page 64rem / --prose 42rem) 폭 하나짜리
+    // Tailwind container를 두면 세 역할이 다시 하나로 뭉개진다 — 패키지 CSS가 단일 출처.
     extend: {
       fontFamily: {
         sans: [
