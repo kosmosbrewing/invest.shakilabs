@@ -11,7 +11,7 @@ const constantsStore = useConstantsStore();
     description="shakilabs.com/invest의 서비스 이용약관입니다. 9개 투자·이자 계산기의 성격, 투자 자문이 아니라는 한계(수익률은 이용자 가정값·ISA 비교는 가입 권유 아님), 광고 게재, 면책 조항과 준거법을 안내합니다."
   />
 
-  <div class="container py-5">
+  <div class="sh-container sh-container--prose py-5">
     <div class="retro-panel">
       <div class="retro-titlebar rounded-t-2xl">
         <h1 class="retro-title">이용약관</h1>

@@ -68,7 +68,7 @@ const faqJsonLd = {
     :canonical-path="canonicalPath"
   />
 
-  <div class="container space-y-5 py-5">
+  <div class="sh-container sh-container--tool space-y-5 py-5">
     <CalculatorPageHeader title="ISA 만기 세후 비교" />
 
     <section class="retro-panel overflow-hidden">

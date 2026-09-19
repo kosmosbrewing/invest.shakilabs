@@ -16,11 +16,13 @@ const props = defineProps<{
   extra?: readonly FaqItem[];
 }>();
 
+// 읽는 줄 캡(65ch)은 카드가 아니라 질문·답변 텍스트에 건다 — 카드째 좁히면
+// 위 계산기 카드와 우변이 어긋난다(SeoRichGuide와 같은 규칙).
 const visibleItems = computed(() => mergeFaqs(props.items, props.extra));
 </script>
 
 <template>
-  <section class="retro-panel overflow-hidden max-w-[65ch]">
+  <section class="retro-panel overflow-hidden">
     <div class="retro-titlebar rounded-t-2xl">
       <h2 class="retro-title">{{ title ?? "자주 묻는 질문" }}</h2>
     </div>
@@ -33,12 +35,12 @@ const visibleItems = computed(() => mergeFaqs(props.items, props.extra));
           :value="`faq-${index}`"
         >
           <AccordionTrigger class="text-left text-caption">
-            {{ item.q }}
+            <span class="max-w-[65ch]">{{ item.q }}</span>
           </AccordionTrigger>
           <!-- force-mount: 이 답변들은 FAQPage 스키마가 신고하는 텍스트다. 접었을 때
                언마운트되면 스키마에는 있고 DOM에는 없는 유령 답변이 되므로(9라우트 73문항
                라이브 실측), 항상 렌더하고 닫힘 상태는 CSS로만 감춘다. -->
-          <AccordionContent force-mount>
+          <AccordionContent force-mount class="max-w-[65ch]">
             {{ item.a }}
           </AccordionContent>
         </AccordionItem>

@@ -13,11 +13,11 @@ import { INVEST_TOOL_GROUPS } from "@/data/investNavigation";
     title="투자 계산기 전체 보기 | 목적별 9개 금융·세금 도구"
     description="저축·자산 성장, 투자 세금, 증여·상속 목적별로 필요한 계산기를 빠르게 찾으세요."
   />
-  <div class="container space-y-5 py-5">
+  <div class="sh-container sh-container--page space-y-5 py-5">
     <ShSurface padding="lg">
       <ShText as="p" variant="caption" tone="muted">INVEST TOOL DIRECTORY</ShText>
       <ShText as="h1" variant="display" class="mt-2">목적부터 고르면 계산기가 선명해집니다</ShText>
-      <ShText tone="muted" class="mt-3 max-w-3xl">
+      <ShText tone="muted" class="mt-3">
         세후 수익, 투자 과세, 자산 이전 중 지금 내 결정과 가까운 묶음에서 시작하세요.
       </ShText>
     </ShSurface>
