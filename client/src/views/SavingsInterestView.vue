@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ShCalculatorSplit } from "@shakilabs/ui";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
@@ -96,23 +97,30 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <CalculatorInteractionTracker
-      calculator-id="savings_interest"
-      page-path="/invest/savings-interest"
-    >
-      <SavingsInputPanel
-        :monthly-deposit="calc.monthlyDeposit.value"
-        :months="calc.months.value"
-        :annual-rate="calc.annualRate.value"
-        :tax-type="calc.taxType.value"
-        @update:monthly-deposit="calc.monthlyDeposit.value = $event"
-        @update:months="calc.months.value = $event"
-        @update:annual-rate="calc.annualRate.value = $event"
-        @update:tax-type="calc.taxType.value = $event"
-      />
-    </CalculatorInteractionTracker>
+    <ShCalculatorSplit>
+      <template #input>
+        <CalculatorInteractionTracker
+          calculator-id="savings_interest"
+          page-path="/invest/savings-interest"
+        >
+          <SavingsInputPanel
+            :monthly-deposit="calc.monthlyDeposit.value"
+            :months="calc.months.value"
+            :annual-rate="calc.annualRate.value"
+            :tax-type="calc.taxType.value"
+            @update:monthly-deposit="calc.monthlyDeposit.value = $event"
+            @update:months="calc.months.value = $event"
+            @update:annual-rate="calc.annualRate.value = $event"
+            @update:tax-type="calc.taxType.value = $event"
+          />
+        </CalculatorInteractionTracker>
+      </template>
 
-    <SavingsResultPanel :result="calc.result.value" />
+      <template #result>
+        <SavingsResultPanel :result="calc.result.value" />
+      </template>
+    </ShCalculatorSplit>
+
     <IntentRelatedLinks current-path="/savings-interest" />
     <FaqAccordionPanel :items="mergedFaqs" />
 

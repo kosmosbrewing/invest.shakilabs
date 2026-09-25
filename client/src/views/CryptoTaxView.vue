@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ShSurface, ShText } from "@shakilabs/ui";
+import { ShCalculatorSplit, ShSurface, ShText } from "@shakilabs/ui";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
@@ -89,22 +89,34 @@ const faqJsonLd = {
       </div>
     </ShSurface>
 
-    <CalculatorInteractionTracker
-      calculator-id="crypto_tax"
-      page-path="/invest/crypto-tax"
-    >
-      <CryptoInputPanel
-        :purchase-amount="calc.purchaseAmount.value"
-        :sale-amount="calc.saleAmount.value"
-        :expenses="calc.expenses.value"
-        @update:purchase-amount="calc.purchaseAmount.value = $event"
-        @update:sale-amount="calc.saleAmount.value = $event"
-        @update:expenses="calc.expenses.value = $event"
-      />
-    </CalculatorInteractionTracker>
+    <ShCalculatorSplit>
+      <template #input>
+        <CalculatorInteractionTracker
+          calculator-id="crypto_tax"
+          page-path="/invest/crypto-tax"
+        >
+          <CryptoInputPanel
+            :purchase-amount="calc.purchaseAmount.value"
+            :sale-amount="calc.saleAmount.value"
+            :expenses="calc.expenses.value"
+            @update:purchase-amount="calc.purchaseAmount.value = $event"
+            @update:sale-amount="calc.saleAmount.value = $event"
+            @update:expenses="calc.expenses.value = $event"
+          />
+        </CalculatorInteractionTracker>
+      </template>
 
-    <CryptoResultPanel :result="calc.result.value" />
-    <IntentRelatedLinks current-path="/crypto-tax" />
+      <template #result>
+        <CryptoResultPanel :result="calc.result.value" />
+      </template>
+
+      <!-- 결과(784px)가 입력(391px)보다 300px 이상 길어 왼쪽이 빈다(1440px 실측) —
+           입력과 관련된 다음 계산 링크로 왼쪽을 채운다. -->
+      <template #below-input>
+        <IntentRelatedLinks current-path="/crypto-tax" compact />
+      </template>
+    </ShCalculatorSplit>
+
     <FaqAccordionPanel :items="mergedFaqs" />
     <RelatedServices />
 

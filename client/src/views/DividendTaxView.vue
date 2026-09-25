@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ShCalculatorSplit } from "@shakilabs/ui";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
@@ -82,23 +83,30 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <CalculatorInteractionTracker
-      calculator-id="dividend_tax"
-      page-path="/invest/dividend-tax"
-    >
-      <DividendInputPanel
-        :dividend-amount="calc.dividendAmount.value"
-        :country="calc.country.value"
-        :other-financial-income="calc.otherFinancialIncome.value"
-        :other-comprehensive-income="calc.otherComprehensiveIncome.value"
-        @update:dividend-amount="calc.dividendAmount.value = $event"
-        @update:country="calc.country.value = $event"
-        @update:other-financial-income="calc.otherFinancialIncome.value = $event"
-        @update:other-comprehensive-income="calc.otherComprehensiveIncome.value = $event"
-      />
-    </CalculatorInteractionTracker>
+    <ShCalculatorSplit>
+      <template #input>
+        <CalculatorInteractionTracker
+          calculator-id="dividend_tax"
+          page-path="/invest/dividend-tax"
+        >
+          <DividendInputPanel
+            :dividend-amount="calc.dividendAmount.value"
+            :country="calc.country.value"
+            :other-financial-income="calc.otherFinancialIncome.value"
+            :other-comprehensive-income="calc.otherComprehensiveIncome.value"
+            @update:dividend-amount="calc.dividendAmount.value = $event"
+            @update:country="calc.country.value = $event"
+            @update:other-financial-income="calc.otherFinancialIncome.value = $event"
+            @update:other-comprehensive-income="calc.otherComprehensiveIncome.value = $event"
+          />
+        </CalculatorInteractionTracker>
+      </template>
 
-    <DividendResultPanel :result="calc.result.value" />
+      <template #result>
+        <DividendResultPanel :result="calc.result.value" />
+      </template>
+    </ShCalculatorSplit>
+
     <IntentRelatedLinks current-path="/dividend-tax" />
     <FaqAccordionPanel :items="mergedFaqs" />
 

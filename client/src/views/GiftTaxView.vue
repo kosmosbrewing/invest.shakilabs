@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ShCalculatorSplit } from "@shakilabs/ui";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
@@ -68,25 +69,37 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <CalculatorInteractionTracker
-      calculator-id="gift_tax"
-      page-path="/invest/gift-tax"
-    >
-      <GiftTaxInputPanel
-        :gift-amount="calc.giftAmount.value"
-        :prior-deduction-used="calc.priorDeductionUsed.value"
-        :relationship="calc.relationship.value"
-        :is-generation-skipping="calc.isGenerationSkipping.value"
-        @update:gift-amount="calc.giftAmount.value = $event"
-        @update:prior-deduction-used="calc.priorDeductionUsed.value = $event"
-        @update:relationship="calc.relationship.value = $event"
-        @update:is-generation-skipping="calc.isGenerationSkipping.value = $event"
-      />
-    </CalculatorInteractionTracker>
+    <ShCalculatorSplit>
+      <template #input>
+        <CalculatorInteractionTracker
+          calculator-id="gift_tax"
+          page-path="/invest/gift-tax"
+        >
+          <GiftTaxInputPanel
+            :gift-amount="calc.giftAmount.value"
+            :prior-deduction-used="calc.priorDeductionUsed.value"
+            :relationship="calc.relationship.value"
+            :is-generation-skipping="calc.isGenerationSkipping.value"
+            @update:gift-amount="calc.giftAmount.value = $event"
+            @update:prior-deduction-used="calc.priorDeductionUsed.value = $event"
+            @update:relationship="calc.relationship.value = $event"
+            @update:is-generation-skipping="calc.isGenerationSkipping.value = $event"
+          />
+        </CalculatorInteractionTracker>
+        <InputRangeNotice :notices="calc.rangeNotices.value" />
+      </template>
 
-    <InputRangeNotice :notices="calc.rangeNotices.value" />
-    <GiftTaxResultPanel :result="calc.result.value" />
-    <IntentRelatedLinks current-path="/gift-tax" />
+      <template #result>
+        <GiftTaxResultPanel :result="calc.result.value" />
+      </template>
+
+      <!-- 결과(858px)가 입력(409px)보다 300px 이상 길어 왼쪽이 빈다(1440px 실측) —
+           입력과 관련된 다음 계산 링크로 왼쪽을 채운다. -->
+      <template #below-input>
+        <IntentRelatedLinks current-path="/gift-tax" compact />
+      </template>
+    </ShCalculatorSplit>
+
     <FaqAccordionPanel title="출처 및 FAQ" :items="mergedFaqs">
       <template #before>
         <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">

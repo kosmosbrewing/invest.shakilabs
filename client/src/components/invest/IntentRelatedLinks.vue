@@ -6,7 +6,8 @@ import { ShSurface, ShText } from "@shakilabs/ui";
 import { getRelatedInvestTools } from "@/data/investNavigation";
 import { trackEvent } from "@/lib/analytics";
 
-const props = defineProps<{ currentPath: string }>();
+// compact: below-input(반폭 칸)에 들어갈 때 3열 카드가 좁은 칸에 눌리지 않도록 lg에서 1열로 쌓는다.
+const props = defineProps<{ currentPath: string; compact?: boolean }>();
 const links = getRelatedInvestTools(props.currentPath);
 const currentTool = props.currentPath.slice(1).replaceAll("-", "_");
 
@@ -39,7 +40,7 @@ function trackRelatedClick(toTool: string): void {
         전체 도구 보기
       </RouterLink>
     </div>
-    <div class="grid gap-3 md:grid-cols-3">
+    <div class="grid gap-3 md:grid-cols-3" :class="{ 'lg:grid-cols-1': compact }">
       <RouterLink
         v-for="link in links"
         :key="link.path"

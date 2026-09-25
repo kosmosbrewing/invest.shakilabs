@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ShCalculatorSplit } from "@shakilabs/ui";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
@@ -8,6 +9,7 @@ import { mergeFaqs } from "@/lib/faqMerge";
 import { COMPOUND_INTEREST_GUIDE } from "@/data/seoGuides";
 import CompoundInputPanel from "@/components/compound/CompoundInputPanel.vue";
 import CompoundResultPanel from "@/components/compound/CompoundResultPanel.vue";
+import CompoundGrowthDetail from "@/components/compound/CompoundGrowthDetail.vue";
 import CalculatorPageHeader from "@/components/invest/CalculatorPageHeader.vue";
 import CalculatorInteractionTracker from "@/components/analytics/CalculatorInteractionTracker.vue";
 import { useCompoundInterestCalc } from "@/composables/useCompoundInterestCalc";
@@ -94,23 +96,33 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <CalculatorInteractionTracker
-      calculator-id="compound_interest"
-      page-path="/invest/compound-interest"
-    >
-      <CompoundInputPanel
-        :initial-amount="calc.initialAmount.value"
-        :monthly-contribution="calc.monthlyContribution.value"
-        :annual-rate="calc.annualRate.value"
-        :years="calc.years.value"
-        @update:initial-amount="calc.initialAmount.value = $event"
-        @update:monthly-contribution="calc.monthlyContribution.value = $event"
-        @update:annual-rate="calc.annualRate.value = $event"
-        @update:years="calc.years.value = $event"
-      />
-    </CalculatorInteractionTracker>
+    <ShCalculatorSplit>
+      <template #input>
+        <CalculatorInteractionTracker
+          calculator-id="compound_interest"
+          page-path="/invest/compound-interest"
+        >
+          <CompoundInputPanel
+            :initial-amount="calc.initialAmount.value"
+            :monthly-contribution="calc.monthlyContribution.value"
+            :annual-rate="calc.annualRate.value"
+            :years="calc.years.value"
+            @update:initial-amount="calc.initialAmount.value = $event"
+            @update:monthly-contribution="calc.monthlyContribution.value = $event"
+            @update:annual-rate="calc.annualRate.value = $event"
+            @update:years="calc.years.value = $event"
+          />
+        </CalculatorInteractionTracker>
+      </template>
 
-    <CompoundResultPanel :result="calc.result.value" />
+      <template #result>
+        <CompoundResultPanel :result="calc.result.value" />
+      </template>
+    </ShCalculatorSplit>
+
+    <!-- 결과(1024px)가 입력(478px)보다 300px 이상 길어 왼쪽이 빈다(1440px 실측) —
+         연도별 성장 차트·표는 상세이므로 1×2 아래 전폭으로 내리고 결과 칸엔 요약만 남긴다. -->
+    <CompoundGrowthDetail :result="calc.result.value" />
     <IntentRelatedLinks current-path="/compound-interest" />
     <FaqAccordionPanel :items="mergedFaqs" />
 

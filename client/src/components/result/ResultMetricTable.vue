@@ -36,7 +36,10 @@ function toneClass(tone?: MetricTone): string {
 </script>
 
 <template>
-  <div class="space-y-3 md:hidden">
+  <!-- lg(1024px+)에서는 결과 칸이 1×2 틀의 반폭(~480~540px)이라 표의 "설명" 열이
+       가려져 칸 안 가로 스크롤이 생긴다 — 표는 결과가 전폭인 md~lg 구간에만 두고
+       lg부터는 다시 카드 목록으로 보여준다(모바일 카드 재사용, 열을 지우지 않는다). -->
+  <div class="space-y-3 md:hidden lg:block">
     <ShSurface
       v-for="row in rows"
       :key="row.label"
@@ -60,7 +63,7 @@ function toneClass(tone?: MetricTone): string {
     </ShSurface>
   </div>
 
-  <div class="hidden md:block">
+  <div class="hidden md:block lg:hidden">
     <ShTable aria-label="계산 결과 항목별 상세" density="compact">
       <ShTableHeader>
         <ShTableRow>

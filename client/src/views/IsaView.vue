@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ShCalculatorSplit } from "@shakilabs/ui";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
@@ -82,24 +83,36 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <CalculatorInteractionTracker
-      calculator-id="isa"
-      page-path="/invest/isa"
-    >
-      <IsaInputPanel
-        :annual-investment="calc.annualInvestment.value"
-        :annual-return-rate="calc.annualReturnRate.value"
-        :holding-years="calc.holdingYears.value"
-        :isa-type="calc.isaType.value"
-        @update:annual-investment="calc.annualInvestment.value = $event"
-        @update:annual-return-rate="calc.annualReturnRate.value = $event"
-        @update:holding-years="calc.holdingYears.value = $event"
-        @update:isa-type="calc.isaType.value = $event"
-      />
-    </CalculatorInteractionTracker>
+    <ShCalculatorSplit>
+      <template #input>
+        <CalculatorInteractionTracker
+          calculator-id="isa"
+          page-path="/invest/isa"
+        >
+          <IsaInputPanel
+            :annual-investment="calc.annualInvestment.value"
+            :annual-return-rate="calc.annualReturnRate.value"
+            :holding-years="calc.holdingYears.value"
+            :isa-type="calc.isaType.value"
+            @update:annual-investment="calc.annualInvestment.value = $event"
+            @update:annual-return-rate="calc.annualReturnRate.value = $event"
+            @update:holding-years="calc.holdingYears.value = $event"
+            @update:isa-type="calc.isaType.value = $event"
+          />
+        </CalculatorInteractionTracker>
+      </template>
 
-    <IsaResultPanel :result="calc.result.value" />
-    <IntentRelatedLinks current-path="/isa" />
+      <template #result>
+        <IsaResultPanel :result="calc.result.value" />
+      </template>
+
+      <!-- 결과(754px)가 입력(409px)보다 300px 이상 길어 왼쪽이 빈다(1440px 실측) —
+           입력과 관련된 다음 계산 링크로 왼쪽을 채운다. -->
+      <template #below-input>
+        <IntentRelatedLinks current-path="/isa" compact />
+      </template>
+    </ShCalculatorSplit>
+
     <FaqAccordionPanel :items="mergedFaqs" />
 
     <SeoRichGuide
