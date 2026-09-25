@@ -1,20 +1,23 @@
 <script setup lang="ts">
 // v3 AppShell(BL-003/004) — 앱 자체 헤더 마크업을 패키지 ShGlobalHeader로 교체한다.
 // 검정 고정 배경·56px 높이·로고→포털 홈(/)은 패키지가 강제하므로 앱은 유틸(테마 토글)만 채운다.
-// 팁 티커는 0.3.24부터 #tip 슬롯으로 헤더에 복귀 — 패키지가 out-of-flow(absolute)로
-// 렌더해 텍스트 길이가 바뀌어도 헤더 높이가 56px로 고정되므로 BL-005 재발 없이 안전하다.
+// 0.3.38 "순수 내비게이션"(2026-09-25): 헤더는 위치(로고 / 앱 이름)와 이동(블로그·소개·☰)만 싣는다 — 팁 티커는 뺐다.
 import { computed, onMounted, ref } from "vue";
 import { Moon, Sun } from "lucide-vue-next";
 import { RouterLink, useRoute } from "vue-router";
-import { ShButton, ShGlobalHeader } from "@shakilabs/ui";
+import { ShButton, ShGlobalHeader, type GlobalHeaderLink } from "@shakilabs/ui";
 import { INVEST_TABS } from "@/data/investTabs";
-import TickerBar from "@/components/common/TickerBar.vue";
-import { tickerMessages } from "@/data/tickerMessages";
 
 const THEME_STORAGE_KEY = "invest-calc:theme:v1";
 type ThemeMode = "light" | "dark";
 
-// 모바일 드로어(v3 §3.3-1)에 실을 도구 목록 — 2차 내비(TabNavigation)와 같은
+// 사이트 링크 — 블로그는 포털 소유라 href, 소개는 이 앱 라우트라 RouterLink(to). 모바일에서는 ☰ 안으로 들어간다.
+const links: GlobalHeaderLink[] = [
+  { href: "/blog", label: "블로그" },
+  { to: "/about", label: "소개" },
+];
+
+// 모바일 전체 메뉴(☰)에 실을 도구 목록 — 2차 내비(TabNavigation)와 같은
 // 출처(INVEST_TABS)를 쓴다. 목록을 복제하지 않는다.
 const route = useRoute();
 const navItems = INVEST_TABS;
@@ -43,14 +46,12 @@ onMounted(() => {
 
 <template>
   <ShGlobalHeader
+    app="invest"
+    :links="links"
     :nav-items="navItems"
     :nav-active-key="navActiveKey"
-    nav-title="투자 도구"
     :link-component="RouterLink"
   >
-    <template #tip>
-      <TickerBar :messages="tickerMessages" />
-    </template>
     <template #utility>
       <ShButton
         type="button"
