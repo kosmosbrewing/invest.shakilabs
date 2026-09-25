@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ShCalculatorSplit } from "@shakilabs/ui";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
@@ -101,25 +102,32 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <CalculatorInteractionTracker
-      calculator-id="deposit_interest"
-      page-path="/invest/deposit-interest"
-    >
-      <DepositInputPanel
-        :principal="calc.principal.value"
-        :months="calc.months.value"
-        :annual-rate="calc.annualRate.value"
-        :tax-type="calc.taxType.value"
-        :payment-type="calc.paymentType.value"
-        @update:principal="calc.principal.value = $event"
-        @update:months="calc.months.value = $event"
-        @update:annual-rate="calc.annualRate.value = $event"
-        @update:tax-type="calc.taxType.value = $event"
-        @update:payment-type="calc.paymentType.value = $event"
-      />
-    </CalculatorInteractionTracker>
+    <ShCalculatorSplit>
+      <template #input>
+        <CalculatorInteractionTracker
+          calculator-id="deposit_interest"
+          page-path="/invest/deposit-interest"
+        >
+          <DepositInputPanel
+            :principal="calc.principal.value"
+            :months="calc.months.value"
+            :annual-rate="calc.annualRate.value"
+            :tax-type="calc.taxType.value"
+            :payment-type="calc.paymentType.value"
+            @update:principal="calc.principal.value = $event"
+            @update:months="calc.months.value = $event"
+            @update:annual-rate="calc.annualRate.value = $event"
+            @update:tax-type="calc.taxType.value = $event"
+            @update:payment-type="calc.paymentType.value = $event"
+          />
+        </CalculatorInteractionTracker>
+      </template>
 
-    <DepositResultPanel :result="calc.result.value" :payment-type="calc.paymentType.value" />
+      <template #result>
+        <DepositResultPanel :result="calc.result.value" :payment-type="calc.paymentType.value" />
+      </template>
+    </ShCalculatorSplit>
+
     <IntentRelatedLinks current-path="/deposit-interest" />
     <FaqAccordionPanel :items="mergedFaqs" />
 

@@ -1,17 +1,8 @@
 <script setup lang="ts">
 import CountUpAmount from "@/components/common/CountUpAmount.vue";
 import { computed } from "vue";
-import {
-  ShBadge,
-  ShTable,
-  ShTableBody,
-  ShTableCell,
-  ShTableHead,
-  ShTableHeader,
-  ShTableRow,
-} from "@shakilabs/ui";
+import { ShBadge } from "@shakilabs/ui";
 import ResultMetricTable from "@/components/result/ResultMetricTable.vue";
-import CompoundGrowthChart from "@/components/compound/CompoundGrowthChart.vue";
 import type { CompoundInterestResult } from "@/utils/interestCalculator";
 import { formatWon } from "@/lib/utils";
 
@@ -49,15 +40,6 @@ const metricRows = computed(() => [
     badge: "Rule of 72",
   },
 ]);
-
-// 연도별 테이블 (5년 단위로 표시)
-const displayYears = computed(() => {
-  const data = props.result.yearlyData;
-  if (data.length <= 10) return data;
-  // 10년 초과 시: 첫해 + 5년 간격 + 마지막
-  const filtered = data.filter((d, i) => i === 0 || d.year % 5 === 0 || i === data.length - 1);
-  return filtered;
-});
 </script>
 
 <template>
@@ -80,36 +62,6 @@ const displayYears = computed(() => {
       </div>
 
       <ResultMetricTable :rows="metricRows" />
-
-      <CompoundGrowthChart :rows="result.yearlyData" />
-
-      <!-- 연도별 성장 테이블 -->
-      <details v-if="displayYears.length > 1" class="retro-details">
-        <summary class="retro-details-summary">
-          <span>연도별 성장 내역</span>
-          <span class="retro-details-chevron">+</span>
-        </summary>
-        <div class="px-3 py-3 sm:px-4">
-          <ShTable aria-label="연도별 단리와 복리 성장 비교" density="compact" min-width="30rem" scroll-hint="표를 좌우로 스크롤해 연도별 금액을 확인하세요.">
-            <ShTableHeader>
-              <ShTableRow>
-                <ShTableHead>연차</ShTableHead>
-                <ShTableHead numeric>투자 원금</ShTableHead>
-                <ShTableHead numeric>단리</ShTableHead>
-                <ShTableHead numeric>복리</ShTableHead>
-              </ShTableRow>
-            </ShTableHeader>
-            <ShTableBody>
-              <ShTableRow v-for="row in displayYears" :key="row.year">
-                <ShTableCell>{{ row.year }}년</ShTableCell>
-                <ShTableCell numeric>{{ formatWon(row.invested) }}</ShTableCell>
-                <ShTableCell numeric>{{ formatWon(row.simpleTotal) }}</ShTableCell>
-                <ShTableCell numeric emphasis class="text-primary">{{ formatWon(row.compoundTotal) }}</ShTableCell>
-              </ShTableRow>
-            </ShTableBody>
-          </ShTable>
-        </div>
-      </details>
 
       <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground space-y-1">
         <p>* 72법칙: 72 / 연수익률(%) = 원금 2배 도달 예상 기간</p>

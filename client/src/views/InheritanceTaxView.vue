@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { ShCalculatorSplit } from "@shakilabs/ui";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import IntentRelatedLinks from "@/components/invest/IntentRelatedLinks.vue";
@@ -72,27 +73,39 @@ const faqJsonLd = {
       </div>
     </section>
 
-    <CalculatorInteractionTracker
-      calculator-id="inheritance_tax"
-      page-path="/invest/inheritance-tax"
-    >
-      <InheritanceTaxInputPanel
-        :total-estate="calc.totalEstate.value"
-        :debt="calc.debt.value"
-        :financial-assets="calc.financialAssets.value"
-        :has-spouse="calc.hasSpouse.value"
-        :children-count="calc.childrenCount.value"
-        @update:total-estate="calc.totalEstate.value = $event"
-        @update:debt="calc.debt.value = $event"
-        @update:financial-assets="calc.financialAssets.value = $event"
-        @update:has-spouse="calc.hasSpouse.value = $event"
-        @update:children-count="calc.childrenCount.value = $event"
-      />
-    </CalculatorInteractionTracker>
+    <ShCalculatorSplit>
+      <template #input>
+        <CalculatorInteractionTracker
+          calculator-id="inheritance_tax"
+          page-path="/invest/inheritance-tax"
+        >
+          <InheritanceTaxInputPanel
+            :total-estate="calc.totalEstate.value"
+            :debt="calc.debt.value"
+            :financial-assets="calc.financialAssets.value"
+            :has-spouse="calc.hasSpouse.value"
+            :children-count="calc.childrenCount.value"
+            @update:total-estate="calc.totalEstate.value = $event"
+            @update:debt="calc.debt.value = $event"
+            @update:financial-assets="calc.financialAssets.value = $event"
+            @update:has-spouse="calc.hasSpouse.value = $event"
+            @update:children-count="calc.childrenCount.value = $event"
+          />
+        </CalculatorInteractionTracker>
+        <InputRangeNotice :notices="calc.rangeNotices.value" />
+      </template>
 
-    <InputRangeNotice :notices="calc.rangeNotices.value" />
-    <InheritanceTaxResultPanel :result="calc.result.value" />
-    <IntentRelatedLinks current-path="/inheritance-tax" />
+      <template #result>
+        <InheritanceTaxResultPanel :result="calc.result.value" />
+      </template>
+
+      <!-- 결과(936px)가 입력(554px)보다 300px 이상 길어 왼쪽이 빈다(1440px 실측) —
+           입력과 관련된 다음 계산 링크로 왼쪽을 채운다. -->
+      <template #below-input>
+        <IntentRelatedLinks current-path="/inheritance-tax" compact />
+      </template>
+    </ShCalculatorSplit>
+
     <FaqAccordionPanel title="출처 및 FAQ" :items="mergedFaqs">
       <template #before>
         <div class="rounded-lg bg-muted/40 px-3 py-2 text-tiny text-muted-foreground">
