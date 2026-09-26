@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useId } from "vue";
 import { PiggyBank } from "lucide-vue-next";
 import { ShPresetGroup, ShSlider } from "@shakilabs/ui";
 import type { TaxType } from "@/data/interestData";
@@ -33,6 +34,11 @@ const periodPresets = SAVINGS_PERIOD_PRESETS.map((value) => ({
   label: `${value}개월`,
   value,
 }));
+
+// 왜: 보이는 작은 제목을 <label for>로 칸에 묶어야 스크린리더가 "편집, 빈칸" 대신 칸 이름을 읽는다
+const monthlyDepositId = useId();
+const annualRateId = useId();
+const monthsId = useId();
 </script>
 
 <template>
@@ -45,12 +51,14 @@ const periodPresets = SAVINGS_PERIOD_PRESETS.map((value) => ({
     </div>
 
     <div class="retro-panel-content space-y-4">
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <!-- 1×2 틀의 반폭 칸(lg+)에서는 아래 묶음과 같이 1열 — 한 카드 안 슬라이더 폭을 한 가지로 맞춘다.
+           틀이 한 줄로 쌓이는 sm~lg에서는 입력 카드가 전폭이라 2열을 유지한다. -->
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">월 적립액</label>
+          <label :for="monthlyDepositId" class="mb-2 block text-caption font-semibold text-foreground">월 적립액</label>
           <div class="relative">
             <input
-              aria-label="월 적립액"
+              :id="monthlyDepositId"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -69,9 +77,10 @@ const periodPresets = SAVINGS_PERIOD_PRESETS.map((value) => ({
         </div>
 
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">연이율 (%)</label>
+          <label :for="annualRateId" class="mb-2 block text-caption font-semibold text-foreground">연이율 (%)</label>
           <div class="flex items-center gap-3">
             <ShSlider
+              :id="annualRateId"
               :model-value="annualRate"
               :min="0.5"
               :max="10"
@@ -95,11 +104,14 @@ const periodPresets = SAVINGS_PERIOD_PRESETS.map((value) => ({
         </div>
       </div>
 
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <!-- 반폭 칸(lg+)에서는 1열 — 2열이면 이자과세 선택지가 두 줄로 꺾인다(라디오 묶음은 한 줄씩).
+           틀이 한 줄로 쌓이는 sm~lg에서는 입력 카드가 전폭이라 2열을 유지한다. -->
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">적금 기간</label>
+          <label :for="monthsId" class="mb-2 block text-caption font-semibold text-foreground">적금 기간</label>
           <div class="flex items-center gap-3">
             <ShSlider
+              :id="monthsId"
               :model-value="months"
               :min="1"
               :max="60"
@@ -121,7 +133,7 @@ const periodPresets = SAVINGS_PERIOD_PRESETS.map((value) => ({
         </div>
 
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">이자과세</label>
+          <span class="mb-2 block text-caption font-semibold text-foreground">이자과세</span>
           <div class="grid grid-cols-1 gap-2">
             <label
               v-for="opt in TAX_TYPE_OPTIONS"

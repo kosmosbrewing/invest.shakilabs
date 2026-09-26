@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useId } from "vue";
 import { Banknote } from "lucide-vue-next";
 import { ShPresetGroup } from "@shakilabs/ui";
 import { DIVIDEND_TAX } from "@/data/investTaxRates";
@@ -52,6 +53,11 @@ function parseInput(value: string): number {
   const num = Number(value.replace(/[^0-9.-]/g, ""));
   return isNaN(num) ? 0 : Math.max(0, num);
 }
+
+// 왜: 보이는 작은 제목을 <label for>로 칸에 묶어야 스크린리더가 "편집, 빈칸" 대신 칸 이름을 읽는다
+const dividendAmountId = useId();
+const otherFinancialIncomeId = useId();
+const otherComprehensiveIncomeId = useId();
 </script>
 
 <template>
@@ -64,12 +70,14 @@ function parseInput(value: string): number {
     </div>
 
     <div class="retro-panel-content space-y-4">
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- 1×2 틀의 반폭 칸(lg+)에서는 1열 — 4열이면 칸당 85px라 5,000,000도 잘리고 안내문이 5~6줄로 꺾인다.
+           틀이 한 줄로 쌓이는 sm~lg에서는 입력 카드가 전폭이라 2열을 유지한다. -->
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">배당금(세전)</label>
+          <label :for="dividendAmountId" class="mb-2 block text-caption font-semibold text-foreground">배당금(세전)</label>
           <div class="relative">
             <input
-              aria-label="세전 배당금"
+              :id="dividendAmountId"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -88,36 +96,22 @@ function parseInput(value: string): number {
         </div>
 
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">배당 국가</label>
-          <div class="grid grid-cols-1 gap-2">
-            <label
-              v-for="countryItem in countries"
-              :key="countryItem.value"
-              :class="[
-                'flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2.5 text-caption transition-colors',
-                country === countryItem.value
-                  ? 'border-primary bg-primary/8 font-semibold text-foreground'
-                  : 'border-border text-muted-foreground hover:border-primary/50',
-              ]"
-            >
-              <input
-                type="radio"
-                name="country"
-                class="retro-radio"
-                :value="countryItem.value"
-                :checked="country === countryItem.value"
-                @change="emit('update:country', countryItem.value)"
-              />
-              {{ countryItem.label }}
-            </label>
-          </div>
+          <span class="mb-2 block text-caption font-semibold text-foreground">배당 국가</span>
+          <!-- 왜: 라디오 6줄 목록은 반폭 칸에서 줄마다 두 줄로 꺾여 입력 열을 길게 늘린다 —
+               앱의 선택 칩(증여 관계·배우자 공제와 같은 문법)으로 한두 줄에 담는다. -->
+          <ShPresetGroup
+            :model-value="country"
+            :options="countries"
+            label="배당 국가"
+            @update:model-value="emit('update:country', $event)"
+          />
         </div>
 
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">기타 금융소득</label>
+          <label :for="otherFinancialIncomeId" class="mb-2 block text-caption font-semibold text-foreground">기타 금융소득</label>
           <div class="relative">
             <input
-              aria-label="기타 금융소득"
+              :id="otherFinancialIncomeId"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -137,10 +131,10 @@ function parseInput(value: string): number {
         </div>
 
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">다른 종합소득 과세표준</label>
+          <label :for="otherComprehensiveIncomeId" class="mb-2 block text-caption font-semibold text-foreground">다른 종합소득 과세표준</label>
           <div class="relative">
             <input
-              aria-label="다른 종합소득 과세표준"
+              :id="otherComprehensiveIncomeId"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"

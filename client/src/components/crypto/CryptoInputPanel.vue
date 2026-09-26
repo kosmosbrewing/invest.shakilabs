@@ -53,7 +53,9 @@ const expensesId = useId();
     </div>
 
     <div class="retro-panel-content space-y-4">
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <!-- 1×2 틀의 반폭 칸(lg+)에서는 1열 — 3열이면 칸당 129px라 안내문이 4~5줄로 꺾이고 프리셋이 세로로 쌓인다.
+           틀이 한 줄로 쌓이는 sm~lg에서는 입력 카드가 전폭이라 3열을 유지한다. -->
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-1">
         <div class="crypto-input-card retro-panel-muted p-3.5">
           <label :for="purchaseAmountId" class="mb-2 block text-caption font-semibold text-foreground">
             취득가액
