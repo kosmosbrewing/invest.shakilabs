@@ -12,5 +12,3 @@ export const INVEST_TABS: readonly PrimaryNavigationItem[] = [
   { key: "isa", label: "ISA 비교", to: "/isa" },
   { key: "gift-tax", label: "증여세", to: "/gift-tax" },
 ];
-
-export const INVEST_MOBILE_DEFAULT_KEYS = ["all", "crypto-tax", "dividend-tax", "isa"] as const;
