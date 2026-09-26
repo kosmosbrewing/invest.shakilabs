@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useId } from "vue";
 import { TrendingUp } from "lucide-vue-next";
 import { ShPresetGroup, ShSlider } from "@shakilabs/ui";
 import { COMPOUND_YEAR_PRESETS, COMPOUND_RATE_PRESETS } from "@/data/interestData";
@@ -39,6 +40,12 @@ const compoundYearPresets = COMPOUND_YEAR_PRESETS.map((value) => ({
   label: `${value}년`,
   value,
 }));
+
+// 왜: 보이는 작은 제목을 <label for>로 칸에 묶어야 스크린리더가 "편집, 빈칸" 대신 칸 이름을 읽는다
+const initialAmountId = useId();
+const monthlyContributionId = useId();
+const annualRateId = useId();
+const yearsId = useId();
 </script>
 
 <template>
@@ -53,10 +60,10 @@ const compoundYearPresets = COMPOUND_YEAR_PRESETS.map((value) => ({
     <div class="retro-panel-content space-y-4">
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">초기 투자금</label>
+          <label :for="initialAmountId" class="mb-2 block text-caption font-semibold text-foreground">초기 투자금</label>
           <div class="relative">
             <input
-              aria-label="초기 투자금"
+              :id="initialAmountId"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -75,10 +82,10 @@ const compoundYearPresets = COMPOUND_YEAR_PRESETS.map((value) => ({
         </div>
 
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">월 추가 적립금</label>
+          <label :for="monthlyContributionId" class="mb-2 block text-caption font-semibold text-foreground">월 추가 적립금</label>
           <div class="relative">
             <input
-              aria-label="월 추가 적립금"
+              :id="monthlyContributionId"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -99,9 +106,10 @@ const compoundYearPresets = COMPOUND_YEAR_PRESETS.map((value) => ({
 
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">연 수익률 (%)</label>
+          <label :for="annualRateId" class="mb-2 block text-caption font-semibold text-foreground">연 수익률 (%)</label>
           <div class="flex items-center gap-3">
             <ShSlider
+              :id="annualRateId"
               :model-value="annualRate"
               :min="1"
               :max="20"
@@ -125,9 +133,10 @@ const compoundYearPresets = COMPOUND_YEAR_PRESETS.map((value) => ({
         </div>
 
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">투자 기간</label>
+          <label :for="yearsId" class="mb-2 block text-caption font-semibold text-foreground">투자 기간</label>
           <div class="flex items-center gap-3">
             <ShSlider
+              :id="yearsId"
               :model-value="years"
               :min="1"
               :max="40"

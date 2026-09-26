@@ -1,15 +1,23 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { ArrowRight } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
-import { ShSurface, ShText } from "@shakilabs/ui";
+import { ShNextActions } from "@shakilabs/ui";
+import type { NextActionItem } from "@shakilabs/ui";
 import { getRelatedInvestTools } from "@/data/investNavigation";
 import { trackEvent } from "@/lib/analytics";
 
-// compact: below-input(반폭 칸)에 들어갈 때 3열 카드가 좁은 칸에 눌리지 않도록 lg에서 1열로 쌓는다.
-const props = defineProps<{ currentPath: string; compact?: boolean }>();
+// 카드 문법(제목 + 한 줄)과 폭 판정(반폭이면 목록, 전폭이면 3열)은 패키지 ShNextActions가 맡는다 —
+// 앱마다 카드·CTA 문구·격자를 따로 두지 않기 위해서다.
+// 허브 링크("전체 도구 보기")는 두지 않는다: 같은 /all을 상단 탭·드로어·푸터가 원시 HTML에서 이미 링크한다.
+const props = defineProps<{ currentPath: string }>();
 const links = getRelatedInvestTools(props.currentPath);
 const currentTool = props.currentPath.slice(1).replaceAll("-", "_");
+const items: NextActionItem[] = links.map((link) => ({
+  key: link.key,
+  title: link.title,
+  to: link.path,
+  note: link.note,
+}));
 
 onMounted(() => {
   links.forEach((link) => trackEvent("related_tool_impression", {
@@ -20,42 +28,17 @@ onMounted(() => {
   }));
 });
 
-function trackRelatedClick(toTool: string): void {
+// 이벤트 이름·파라미터는 카드 교체 전과 같다(to_tool = 도구 key) — GA4 비교가 끊기지 않게.
+function trackRelatedClick(item: NextActionItem): void {
   trackEvent("related_tool_click", {
     app_id: "invest",
     from_tool: currentTool,
-    to_tool: toTool,
+    to_tool: item.key,
     placement: "after_result",
   });
 }
 </script>
 
 <template>
-  <section :aria-labelledby="`${currentTool}-next-actions-title`">
-    <div class="mb-3 flex flex-wrap items-end justify-between gap-2">
-      <ShText :id="`${currentTool}-next-actions-title`" as="h2" variant="heading">
-        계산 결과에서 다음 결정을 이어가세요
-      </ShText>
-      <RouterLink to="/all" class="retro-link text-caption font-semibold">
-        전체 도구 보기
-      </RouterLink>
-    </div>
-    <div class="grid gap-3 md:grid-cols-3" :class="{ 'lg:grid-cols-1': compact }">
-      <RouterLink
-        v-for="link in links"
-        :key="link.path"
-        :to="link.path"
-        class="block no-underline"
-        @click="trackRelatedClick(link.key)"
-      >
-        <ShSurface variant="outlined" padding="md" class="group flex h-full flex-col hover:border-primary">
-          <ShText as="h3" variant="heading">{{ link.title }}</ShText>
-          <ShText variant="caption" tone="muted" class="mt-2 flex-1">{{ link.description }}</ShText>
-          <span class="mt-4 inline-flex items-center gap-1 text-caption font-semibold text-primary">
-            바로 계산하기 <ArrowRight class="h-4 w-4" aria-hidden="true" />
-          </span>
-        </ShSurface>
-      </RouterLink>
-    </div>
-  </section>
+  <ShNextActions :items="items" :link-component="RouterLink" @select="trackRelatedClick" />
 </template>

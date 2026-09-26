@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useId } from "vue";
 import { Landmark } from "lucide-vue-next";
 import { ShPresetGroup } from "@shakilabs/ui";
 import { GIFT_TAX_RELATIONSHIP_OPTIONS } from "@/data/giftTax";
@@ -34,6 +35,10 @@ const deductionPresets = [
   { label: "2천만", value: 20_000_000 },
   { label: "5천만", value: 50_000_000 },
 ] as const;
+
+// 왜: 보이는 작은 제목을 <label for>로 칸에 묶어야 스크린리더가 "편집, 빈칸" 대신 칸 이름을 읽는다
+const giftAmountId = useId();
+const priorDeductionUsedId = useId();
 </script>
 
 <template>
@@ -46,11 +51,13 @@ const deductionPresets = [
     </div>
 
     <div class="retro-panel-content space-y-4">
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <!-- 1×2 틀의 반폭 칸(lg+)에서는 1열 — 3열이면 칸당 129px라 안내문이 4~5줄로 꺾이고 프리셋이 세로로 쌓인다.
+           틀이 한 줄로 쌓이는 sm~lg에서는 입력 카드가 전폭이라 3열을 유지한다. -->
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-1">
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">증여금액</label>
+          <label :for="giftAmountId" class="mb-2 block text-caption font-semibold text-foreground">증여금액</label>
           <input
-            aria-label="증여금액"
+            :id="giftAmountId"
             type="text"
             inputmode="numeric"
             class="retro-input"
@@ -67,9 +74,9 @@ const deductionPresets = [
         </div>
 
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">기존 사용 공제액</label>
+          <label :for="priorDeductionUsedId" class="mb-2 block text-caption font-semibold text-foreground">기존 사용 공제액</label>
           <input
-            aria-label="기존 사용 공제액"
+            :id="priorDeductionUsedId"
             type="text"
             inputmode="numeric"
             class="retro-input"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useId } from "vue";
 import { PiggyBank } from "lucide-vue-next";
 import { ShPresetGroup, ShSlider } from "@shakilabs/ui";
 
@@ -37,6 +38,10 @@ const holdingYearPresets = [3, 5, 10].map((value) => ({
   label: `${value}년`,
   value,
 }));
+
+// 왜: 보이는 작은 제목을 <label for>로 칸에 묶어야 스크린리더가 "편집, 빈칸" 대신 칸 이름을 읽는다
+const annualInvestmentId = useId();
+const annualReturnRateId = useId();
 </script>
 
 <template>
@@ -49,9 +54,11 @@ const holdingYearPresets = [3, 5, 10].map((value) => ({
     </div>
 
     <div class="retro-panel-content space-y-4">
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <!-- 1×2 틀의 반폭 칸(lg+)에서는 1열 — 3열이면 칸당 129px라 안내문이 4~5줄로 꺾이고 프리셋이 세로로 쌓인다.
+           틀이 한 줄로 쌓이는 sm~lg에서는 입력 카드가 전폭이라 3열을 유지한다. -->
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-1">
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">ISA 유형</label>
+          <span class="mb-2 block text-caption font-semibold text-foreground">ISA 유형</span>
           <div class="grid grid-cols-1 gap-2">
             <label
               :class="[
@@ -93,10 +100,10 @@ const holdingYearPresets = [3, 5, 10].map((value) => ({
         </div>
 
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">연간 투자금액</label>
+          <label :for="annualInvestmentId" class="mb-2 block text-caption font-semibold text-foreground">연간 투자금액</label>
           <div class="relative">
             <input
-              aria-label="연간 투자금액"
+              :id="annualInvestmentId"
               type="text"
               inputmode="numeric"
               class="retro-input pr-8"
@@ -116,9 +123,10 @@ const holdingYearPresets = [3, 5, 10].map((value) => ({
         </div>
 
         <div class="retro-panel-muted p-3.5">
-          <label class="mb-2 block text-caption font-semibold text-foreground">예상 연 수익률</label>
+          <label :for="annualReturnRateId" class="mb-2 block text-caption font-semibold text-foreground">예상 연 수익률</label>
           <div class="flex items-center gap-3">
             <ShSlider
+              :id="annualReturnRateId"
               :model-value="annualReturnRate"
               :min="0.01"
               :max="0.2"
