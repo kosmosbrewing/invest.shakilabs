@@ -3,6 +3,9 @@ export interface InvestToolLink {
   path: string;
   title: string;
   description: string;
+  /** 결과 뒤 "이어서 계산하기" 카드의 한 줄 — description 요약.
+   * 설명 문장은 /all 허브 카드가 그대로 쓰고, 계산기 화면 카드는 제목 + 한 줄만 둔다(글이 많다는 피드백). */
+  note: string;
 }
 
 export interface InvestToolGroup {
@@ -13,15 +16,15 @@ export interface InvestToolGroup {
 }
 
 const tools = {
-  crypto: { key: "crypto_tax", path: "/crypto-tax", title: "가상자산 세금", description: "기본공제와 예정세율을 반영해 예상 세금을 계산합니다." },
-  dividend: { key: "dividend_tax", path: "/dividend-tax", title: "배당소득세", description: "배당 원천징수와 세후 수령액을 확인합니다." },
-  foreign: { key: "foreign_stock_tax", path: "/foreign-stock-tax", title: "해외주식 양도세", description: "기본공제 적용 후 예상 양도소득세를 계산합니다." },
-  isa: { key: "isa", path: "/isa", title: "ISA 만기 비교", description: "ISA와 일반 계좌의 세후 수령액 차이를 비교합니다." },
-  savings: { key: "savings_interest", path: "/savings-interest", title: "적금 이자", description: "월 적립액 기준 만기 수령액과 세후 이자를 계산합니다." },
-  deposit: { key: "deposit_interest", path: "/deposit-interest", title: "예금 이자", description: "예치 원금 기준 만기 수령액과 세후 이자를 계산합니다." },
-  compound: { key: "compound_interest", path: "/compound-interest", title: "복리 성장", description: "기간별 단리·복리 차이와 자산 성장 속도를 비교합니다." },
-  gift: { key: "gift_tax", path: "/gift-tax", title: "증여세", description: "관계별 공제와 누진세율을 반영해 예상 세액을 봅니다." },
-  inheritance: { key: "inheritance_tax", path: "/inheritance-tax", title: "상속세", description: "공제와 누진세율을 반영해 예상 상속세를 계산합니다." },
+  crypto: { key: "crypto_tax", path: "/crypto-tax", title: "가상자산 세금", description: "기본공제와 예정세율을 반영해 예상 세금을 계산합니다.", note: "기본공제·예정세율 반영 예상 세금" },
+  dividend: { key: "dividend_tax", path: "/dividend-tax", title: "배당소득세", description: "배당 원천징수와 세후 수령액을 확인합니다.", note: "배당 원천징수와 세후 수령액" },
+  foreign: { key: "foreign_stock_tax", path: "/foreign-stock-tax", title: "해외주식 양도세", description: "기본공제 적용 후 예상 양도소득세를 계산합니다.", note: "기본공제 적용 후 예상 양도소득세" },
+  isa: { key: "isa", path: "/isa", title: "ISA 만기 비교", description: "ISA와 일반 계좌의 세후 수령액 차이를 비교합니다.", note: "일반 계좌와 세후 수령액 차이" },
+  savings: { key: "savings_interest", path: "/savings-interest", title: "적금 이자", description: "월 적립액 기준 만기 수령액과 세후 이자를 계산합니다.", note: "월 적립액 기준 만기 수령액·세후 이자" },
+  deposit: { key: "deposit_interest", path: "/deposit-interest", title: "예금 이자", description: "예치 원금 기준 만기 수령액과 세후 이자를 계산합니다.", note: "예치 원금 기준 만기 수령액·세후 이자" },
+  compound: { key: "compound_interest", path: "/compound-interest", title: "복리 성장", description: "기간별 단리·복리 차이와 자산 성장 속도를 비교합니다.", note: "기간별 단리·복리 차이와 성장 속도" },
+  gift: { key: "gift_tax", path: "/gift-tax", title: "증여세", description: "관계별 공제와 누진세율을 반영해 예상 세액을 봅니다.", note: "관계별 공제·누진세율 반영 예상 세액" },
+  inheritance: { key: "inheritance_tax", path: "/inheritance-tax", title: "상속세", description: "공제와 누진세율을 반영해 예상 상속세를 계산합니다.", note: "공제·누진세율 반영 예상 상속세" },
 } as const satisfies Record<string, InvestToolLink>;
 
 export const INVEST_TOOL_GROUPS: readonly InvestToolGroup[] = [
