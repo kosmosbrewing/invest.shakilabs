@@ -30,15 +30,19 @@ const canonicalPath = computed(() =>
 const amountLabel = computed(() =>
   props.initialPrincipalMan ? formatManWon(props.initialPrincipalMan * 10_000) : null,
 );
+// 네이버 CTR 재작성(BRIEF-TITLE.md 2026-10-03): 노출 1,659·클릭 24·CTR 1.4% —
+// 35자 절단 구간에 핵심 구절(예금 이자 계산기 2026)이 들어가도록 앞을 당겼다.
+// "만기일시·월이자"는 DepositInputPanel의 payment-type 선택지(만기일시지급/
+// 월이자지급, 아래 FAQ와 동일)로 실제로 존재하는 기능이라 거짓 약속이 아니다.
 const seoTitle = computed(() =>
   amountLabel.value
     ? `${amountLabel.value} 예금 이자 계산기 | 만기 수령액 시뮬레이션`
-    : "2026 예금 이자 계산기 | 정기예금 만기·세후 이자 계산",
+    : "예금 이자 계산기 2026 · 만기 수령액·세후 이자 (만기일시·월이자)",
 );
 const seoDesc = computed(() =>
   amountLabel.value
     ? `${amountLabel.value} 예금 시 만기 수령액과 세후 이자를 계산합니다.`
-    : "예금 원금, 이율, 기간을 입력하면 만기 수령액과 세후 이자를 바로 확인합니다. 만기일시/월이자 방식 비교.",
+    : "예금 원금·이율·기간을 입력하면 만기 수령액과 세후 이자를 계산합니다. 만기일시지급과 월이자지급 방식을 비교할 수 있습니다.",
 );
 
 const calc = useDepositInterestCalc(props.initialPrincipalMan);

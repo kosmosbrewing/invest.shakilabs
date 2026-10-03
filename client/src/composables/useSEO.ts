@@ -3,15 +3,24 @@ import { toValue, type MaybeRefOrGetter } from "vue";
 import { useRoute } from "vue-router";
 import { getSiteUrl } from "@/lib/site";
 
-// 정본 규칙(디자인 시스템 §11.1): "{페이지} | {카테고리} | ShakiLabs".
-const CATEGORY = "투자 세금 계산기";
-const TITLE_SUFFIX = ` | ${CATEGORY} | ShakiLabs`;
-const DEFAULT_TITLE = CATEGORY;
+// 네이버 CTR 레시피(2026-10-03 수정, BRIEF-TITLE.md): 네이버가 제목을 약 35자에서
+// 자르기 때문에 가운데 "{앱 이름}" 접미사가 핵심 구절·브랜드를 밀어내던 3단 레시피를
+// 버렸다. 계산기 페이지는 앱 이름 없이 2단으로, 검색 유입이 목적이 아닌 홈·정책류는
+// 앱 이름을 유지해 12개 앱 간 제목 중복을 막는다(예: "이용약관 | ShakiLabs"는 모든
+// 앱에서 같은 문자열이 된다).
+const APP_NAME = "투자 세금 계산기";
+const BRAND = "ShakiLabs";
+
+export type TitleKind = "calculator" | "home" | "policy";
+
+// 길이가 긴 접미사를 먼저 검사해야 한다 — " | ShakiLabs"는 그 위의 모든 접미사의
+// 끝부분이라 먼저 걸리면 가운데 세그먼트가 안 지워진 채로 남는다.
 const LEGACY_TITLE_SUFFIXES = [
-  TITLE_SUFFIX,
+  ` · ${APP_NAME} | ${BRAND}`,
+  ` | ${APP_NAME} | ${BRAND}`,
+  ` | ${BRAND}`,
   " | shakilabs.com/invest",
-  " | ShakiLabs",
-  ` | ${CATEGORY}`,
+  ` | ${APP_NAME}`,
 ] as const;
 
 type SEOOptions = {
@@ -28,14 +37,21 @@ type SEOOptions = {
    * 이 경로 기준으로 계산되어 세 메타가 항상 일치한다.
    */
   canonicalPath?: MaybeRefOrGetter<string | undefined>;
+  /**
+   * 페이지 타입 — 레시피가 갈라지는 기준(기본값 "calculator").
+   * - calculator: 계산기·도구·가이드. 앱 이름 접미사 없이 `{페이지} | ShakiLabs`.
+   * - home: 홈. 페이지 제목 없이 `{앱 이름} | ShakiLabs`.
+   * - policy: 허브(/all)·소개·약관·개인정보·404. `{페이지} · {앱 이름} | ShakiLabs`.
+   */
+  titleKind?: MaybeRefOrGetter<TitleKind | undefined>;
 };
 
-// 뷰가 넘기는 title에 이미 "|"가 들어있어도(서브타이틀 병기) 배지를 건너뛰지
-// 않는다 — 예전에는 pipe 유무로 두 레시피가 섞였다(카테고리 배지 있음/없음).
-// 항상 한 레시피만 적용해 배지 유무가 페이지마다 갈리지 않게 한다.
-export function normalizeTitle(rawTitle: string): string {
+// 뷰가 넘기는 title에 이미 "|"가 들어있어도(서브타이틀 병기) 중점 변환을 건너뛰지
+// 않는다 — 최종 레시피의 pipe(브랜드 구분자)가 늘 유일해야 네이버가 35자에서 잘라도
+// 어디까지가 페이지명인지 섞이지 않는다.
+export function normalizeTitle(rawTitle: string, kind: TitleKind = "calculator"): string {
   const trimmed = rawTitle.trim();
-  let baseTitle = trimmed || DEFAULT_TITLE;
+  let baseTitle = trimmed || APP_NAME;
 
   for (const suffix of LEGACY_TITLE_SUFFIXES) {
     if (baseTitle.endsWith(suffix)) {
@@ -45,21 +61,25 @@ export function normalizeTitle(rawTitle: string): string {
   }
 
   if (!baseTitle) {
-    baseTitle = DEFAULT_TITLE;
+    baseTitle = APP_NAME;
   }
 
-  // v3 §11.1의 레시피는 `{페이지} | {카테고리} | ShakiLabs` 3단이다.
-  // 페이지 이름이 자체 부제를 pipe로 달고 있으면 4단이 되어 어디까지가 페이지명인지
-  // 읽히지 않는다. 부제는 검색 키워드를 담고 있으므로 버리지 않고 구분자만 중점으로 바꾼다.
   baseTitle = baseTitle.replace(/\s*\|\s*/g, " · ");
 
-  // 카테고리 없는 루트 예외(§11.1): 페이지 이름이 이미 카테고리로 시작하면
-  // ("투자 세금 계산기 | ..." 같은 홈) 배지를 또 붙이지 않고 ShakiLabs만 추가한다.
-  if (baseTitle.startsWith(CATEGORY)) {
-    return `${baseTitle} | ShakiLabs`;
+  // 홈: 페이지 제목 없이 앱 이름 자체가 제목이다("<앱 이름> · <앱 이름>" 중복 방지).
+  if (kind === "home") {
+    return `${APP_NAME} | ${BRAND}`;
   }
 
-  return `${baseTitle}${TITLE_SUFFIX}`;
+  // 정책류(허브·소개·약관·개인정보·404): 앱 이름이 없으면 "이용약관 | ShakiLabs"가
+  // 12개 앱에서 동일해져 도메인 안 중복 제목이 된다. 이 그룹은 검색 유입이 목적이
+  // 아니라 35자 절단이 문제되지 않는다.
+  if (kind === "policy") {
+    return `${baseTitle} · ${APP_NAME} | ${BRAND}`;
+  }
+
+  // 계산기·도구·가이드: 네이버 35자 절단 대응으로 앱 이름 접미사를 없앤다.
+  return `${baseTitle} | ${BRAND}`;
 }
 
 export function useSEO({
@@ -69,11 +89,12 @@ export function useSEO({
   ogImage,
   jsonLd,
   canonicalPath,
+  titleKind,
 }: SEOOptions): void {
   const route = useRoute();
 
   useHead(() => {
-    const resolvedTitle = normalizeTitle(toValue(title));
+    const resolvedTitle = normalizeTitle(toValue(title), toValue(titleKind) ?? "calculator");
     const resolvedDescription = toValue(description);
     const resolvedNoindex = Boolean(toValue(noindex));
     const resolvedJsonLd = toValue(jsonLd);

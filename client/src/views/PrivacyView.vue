@@ -9,6 +9,7 @@ const constantsStore = useConstantsStore();
   <SEOHead
     title="개인정보 처리방침"
     description="shakilabs.com/invest의 개인정보 처리방침입니다. 9개 투자·이자 계산기가 받는 입력 항목 전부, 주소창에 남는 금액과 남지 않는 금액, 쿠키와 제3자 광고(Google AdSense), 맞춤 광고 해제 방법을 안내합니다."
+    kind="policy"
   />
 
   <div class="sh-container sh-container--prose py-5">

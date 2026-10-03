@@ -45,6 +45,7 @@ const itemListJsonLd = {
     :title="SEO_TITLE"
     :description="SEO_DESCRIPTION"
     :json-ld="[faqJsonLd, itemListJsonLd]"
+    kind="home"
   />
 
   <div class="sh-container sh-container--page space-y-5 py-5">
