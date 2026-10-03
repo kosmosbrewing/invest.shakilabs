@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { chunkParagraph } from "../../data/digests/format";
 /**
  * SEO 리치 가이드 섹션 컴포넌트
  * 각 계산기 뷰 하단에 도메인 가이드 + FAQ + 체크리스트를 출력하여
@@ -40,9 +41,10 @@ defineProps<{
   disclaimer?: string;
 }>();
 
-// body가 문자열이면 문단 1개로, 배열이면 그대로 — 호출부 양쪽을 한 규칙으로 렌더한다.
+// body가 문자열이면 렌더 시점에 문장 경계로 ≤250자 문단으로 나눈다(데이터 쪽 chunkParagraph를 놓친
+// 다이제스트 — dividend-tax 265자 — 까지 한 규칙으로). 배열이면 그대로.
 function paragraphsOf(body: string | string[]): string[] {
-  return Array.isArray(body) ? body : [body];
+  return Array.isArray(body) ? body : chunkParagraph(body);
 }
 </script>
 
