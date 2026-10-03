@@ -25,6 +25,8 @@ interface ImportMeta {
 declare module "vue-router" {
   interface RouteMeta {
     title?: string;
+    // 제목 레시피 종류(BRIEF-TITLE.md 2026-10-03) — 미지정 시 useSEO 기본값 "calculator"
+    titleKind?: "calculator" | "home" | "policy";
     requiresAuth?: boolean;
     requiresAdmin?: boolean;
     guestOnly?: boolean;

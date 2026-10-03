@@ -15,6 +15,7 @@ const constantsStore = useConstantsStore();
   <SEOHead
     title="서비스 안내"
     description="shakilabs.com/invest는 배당소득세, 가상자산세, ISA 만기 비교, 증여세를 빠르게 계산하는 투자 세금 계산기입니다."
+    kind="policy"
   />
 
   <div class="sh-container sh-container--prose py-5 space-y-5">

@@ -12,6 +12,7 @@ import { INVEST_TOOL_GROUPS } from "@/data/investNavigation";
   <SEOHead
     title="투자 계산기 전체 보기 | 목적별 9개 금융·세금 도구"
     description="저축·자산 성장, 투자 세금, 증여·상속 목적별로 필요한 계산기를 빠르게 찾으세요."
+    kind="policy"
   />
   <div class="sh-container sh-container--page space-y-5 py-5">
     <ShSurface padding="lg">
