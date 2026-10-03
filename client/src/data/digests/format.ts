@@ -11,6 +11,42 @@ export interface Finding {
   body: string;
 }
 
+// 가독성 게이트(BRIEF-V8) — 문단은 사람이 한눈에 읽을 수 있는 길이(<=250자)여야 하지만
+// 문장을 지우거나 숫자를 바꾸면 안 된다. Finding.body 자체는 그대로 두고(위 digests.test.ts의
+// "엔진 재계산 일치" 류 테스트가 문자열 그대로를 기대한다), 화면에 렌더할 때만 이 함수로 감싸
+// 문단을 쪼갠다 — seoGuides.ts의 GuideSection.body: string | string[]를 통해 SeoRichGuide.vue가
+// 배열이면 <p> 여러 개로 렌더한다. 원문이 바뀌어도(법령 개정 등) 같은 규칙으로 다시 쪼개진다.
+export function splitSentences(text: string): string[] {
+  // 마침표·물음표·느낌표 뒤에 공백이 오는 지점만 문장 경계로 본다 — "3.5%"처럼 숫자 중간의
+  // 점은 뒤에 공백이 없어 걸리지 않는다(이 앱의 소수 표기는 전부 점 바로 뒤에 숫자나 %가 온다).
+  return text.split(/(?<=[.!?])\s+(?=\S)/).filter((s) => s.length > 0);
+}
+
+export function chunkSentences(sentences: string[], maxChars = 250): string[] {
+  const paragraphs: string[] = [];
+  let current = "";
+  for (const sentence of sentences) {
+    const candidate = current ? `${current} ${sentence}` : sentence;
+    if (candidate.length > maxChars && current) {
+      paragraphs.push(current);
+      current = sentence;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current) paragraphs.push(current);
+  return paragraphs;
+}
+
+/**
+ * 250자를 넘는 단일 문단 문자열을 문장 경계에서 쪼개 배열로 돌려준다. 원문 문자열 리터럴·수치는
+ * 전혀 바꾸지 않고 이 함수로 감싸기만 하므로 문장 삭제·숫자 변경이 구조적으로 불가능하다.
+ * 짧은 문단은 쪼갤 필요가 없어 그대로 1개짜리 배열이 된다.
+ */
+export function chunkParagraph(text: string, maxChars = 250): string[] {
+  return chunkSentences(splitSentences(text), maxChars);
+}
+
 export function won(value: number): string {
   return `${Math.round(value).toLocaleString("ko-KR")}원`;
 }

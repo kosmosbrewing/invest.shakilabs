@@ -10,7 +10,9 @@
  */
 export interface GuideSection {
   h2: string;
-  body: string;
+  // 문자열 그대로(기존 호출부) 또는 문단 배열 — 250자 넘는 단일 문단 결함(BRIEF-V8) 수정 후
+  // 긴 섹션은 배열로 넘겨 각 문단을 250자 이내로 쪼갠다. 문장 삭제·숫자 변경 없음.
+  body: string | string[];
 }
 
 export interface GuideFaq {
@@ -37,6 +39,11 @@ defineProps<{
   sources?: GuideSource[];
   disclaimer?: string;
 }>();
+
+// body가 문자열이면 문단 1개로, 배열이면 그대로 — 호출부 양쪽을 한 규칙으로 렌더한다.
+function paragraphsOf(body: string | string[]): string[] {
+  return Array.isArray(body) ? body : [body];
+}
 </script>
 
 <template>
@@ -53,7 +60,11 @@ defineProps<{
         class="space-y-2"
       >
         <h3 class="text-base font-semibold text-foreground">{{ s.h2 }}</h3>
-        <p class="max-w-[65ch] text-sm leading-relaxed text-muted-foreground">{{ s.body }}</p>
+        <p
+          v-for="(paragraph, pIdx) in paragraphsOf(s.body)"
+          :key="`sec-${i}-p-${pIdx}`"
+          class="max-w-[65ch] text-sm leading-relaxed text-muted-foreground"
+        >{{ paragraph }}</p>
       </article>
     </div>
 
