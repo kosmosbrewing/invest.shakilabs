@@ -92,8 +92,8 @@
   .text-display { font-size: 1.5rem; line-height: 1.15; }
   .text-heading, .retro-title { font-size: 0.9375rem; line-height: 1.3; }
   .text-body { font-size: 0.8125rem; line-height: 1.45; }
-  .text-caption { font-size: 0.75rem; line-height: 1.4; }
-  .text-tiny { font-size: 0.65625rem; line-height: 1.3; }
+  .text-caption { font-size: 0.8125rem; line-height: 1.4; } /* v8: 모바일도 13px 하한 */
+  .text-tiny { font-size: 0.8125rem; line-height: 1.3; }
   .retro-titlebar, .retro-panel-content, .retro-board-item { padding-left: 0.875rem; padding-right: 0.875rem; gap: 0.625rem; }
 }
 

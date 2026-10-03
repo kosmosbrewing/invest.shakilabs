@@ -199,7 +199,14 @@ describe("파생 다이제스트 — 복제 방지", () => {
       ISA_GUIDE,
       SAVINGS_INTEREST_GUIDE,
     ]
-      .flatMap((g) => [g.intro, ...(g.sections ?? []).map((s) => s.body), ...(g.faqs ?? []).map((q) => q.a)])
+      // BRIEF-V8: GuideSection.body가 string | string[]로 넓어졌다(250자 넘는 문단은 배열로
+      // 쪼갠다). 배열이면 평평하게 펴서 비교해야 유사도 함수(문자열 전용)가 죽지 않는다 —
+      // 평평하게 편 문자열은 쪼개기 전 원문과 같으므로 비교 의미는 그대로다.
+      .flatMap((g) => [
+        g.intro,
+        ...(g.sections ?? []).map((s) => (Array.isArray(s.body) ? s.body.join(" ") : s.body)),
+        ...(g.faqs ?? []).map((q) => q.a),
+      ])
       .filter((body) => !digestBodies.has(body));
     for (const f of ALL) for (const body of legacy) expect(similarity(f.body, body), f.id).toBeLessThan(MAX_LEGACY_SIMILARITY);
   });
@@ -217,9 +224,15 @@ describe("파생 다이제스트 — 가이드 배선", () => {
     ["foreign-stock-tax", FOREIGN_STOCK_TAX_GUIDE, FOREIGN_STOCK_TAX_DIGEST, [FOREIGN_STOCK_TAX_UPDATED]],
   ];
 
+  // BRIEF-V8: 가이드에 실리는 다이제스트 항목은 body가 chunkParagraph()로 쪼개져 배열이 될 수
+  // 있다(원본 Finding[]의 body는 문자열 그대로). 쪼개진 배열을 다시 합치면 원문과 같아야
+  // toEqual이 의미가 있으므로, 비교 전에 양쪽 다 평평하게 편다(문자열 쪼개기 전엔 no-op).
+  const flattenBodies = (items: { h2: string; body: string | string[] }[]) =>
+    items.map((it) => ({ h2: it.h2, body: Array.isArray(it.body) ? it.body.join(" ") : it.body }));
+
   it("8페이지 가이드가 각자의 다이제스트를 일반 절보다 앞에 싣는다", () => {
     for (const [page, guide, digest] of pairs) {
-      expect(guide.sections!.slice(0, digest.length), page).toEqual(digest);
+      expect(flattenBodies(guide.sections!.slice(0, digest.length)), page).toEqual(flattenBodies(digest));
       expect(guide.sections![digest.length].h2, page).toBe("위 발견의 계산 기준");
       expect(guide.sections!.length, page).toBeGreaterThan(digest.length + 1);
     }
@@ -237,10 +250,13 @@ describe("파생 다이제스트 — 가이드 배선", () => {
     const bodies = new Set<string>();
     for (const [page, guide, digest, dates] of pairs) {
       const basis = guide.sections![digest.length];
-      for (const dparam of dates) expect(basis.body, page).toContain(dparam);
-      expect(basis.body, page).not.toMatch(/매월|매주|정기적으로|실시간/);
-      expect(basis.body, page).toContain("가정");
-      bodies.add(basis.body);
+      // digestBasis()는 항상 문자열 body를 돌려주지만(BRIEF-V8 분할 대상이 아님),
+      // GuideSection.body 타입이 string | string[]로 넓어져 타입을 좁혀 줘야 한다.
+      const basisBody = Array.isArray(basis.body) ? basis.body.join(" ") : basis.body;
+      for (const dparam of dates) expect(basisBody, page).toContain(dparam);
+      expect(basisBody, page).not.toMatch(/매월|매주|정기적으로|실시간/);
+      expect(basisBody, page).toContain("가정");
+      bodies.add(basisBody);
     }
     expect(bodies.size).toBe(8);
   });

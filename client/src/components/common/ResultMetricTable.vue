@@ -44,7 +44,7 @@ const mobileRows = computed(() => props.rows);
         <div class="space-y-1">
           <div class="flex items-center gap-2">
             <p class="text-caption font-semibold text-muted-foreground">{{ row.label }}</p>
-            <Badge v-if="row.badge" variant="outline" class="border-primary/20 bg-primary/5 text-[10px] text-primary">
+            <Badge v-if="row.badge" variant="outline" class="border-primary/20 bg-primary/5 text-caption text-primary">
               {{ row.badge }}
             </Badge>
           </div>
@@ -71,7 +71,7 @@ const mobileRows = computed(() => props.rows);
           <TableCell class="font-semibold text-foreground">
             <div class="flex items-center gap-2">
               <span>{{ row.label }}</span>
-              <Badge v-if="row.badge" variant="outline" class="border-primary/20 bg-primary/5 text-[10px] text-primary">
+              <Badge v-if="row.badge" variant="outline" class="border-primary/20 bg-primary/5 text-caption text-primary">
                 {{ row.badge }}
               </Badge>
             </div>
