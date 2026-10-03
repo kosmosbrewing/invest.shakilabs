@@ -16,8 +16,7 @@ import { INVEST_TOOL_GROUPS } from "@/data/investNavigation";
   />
   <div class="sh-container sh-container--page space-y-5 py-5">
     <ShSurface padding="lg">
-      <ShText as="p" variant="caption" tone="muted">INVEST TOOL DIRECTORY</ShText>
-      <ShText as="h1" variant="display" class="mt-2">목적부터 고르면 계산기가 선명해집니다</ShText>
+      <ShText as="h1" variant="display">목적부터 고르면 계산기가 선명해집니다</ShText>
       <ShText tone="muted" class="mt-3">
         세후 수익, 투자 과세, 자산 이전 중 지금 내 결정과 가까운 묶음에서 시작하세요.
       </ShText>

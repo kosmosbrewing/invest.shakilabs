@@ -28,12 +28,16 @@ const config: Config = {
       },
 
       fontSize: {
+
+        // v8c(2026-10-04, 사용자 결정 ④): text-xs 12px → 13px. 기본값(0.75rem)을 덮어 함대 하한 13px을 지킨다.
+
+        xs: ["0.8125rem", { lineHeight: "1.125rem" }],
         display: ["1.625rem", { lineHeight: "1.2", fontWeight: "700" }],
         h1: ["1.25rem", { lineHeight: "1.3", fontWeight: "700" }],
         heading: ["1rem", { lineHeight: "1.35", fontWeight: "600" }],
         body: ["0.875rem", { lineHeight: "1.5", fontWeight: "400" }],
         caption: ["0.8125rem", { lineHeight: "1.45", fontWeight: "400" }],
-        tiny: ["0.6875rem", { lineHeight: "1.35", fontWeight: "400" }],
+        tiny: ["0.8125rem", { lineHeight: "1.45", fontWeight: "400" }], // v8c: 11px → 13px 하한(.scroll-hint 등 @apply text-tiny 포함)
       },
 
       colors: {
