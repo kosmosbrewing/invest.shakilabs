@@ -50,8 +50,7 @@ const itemListJsonLd = {
 
   <div class="sh-container sh-container--page space-y-5 py-5">
     <ShSurface padding="lg">
-      <ShText as="p" variant="caption" tone="muted">SHAKILABS INVEST</ShText>
-      <ShText as="h1" variant="display" class="mt-2">세금을 뺀 다음에 비교해야 답이 보입니다</ShText>
+      <ShText as="h1" variant="display">세금을 뺀 다음에 비교해야 답이 보입니다</ShText>
       <ShText tone="muted" class="mt-3">
         이자에는 15.4%, 해외주식·가상자산 양도차익에는 22%가 붙습니다. 상품을 고르기 전에 세후 금액으로
         바꿔 보는 계산기 9개를 모았습니다. 입력값은 브라우저를 벗어나지 않습니다.
@@ -59,13 +58,13 @@ const itemListJsonLd = {
       <div class="mt-4 flex flex-wrap gap-2">
         <RouterLink
           to="/all"
-          class="inline-flex items-center gap-1 rounded-xl bg-primary px-4 py-2 text-caption font-semibold text-primary-foreground no-underline"
+          class="sh-button sh-button--primary sh-button--md no-underline"
         >
           전체 계산기 보기 <ArrowRight class="h-4 w-4" aria-hidden="true" />
         </RouterLink>
         <RouterLink
           to="/dividend-tax"
-          class="inline-flex items-center gap-1 rounded-xl border border-border px-4 py-2 text-caption font-semibold text-foreground no-underline"
+          class="sh-button sh-button--secondary sh-button--md no-underline"
         >
           배당소득세부터 계산하기
         </RouterLink>
