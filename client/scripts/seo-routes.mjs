@@ -72,6 +72,11 @@ export const SEO_ROUTES = [
 
 // 사이트맵에는 canonical 대표 URL만 노출한다 (통합 변종은 canonical이 다른 곳을
 // 가리키므로 크롤러에 광고하지 않는다). 프리렌더는 SEO_ROUTES 전체를 유지한다.
+
+// 색인 소거(2026-10-16, 사용자 승인): 62일 활성 사용자 8명 미만 + 네이버 TOP 30 밖인 계산기·가이드.
+// 도구는 그대로 쓰이고(내부 링크 유지) 사이트맵·색인에서만 뺀다. 네이버 클릭이 월 10+ 되면 다시 넣는다.
+// validate-noindex.mjs가 사이트맵 ⇔ noindex 없음 / 사이트맵 밖 self-canonical ⇔ noindex를 빌드마다 대조한다.
+export const NOINDEX_ROUTES = ["/dividend-tax", "/foreign-stock-tax"];
 export const SITEMAP_ROUTES = SEO_ROUTES.filter(
-  (route) => !(route in CANONICAL_OVERRIDES)
+  (route) => !(route in CANONICAL_OVERRIDES) && !NOINDEX_ROUTES.includes(route),
 );
