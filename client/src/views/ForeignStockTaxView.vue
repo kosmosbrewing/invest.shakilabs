@@ -52,7 +52,7 @@ const faqJsonLd = {
 </script>
 
 <template>
-  <SEOHead
+  <SEOHead noindex
     :title="seoTitle"
     :description="seoDesc"
     :json-ld="faqJsonLd"
