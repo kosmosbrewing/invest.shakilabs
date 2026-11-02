@@ -40,27 +40,4 @@ export const HOME_RATE_TABLE: readonly HomeRateRow[] = [
   { item: "상속 일괄공제", value: "5억원", note: "배우자 상속공제는 최소 5억원부터" },
 ];
 
-export interface HomeUsageNote {
-  key: string;
-  title: string;
-  body: string;
-}
-
 /** 홈에서만 설명하는 서비스 이용 방식 */
-export const HOME_USAGE_NOTES: readonly HomeUsageNote[] = [
-  {
-    key: "no_signup",
-    title: "입력값은 저장되지 않습니다",
-    body: "모든 계산은 브라우저 안에서 끝납니다. 회원가입도, 금액을 서버로 보내는 절차도 없습니다.",
-  },
-  {
-    key: "dated",
-    title: "기준일이 표시됩니다",
-    body: "계산기마다 어느 시점의 법령·고시를 반영했는지 배지로 표시해, 오래된 숫자로 계산하는 일을 줄입니다.",
-  },
-  {
-    key: "sourced",
-    title: "근거 출처를 함께 답니다",
-    body: "세율과 공제 한도는 국세청·법령 링크를 함께 제공하므로 계산 결과를 직접 검증할 수 있습니다.",
-  },
-];

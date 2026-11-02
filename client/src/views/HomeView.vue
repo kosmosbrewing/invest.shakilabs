@@ -5,26 +5,13 @@ import { ShSurface, ShText } from "@shakilabs/ui";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import RelatedServices from "@/components/common/RelatedServices.vue";
 import SEOHead from "@/components/common/SEOHead.vue";
-import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
-import { INVEST_HOME_GUIDE } from "@/data/seoGuides";
-import { HOME_INTENTS, HOME_RATE_TABLE, HOME_USAGE_NOTES } from "@/data/homeHighlights";
+import { HOME_INTENTS, HOME_RATE_TABLE } from "@/data/homeHighlights";
 import { INVEST_DATA_UPDATED } from "@/data/investTaxRates";
 import { buildCanonicalUrl } from "@/lib/site";
 
 const SEO_TITLE = "투자 세금 계산기 | 2026 세율·공제 한눈에";
 const SEO_DESCRIPTION =
   "예금·적금 이자부터 배당소득세, 해외주식 양도세, ISA, 증여·상속세까지 9개 계산기를 세후 기준으로 비교합니다. 2026년 세율과 공제 한도를 표로 정리했습니다.";
-
-// 화면에 렌더되는 FAQ와 구조화 데이터를 일치시킨다 (스키마 규칙)
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: (INVEST_HOME_GUIDE.faqs ?? []).map((faq) => ({
-    "@type": "Question",
-    name: faq.q,
-    acceptedAnswer: { "@type": "Answer", text: faq.a },
-  })),
-};
 
 // 홈에서 연결되는 계산기 목록을 구조화 데이터로도 노출한다
 const itemListJsonLd = {
@@ -44,16 +31,16 @@ const itemListJsonLd = {
   <SEOHead
     :title="SEO_TITLE"
     :description="SEO_DESCRIPTION"
-    :json-ld="[faqJsonLd, itemListJsonLd]"
+    :json-ld="[itemListJsonLd]"
     kind="home"
   />
 
   <div class="sh-container sh-container--page space-y-5 py-5">
     <ShSurface padding="lg">
       <ShText as="h1" variant="display">세금을 뺀 다음에 비교해야 답이 보입니다</ShText>
+      <!-- 허브 도입은 한 문장. 세 문장 설명·"믿고 쓰려면" 카드 3장·종합 가이드·FAQ는 2026-11 UI 감사에서 뺐다(GA4 28일 허브 조회 0). -->
       <ShText tone="muted" class="mt-3">
-        이자에는 15.4%, 해외주식·가상자산 양도차익에는 22%가 붙습니다. 상품을 고르기 전에 세후 금액으로
-        바꿔 보는 계산기 9개를 모았습니다. 입력값은 브라우저를 벗어나지 않습니다.
+        이자 15.4%, 해외주식·가상자산 양도차익 22%를 뺀 세후 금액으로 비교하는 계산기 9개.
       </ShText>
       <div class="mt-4 flex flex-wrap gap-2">
         <RouterLink
@@ -63,10 +50,10 @@ const itemListJsonLd = {
           전체 계산기 보기 <ArrowRight class="h-4 w-4" aria-hidden="true" />
         </RouterLink>
         <RouterLink
-          to="/dividend-tax"
+          to="/deposit-interest"
           class="sh-button sh-button--secondary sh-button--md no-underline"
         >
-          배당소득세부터 계산하기
+          예금 이자부터 계산하기
         </RouterLink>
       </div>
     </ShSurface>
@@ -74,9 +61,6 @@ const itemListJsonLd = {
     <section aria-labelledby="home-intents-title">
       <div class="mb-3">
         <ShText id="home-intents-title" as="h2" variant="heading">지금 궁금한 질문부터 고르세요</ShText>
-        <ShText variant="caption" tone="muted" class="mt-1">
-          질문을 누르면 해당 계산기로 바로 이동합니다.
-        </ShText>
       </div>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <RouterLink
@@ -120,26 +104,6 @@ const itemListJsonLd = {
       </Table>
     </ShSurface>
 
-    <section aria-labelledby="home-usage-title">
-      <div class="mb-3">
-        <ShText id="home-usage-title" as="h2" variant="heading">계산 결과를 믿고 쓰려면</ShText>
-      </div>
-      <div class="grid gap-3 sm:grid-cols-3">
-        <ShSurface v-for="note in HOME_USAGE_NOTES" :key="note.key" variant="outlined" padding="md">
-          <ShText as="h3" variant="body" class="font-semibold">{{ note.title }}</ShText>
-          <ShText variant="caption" tone="muted" class="mt-2">{{ note.body }}</ShText>
-        </ShSurface>
-      </div>
-    </section>
-
     <RelatedServices />
-
-    <SeoRichGuide
-      :title="INVEST_HOME_GUIDE.title"
-      :intro="INVEST_HOME_GUIDE.intro"
-      :sections="INVEST_HOME_GUIDE.sections"
-      :faqs="INVEST_HOME_GUIDE.faqs"
-      :disclaimer="INVEST_HOME_GUIDE.disclaimer"
-    />
   </div>
 </template>
